@@ -13,6 +13,11 @@ import os
 import inspect
 from sphinx import apidoc
 
+import mock
+
+MOCK_MODULES = ['numpy', 'pykdtree', 'netCDF4']
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = mock.Mock()
 
 __location__ = os.path.join(os.getcwd(), os.path.dirname(
     inspect.getfile(inspect.currentframe())))
