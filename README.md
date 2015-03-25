@@ -13,4 +13,4 @@ For now the main features are:
 
 # Build Status
 
-![https://travis-ci.org/TUW-GEO/pygeogrid.svg?branch=master](https://travis-ci.org/TUW-GEO/pygeogrids)
+![https://travis-ci.org/TUW-GEO/pygeogrids](https://travis-ci.org/TUW-GEO/pygeogrid.svg?branch=master)
