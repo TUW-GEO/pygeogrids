@@ -11,6 +11,11 @@ For now the main features are:
 - Storage of grids and loading grids from CF-compatible netCDF files
 - Calculation of lookup tables between grids
 
+# Documentation
+
+[![Documentation Status](https://readthedocs.org/projects/pygeogrids/badge/?version=latest)](https://readthedocs.org/projects/pygeogrids/?badge=latest)
+
+
 # Build Status
 
 [![Build Status](https://travis-ci.org/TUW-GEO/pygeogrids.svg?branch=master)](https://travis-ci.org/TUW-GEO/pygeogrids)
