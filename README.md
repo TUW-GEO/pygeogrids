@@ -22,4 +22,4 @@ For now the main features are:
 
 # Test Coverage
 
-[![Coverage Status](https://coveralls.io/repos/TUW-GEO/pygeogrids/badge.svg)](https://coveralls.io/r/TUW-GEO/pygeogrids)
+[![Coverage Status](https://coveralls.io/repos/TUW-GEO/pygeogrids/badge.svg?branch=master)](https://coveralls.io/r/TUW-GEO/pygeogrids?branch=master)
