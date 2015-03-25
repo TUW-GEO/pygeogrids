@@ -14,3 +14,7 @@ For now the main features are:
 # Build Status
 
 [![Build Status](https://travis-ci.org/TUW-GEO/pygeogrids.svg?branch=master)](https://travis-ci.org/TUW-GEO/pygeogrids)
+
+# Test Coverage
+
+[![Coverage Status](https://coveralls.io/repos/TUW-GEO/pygeogrids/badge.svg)](https://coveralls.io/r/TUW-GEO/pygeogrids)
