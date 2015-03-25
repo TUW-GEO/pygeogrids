@@ -13,7 +13,7 @@ For now the main features are:
 
 # Documentation
 
-[![Documentation Status](https://readthedocs.org/projects/pygeogrids/badge/?version=latest)](https://readthedocs.org/projects/pygeogrids/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/pygeogrids/badge/?version=latest)](http://pygeogrids.readthedocs.org/)
 
 
 # Build Status
