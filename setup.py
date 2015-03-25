@@ -201,6 +201,7 @@ def stash(filename):
 
 
 class ShellCommand(object):
+
     def __init__(self, command, shell=True, cwd=None):
         self._command = command
         self._shell = shell
@@ -309,7 +310,7 @@ def version_from_keywords(keywords, tag_prefix, verbose=False):
         # "stabilization", as well as "HEAD" and "master".
         tags = set([r for r in refs if re.search(r'\d', r)])
         if verbose:
-            print("discarding '%s', no digits" % ",".join(refs-tags))
+            print("discarding '%s', no digits" % ",".join(refs - tags))
     if verbose:
         print("likely tags: %s" % ",".join(sorted(tags)))
     for ref in sorted(tags):
@@ -416,6 +417,7 @@ class cmd_version(Command):
 
 
 class cmd_build(_build):
+
     def run(self):
         versions = get_versions(verbose=True)
         _build.run(self)
@@ -433,6 +435,7 @@ if 'cx_Freeze' in sys.modules:  # cx_freeze enabled?
     from cx_Freeze.dist import build_exe as _build_exe
 
     class cmd_build_exe(_build_exe):
+
         def run(self):
             versions = get_versions(verbose=True)
             with stash(versionfile_path):
@@ -443,6 +446,7 @@ if 'cx_Freeze' in sys.modules:  # cx_freeze enabled?
 
 
 class cmd_sdist(_sdist):
+
     def run(self):
         versions = get_versions(verbose=True)
         self._generated_versions = versions
@@ -504,7 +508,7 @@ def setup_package():
           author=metadata['author'],
           author_email=metadata['author_email'],
           license=metadata['license'],
-          long_description=read('README.rst'),
+          long_description=read('README.md'),
           classifiers=metadata['classifiers'],
           test_suite='tests',
           packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
