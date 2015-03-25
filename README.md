@@ -10,3 +10,7 @@ For now the main features are:
 - conversion of grid piont indices to lat, lon
 - Storage of grids and loading grids from CF-compatible netCDF files
 - Calculation of lookup tables between grids
+
+# Build Status
+
+![https://travis-ci.org/TUW-GEO/pygeogrid.svg?branch=master](https://travis-ci.org/TUW-GEO/pygeogrids)
