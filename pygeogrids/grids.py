@@ -200,9 +200,9 @@ class BasicGrid(object):
 
         self.kdTree = None
         if setup_kdTree:
-            self._setup_kdTree()
+            self._setup_kdtree()
 
-    def _setup_kdTree(self):
+    def _setup_kdtree(self):
         """
         setup kdTree
         """
@@ -336,9 +336,9 @@ class BasicGrid(object):
 
         Parameters
         ----------
-        lon : float
+        lon : float or iterable
             longitude of point
-        lat : float
+        lat : float or iterable
             latitude of point
 
         Returns
@@ -349,16 +349,26 @@ class BasicGrid(object):
             distance of gpi to given lon, lat
             At the moment not on a great circle but in spherical cartesian coordinates
         """
+        # check if input is iterable
+        try:
+            lon[0]
+            iterable = True
+        except TypeError:
+            iterable = False
 
         if self.kdTree is None:
-            self.kdTree = NN.findGeoNN(self.activearrlon, self.activearrlat)
+            self._setup_kdtree()
 
         d, ind = self.kdTree.find_nearest_index(lon, lat, max_dist=max_dist)
 
-        if self.gpidirect and self.allpoints:
-            return ind[0], d
+        if not iterable:
+            d = d[0]
+            ind = ind[0]
 
-        return self.activegpis[ind[0]], d
+        if self.gpidirect and self.allpoints:
+            return ind, d
+
+        return self.activegpis[ind], d
 
     def gpi2lonlat(self, gpi):
         """
@@ -366,7 +376,7 @@ class BasicGrid(object):
 
         Parameters
         ----------
-        gpi : int32
+        gpi : int32 or iterable
             Grid Point Index.
 
         Returns
@@ -400,14 +410,28 @@ class BasicGrid(object):
         col : int
             column in 2D array
         """
+        # check if iterable
+        try:
+            gpi[0]
+            iterable = True
+        except TypeError:
+            iterable = False
+        gpi = np.atleast_1d(gpi)
         if len(self.shape) == 2:
             if self.gpidirect:
                 index = gpi
             else:
-                index = np.where(self.gpis == gpi)[0][0]
+                # get the indices that would sort the gpis
+                gpisorted = np.argsort(self.gpis)
+                # find the position where the gpis fit in the sorted array
+                pos = np.searchsorted(self.gpis[gpisorted], gpi)
+                index = gpisorted[pos]
 
-            index_lat = int(index / len(self.londim))
+            index_lat = (index / len(self.londim)).astype(np.int)
             index_lon = index % len(self.londim)
+            if not iterable:
+                index_lat = index_lat[0]
+                index_lon = index_lon[0]
             return index_lat, index_lon
 
         else:
@@ -437,10 +461,10 @@ class BasicGrid(object):
         """
 
         if self.kdTree is None:
-            self._setup_kdTree()
+            self._setup_kdtree()
 
         if other.kdTree is None:
-            other._setup_kdTree()
+            other._setup_kdtree()
 
         if self.kdTree.kdtree is not None and other.kdTree.kdtree is not None:
             dist, index = other.kdTree.find_nearest_index(
@@ -626,26 +650,35 @@ class CellGrid(BasicGrid):
 
         Parameters
         ----------
-        gpi : int32
+        gpi : int32 or iterable
             Grid Point Index.
 
         Returns
         -------
-        cell : int
+        cell : int or iterable
             Cell number of GPI.
-
-        Raises
-        ------
-        IndexError
-            if gpi is not found
         """
+        # check if iterable
+        try:
+            gpi[0]
+            iterable = True
+        except TypeError:
+            iterable = False
+        gpi = np.atleast_1d(gpi)
         if self.gpidirect:
-            return self.arrcell[gpi]
+            cell = self.arrcell[gpi]
         else:
-            index = np.where(self.activegpis == gpi)[0]
-            if index.size == 0:
-                raise IndexError('Not a valid gpi')
-            return self.activearrcell[index[0]]
+            # get the indices that would sort the gpis
+            gpisorted = np.argsort(self.gpis)
+            # find the position where the gpis fit in the sorted array
+            pos = np.searchsorted(self.gpis[gpisorted], gpi)
+            index = gpisorted[pos]
+            cell = self.activearrcell[index]
+
+        if not iterable:
+            cell = cell[0]
+
+        return cell
 
     def get_cells(self):
         """
