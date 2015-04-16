@@ -65,7 +65,8 @@ class Test(unittest.TestCase):
     def test_save_lonlat_nc(self):
         grid_nc.save_lonlat(self.testfile,
                             self.lons, self.lats, self.cells,
-                            subset_points=self.subset,
+                            subsets={'subset_flag': {'points': self.subset,
+                                                     'meaning': 'test_flag'}},
                             global_attrs={'test': 'test_attribute'})
 
         with Dataset(self.testfile) as nc_data:
