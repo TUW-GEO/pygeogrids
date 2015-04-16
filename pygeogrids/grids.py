@@ -74,6 +74,8 @@ class BasicGrid(object):
         if set (default) then the kdTree for nearest neighbour
         search will be built on initialization
     shape : tuple, optional
+        The regular shape of the array along dimensions (lon, lat).
+        e.g. for a 1x1 degree global regular grid the shape would be (360,180).
         if given the grid can be reshaped into the given shape
         this indicates that it is a regular grid and fills the
         attributes self.londim and self.latdim which
@@ -86,9 +88,9 @@ class BasicGrid(object):
     Attributes
     ----------
     arrlon : numpy.array
-        array of all longitudes of the grid
+        1D array of all longitudes of the grid
     arrlat : numpy.array
-        array of all latitudes of the grid
+        1D array of all latitudes of the grid
     n_gpi : int
         number of gpis in the grid
     gpidirect : boolean
