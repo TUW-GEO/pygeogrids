@@ -40,9 +40,7 @@ from pygeogrids import CellGrid, BasicGrid
 
 
 def save_lonlat(filename, arrlon, arrlat, arrcell=None,
-                gpis=None, subset_points=None, subset_name='land_points',
-                subset_meaning="water land",
-                global_attrs=None):
+                gpis=None, subsets={}, global_attrs=None):
     """
     saves grid information to netCDF file
 
@@ -58,14 +56,11 @@ def save_lonlat(filename, arrlon, arrlat, arrcell=None,
         array of cell numbers
     gpis : numpy.array, optional
         gpi numbers if not index of arrlon, arrlat
-    subset_points : numpy.array, optional
-        and indication if the given grid point is over land
-        must be an indices into arrlon, arrlat
-    subset_name : string, optional
-        long_name of the variable 'subset_flag'
-        if the subset symbolises something other than a land/sea mask
-    subset_meaning : string, optional
-        will be written into flag_meanings metadata of variable 'subset_flag'
+    subsets : dict of dicts, optional
+        keys : long_name of the netcdf variables
+        values : dict with the following keys: points, meaning
+        e.g. subsets = {'subset_flag': {'points': numpy.array,
+                                        'meaning': 'water, land'}}
     global_attrs : dict, optional
         if given will be written as global attributs into netCDF file
     """
@@ -145,26 +140,26 @@ def save_lonlat(filename, arrlon, arrlat, arrcell=None,
             setattr(cell, 'units', '')
             setattr(cell, 'valid_range', [np.min(arrcell), np.max(arrcell)])
 
-        if subset_points is not None:
-            land_flag = ncfile.createVariable('subset_flag',
-                                              np.dtype('int8').char,
-                                              dim)
+        if subsets:
+            for subset_name in subsets.keys():
+                flag = ncfile.createVariable(subset_name, np.dtype('int8').char,
+                                             dim)
 
-            # create landflag array based on shape of data
-            lf = np.zeros_like(gpivalues)
-            if len(dim) == 2:
-                lf = lf.flatten()
-            lf[subset_points] = 1
-            if len(dim) == 2:
-                lf = lf.reshape(latsize, lonsize)
+                # create flag array based on shape of data
+                lf = np.zeros_like(gpivalues)
+                if len(dim) == 2:
+                    lf = lf.flatten()
+                lf[subsets[subset_name]['points']] = 1
+                if len(dim) == 2:
+                    lf = lf.reshape(latsize, lonsize)
 
-            land_flag[:] = lf
-            setattr(land_flag, 'long_name', subset_name)
-            setattr(land_flag, 'units', '')
-            setattr(land_flag, 'coordinates', 'lat lon')
-            setattr(land_flag, 'flag_values', np.arange(2, dtype=np.int8))
-            setattr(land_flag, 'flag_meanings', 'water land')
-            setattr(land_flag, 'valid_range', [0, 1])
+                flag[:] = lf
+                setattr(flag, 'long_name', subset_name)
+                setattr(flag, 'units', '')
+                setattr(flag, 'coordinates', 'lat lon')
+                setattr(flag, 'flag_values', np.arange(2, dtype=np.int8))
+                setattr(flag, 'flag_meanings', subsets[subset_name]['meaning'])
+                setattr(flag, 'valid_range', [0, 1])
 
         s = "%Y-%m-%d %H:%M:%S"
         date_created = datetime.now().strftime(s)
@@ -184,8 +179,8 @@ def save_lonlat(filename, arrlon, arrlat, arrcell=None,
             ncfile.setncatts(global_attrs)
 
 
-def save_grid(filename, grid, subset_name='land_points',
-              subset_meaning="water land", global_attrs=None):
+def save_grid(filename, grid, subset_name='subset_flag',
+              subset_meaning="water, land", global_attrs=None):
     """
     save a BasicGrid or CellGrid to netCDF
     it is assumed that a subset should be used as land_points
@@ -197,10 +192,10 @@ def save_grid(filename, grid, subset_name='land_points',
     grid : BasicGrid or CellGrid object
         grid whose definition to save to netCDF
     subset_name : string, optional
-        long_name of the variable 'subset_flag'
+        long_name of the netcdf variable
         if the subset symbolises something other than a land/sea mask
     subset_meaning : string, optional
-        will be written into flag_meanings metadata of variable 'subset_flag'
+        will be written into flag_meanings metadata of variable 'subset_name'
     global_attrs : dict, optional
         if given will be written as global attributs into netCDF file
     """
@@ -220,13 +215,13 @@ def save_grid(filename, grid, subset_name='land_points',
             global_attrs = {}
         global_attrs['shape'] = grid.shape
 
+    subsets = {subset_name: {'points': grid.subset, 'meaning': subset_meaning}}
+
     save_lonlat(filename, grid.arrlon, grid.arrlat, arrcell=arrcell,
-                gpis=gpis, subset_points=grid.subset, subset_name=subset_name,
-                subset_meaning=subset_meaning,
-                global_attrs=global_attrs)
+                gpis=gpis, subsets=subsets, global_attrs=global_attrs)
 
 
-def load_grid(filename):
+def load_grid(filename, subset_flag='subset_flag'):
     """
     load a grid from netCDF file
 
@@ -234,6 +229,8 @@ def load_grid(filename):
     ----------
     filename : string
         filename
+    subset_flag : string, optional
+        name of the subset to load.
 
     Returns
     -------
@@ -280,17 +277,17 @@ def load_grid(filename):
             lons = lons.flatten('F')
             lats = lats.flatten('F')
 
-            if 'subset_flag' in nc_data.variables.keys():
+            if subset_flag in nc_data.variables.keys():
                 subset = np.where(
-                    nc_data.variables['subset_flag'][:].flatten() == 1)[0]
+                    nc_data.variables[subset_flag][:].flatten() == 1)[0]
 
         elif len(shape) == 1:
             lons = nc_data.variables['lon'][:]
             lats = nc_data.variables['lat'][:]
 
             # determine if it has a subset
-            if 'subset_flag' in nc_data.variables.keys():
-                subset = np.where(nc_data.variables['subset_flag'][:] == 1)[0]
+            if subset_flag in nc_data.variables.keys():
+                subset = np.where(nc_data.variables[subset_flag][:] == 1)[0]
 
         if arrcell is None:
             # BasicGrid
