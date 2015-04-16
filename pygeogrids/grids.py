@@ -33,6 +33,7 @@ Created on Aug 26, 2013
 import pygeogrids.nearest_neighbor as NN
 
 import numpy as np
+import numpy.testing as nptest
 try:
     from itertools import izip as zip
 except ImportError:
@@ -540,8 +541,17 @@ class BasicGrid(object):
         -------
         result : boolean
         """
-        lonsame = np.all(self.arrlon == other.arrlon)
-        latsame = np.all(self.arrlat == other.arrlat)
+        # only test to certain significance for float variables
+        try:
+            nptest.assert_allclose(self.arrlon, other.arrlon)
+            lonsame = True
+        except AssertionError:
+            lonsame = False
+        try:
+            nptest.assert_allclose(self.arrlat, other.arrlat)
+            latsame = True
+        except AssertionError:
+            latsame = False
         gpisame = np.all(self.gpis == other.gpis)
         if self.subset is not None and other.subset is not None:
             subsetsame = np.all(self.subset == other.subset)

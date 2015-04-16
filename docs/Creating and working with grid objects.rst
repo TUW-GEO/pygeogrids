@@ -153,10 +153,11 @@ calculate a lookup table once and reuse it later.
 
 .. parsed-literal::
 
-    [ 17.29906911 -35.38535729 -71.93633461 -45.50119896  21.44038298
-     -51.8807349  -53.74357805  86.06241248  80.23097461 -70.56187193]
-    [ 117.908495     55.71301743 -107.521213   -167.90819856   70.20423657
-     -153.14746009  -12.72514138  -44.59386791   25.45141516    3.75179355]
+    [ -1.54836122e+01  -1.35887580e+00  -4.78383560e-02   4.78709682e+00
+       1.11369002e+01   3.12077283e+01  -8.71094503e+01   2.20725149e+00
+       6.64563916e+01   7.87705109e+01]
+    [ 121.05539154  111.61193334 -131.22315478  -46.73641204   15.1126928
+     -165.14751769 -115.24386825  -56.14158745    9.9695647   143.61467711]
 
 
 Now lets calculate a lookup table to the regular 10x10° grid we created
@@ -170,7 +171,7 @@ earlier
 
 .. parsed-literal::
 
-    [281 455 583 469 241 506 520  13  20 594]
+    [390 353 328 301 271 181 618 300  90  68]
 
 
 The lookup table contains the grid point indices of the other grid,
@@ -185,8 +186,8 @@ autogrid in this case.
 
 .. parsed-literal::
 
-    [ 15. -35. -75. -45.  25. -55. -55.  85.  85. -75.]
-    [ 115.   55. -105. -165.   75. -155.  -15.  -45.   25.    5.]
+    [-15.  -5.  -5.   5.  15.  35. -85.   5.  65.  75.]
+    [ 125.  115. -135.  -45.   15. -165. -115.  -55.    5.  145.]
 
 
 Storing and loading grids
@@ -202,4 +203,16 @@ Grids can be stored to disk as CF compliant netCDF files
 .. code:: python
 
     loadedgrid = nc.load_grid('example.nc')
+
+.. code:: python
+
+    loadedgrid == randgrid
+
+
+
+
+.. parsed-literal::
+
+    True
+
 
