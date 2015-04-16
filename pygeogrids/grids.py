@@ -33,6 +33,7 @@ Created on Aug 26, 2013
 import pygeogrids.nearest_neighbor as NN
 
 import numpy as np
+import numpy.testing as nptest
 try:
     from itertools import izip as zip
 except ImportError:
@@ -74,6 +75,8 @@ class BasicGrid(object):
         if set (default) then the kdTree for nearest neighbour
         search will be built on initialization
     shape : tuple, optional
+        The regular shape of the array along dimensions (lon, lat).
+        e.g. for a 1x1 degree global regular grid the shape would be (360,180).
         if given the grid can be reshaped into the given shape
         this indicates that it is a regular grid and fills the
         attributes self.londim and self.latdim which
@@ -86,9 +89,9 @@ class BasicGrid(object):
     Attributes
     ----------
     arrlon : numpy.array
-        array of all longitudes of the grid
+        1D array of all longitudes of the grid
     arrlat : numpy.array
-        array of all latitudes of the grid
+        1D array of all latitudes of the grid
     n_gpi : int
         number of gpis in the grid
     gpidirect : boolean
@@ -538,8 +541,17 @@ class BasicGrid(object):
         -------
         result : boolean
         """
-        lonsame = np.all(self.arrlon == other.arrlon)
-        latsame = np.all(self.arrlat == other.arrlat)
+        # only test to certain significance for float variables
+        try:
+            nptest.assert_allclose(self.arrlon, other.arrlon)
+            lonsame = True
+        except AssertionError:
+            lonsame = False
+        try:
+            nptest.assert_allclose(self.arrlat, other.arrlat)
+            latsame = True
+        except AssertionError:
+            latsame = False
         gpisame = np.all(self.gpis == other.gpis)
         if self.subset is not None and other.subset is not None:
             subsetsame = np.all(self.subset == other.subset)

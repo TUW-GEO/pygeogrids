@@ -48,8 +48,11 @@ class Test(unittest.TestCase):
         self.subset = np.sort(np.random.choice(np.arange(self.lats.size),
                                                size=500, replace=False))
         self.basic = grids.BasicGrid(self.lons, self.lats, subset=self.subset,
-                                     shape=(180, 360))
-        self.basic_irregular = grids.BasicGrid(self.lons, self.lats,
+                                     shape=(360, 180))
+        self.basic_generated = grids.genreg_grid(1, 1)
+        self.basic_irregular = grids.BasicGrid(np.random.random(360 * 180) * 360 - 180,
+                                               np.random.random(
+                                                   360 * 180) * 180 - 90,
                                                subset=self.subset)
         self.cellgrid = grids.CellGrid(self.lons, self.lats, self.cells,
                                        subset=self.subset)
@@ -87,8 +90,25 @@ class Test(unittest.TestCase):
             nptest.assert_array_equal(self.subset,
                                       np.where(nc_data.variables['subset_flag'][:].flatten() == 1)[0])
             assert nc_data.test == 'test_attribute'
-            assert nc_data.shape[0] == 180
-            assert nc_data.shape[1] == 360
+            assert nc_data.shape[1] == 180
+            assert nc_data.shape[0] == 360
+
+    def test_save_basicgrid_generated(self):
+        grid_nc.save_grid(self.testfile,
+                          self.basic,
+                          global_attrs={'test': 'test_attribute'})
+
+        with Dataset(self.testfile) as nc_data:
+            nptest.assert_array_equal(np.unique(self.lats)[::-1],
+                                      nc_data.variables['lat'][:])
+            nptest.assert_array_equal(np.unique(self.lons),
+                                      nc_data.variables['lon'][:])
+
+            nptest.assert_array_equal(self.subset,
+                                      np.where(nc_data.variables['subset_flag'][:].flatten() == 1)[0])
+            assert nc_data.test == 'test_attribute'
+            assert nc_data.shape[1] == 180
+            assert nc_data.shape[0] == 360
 
     def test_save_basicgrid_irregular_nc(self):
         grid_nc.save_grid(self.testfile,
@@ -96,8 +116,10 @@ class Test(unittest.TestCase):
                           global_attrs={'test': 'test_attribute'})
 
         with Dataset(self.testfile) as nc_data:
-            nptest.assert_array_equal(self.lats, nc_data.variables['lat'][:])
-            nptest.assert_array_equal(self.lons, nc_data.variables['lon'][:])
+            nptest.assert_array_equal(
+                self.basic_irregular.arrlat, nc_data.variables['lat'][:])
+            nptest.assert_array_equal(
+                self.basic_irregular.arrlon, nc_data.variables['lon'][:])
             nptest.assert_array_equal(self.subset,
                                       np.where(nc_data.variables['subset_flag'][:] == 1)[0])
             assert nc_data.test == 'test_attribute'

@@ -73,8 +73,8 @@ def save_lonlat(filename, arrlon, arrlat, arrcell=None,
                 type(global_attrs['shape']) is not int and
                 len(global_attrs['shape']) == 2):
 
-            latsize = global_attrs['shape'][0]
-            lonsize = global_attrs['shape'][1]
+            latsize = global_attrs['shape'][1]
+            lonsize = global_attrs['shape'][0]
             ncfile.createDimension("lat", latsize)
             ncfile.createDimension("lon", lonsize)
             arrlat = np.unique(arrlat)[::-1]  # sorts arrlat descending
@@ -113,7 +113,7 @@ def save_lonlat(filename, arrlon, arrlat, arrcell=None,
             setattr(gpi, 'valid_range', [np.min(gpivalues), np.max(gpivalues)])
             gpidirect = 0x0b
 
-        latitude = ncfile.createVariable('lat', np.dtype('float32').char,
+        latitude = ncfile.createVariable('lat', np.dtype('float64').char,
                                          dim[0])
         latitude[:] = arrlat
         setattr(latitude, 'long_name', 'Latitude')
@@ -125,7 +125,7 @@ def save_lonlat(filename, arrlon, arrlat, arrcell=None,
             londim = dim[1]
         else:
             londim = dim[0]
-        longitude = ncfile.createVariable('lon', np.dtype('float32').char,
+        longitude = ncfile.createVariable('lon', np.dtype('float64').char,
                                           londim)
         longitude[:] = arrlon
         setattr(longitude, 'long_name', 'Longitude')

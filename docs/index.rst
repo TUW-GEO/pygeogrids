@@ -2,36 +2,38 @@
 pygeogrids
 ==========
 
-This is the documentation of **pygeogrids**.
 
-.. note::
+pygeogrids is a package for creation and handling of Discrete Global Grids.
 
-    This is the main page of your project's `Sphinx <http://sphinx-doc.org/>`_
-    documentation. It is formatted in `reStructuredText
-    <http://sphinx-doc.org/rest.html>`__. Add additional pages by creating
-    rst-files in ``docs`` and adding them to the `toctree
-    <http://sphinx-doc.org/markup/toctree.html>`_ below. Use then
-    `references <http://sphinx-doc.org/markup/inline.html>`__ in order to link
-    them from this page. It is also possible to refer to the documentation of
-    other Python packages with the `Python domain syntax
-    <http://sphinx-doc.org/domains.html#the-python-domain>`__. By default you
-    can reference the documentation of `Sphinx <http://sphinx.pocoo.org>`__,
-    `Python <http://docs.python.org/>`__, `matplotlib
-    <http://matplotlib.sourceforge.net>`__, `NumPy
-    <http://docs.scipy.org/doc/numpy>`__, `Scikit-Learn
-    <http://scikit-learn.org/stable>`__, `Pandas
-    <http://pandas.pydata.org/pandas-docs/stable>`__, `SciPy
-    <http://docs.scipy.org/doc/scipy/reference/>`__. You can add more by
-    extending the ``intersphinx_mapping`` in your Sphinx's ``conf.py``.
+It can be used to define a grid on the globe using numpy arrays of longitude and
+latitude.  These grids can also have unique grid point numbers. The grids must
+not be valid globally but can e.g. only cover the Continents.
+
+When a grid is defined it can be used to quickly find the nearest neigbor of a a
+given lat, lon coordinate on the grid. For that the lon, lat coordinates are
+converted to Cartesian coordinates. This approach is of limited use for high
+resolution data which might rely on a specific geodetic datum.
+
+The class :class:`pygeogrids.grids.CellGrid` extends this basic grid with the
+ability to store a additional cell number for each grid point. This can be used
+to tile a grid in e.g. 5x5° cells. We often store remote sensing data in cells
+to partition a dataset into manageable parts. This link with the grid class
+enables us to easily find the link between a grid point and the cell file in
+which the relevant data is stored.
+
+Please see the examples in this documentation as well as the `pytesmo
+<https://github.com/TUW-GEO/pytesmo>`_ code for real world usage examples.
+
+ 
 
 Contents
 ========
 
 .. toctree::
    :maxdepth: 2
-
+               
+   Creating and working with grid objects.rst
    License <license>
-   Authors <authors>
    Module Reference <_rst/modules>
 
 
