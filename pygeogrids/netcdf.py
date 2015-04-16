@@ -59,8 +59,8 @@ def save_lonlat(filename, arrlon, arrlat, arrcell=None,
     subsets : dict of dicts, optional
         keys : long_name of the netcdf variables
         values : dict with the following keys: points, meaning
-        e.g. subsets = {'land_flag': {'points': numpy.array,
-                                      'meaning': 'water, land'}}
+        e.g. subsets = {'subset_flag': {'points': numpy.array,
+                                        'meaning': 'water, land'}}
     global_attrs : dict, optional
         if given will be written as global attributs into netCDF file
     """
@@ -179,7 +179,7 @@ def save_lonlat(filename, arrlon, arrlat, arrcell=None,
             ncfile.setncatts(global_attrs)
 
 
-def save_grid(filename, grid, subset_name='land_flag',
+def save_grid(filename, grid, subset_name='subset_flag',
               subset_meaning="water, land", global_attrs=None):
     """
     save a BasicGrid or CellGrid to netCDF
@@ -229,6 +229,8 @@ def load_grid(filename, subset_flag='subset_flag'):
     ----------
     filename : string
         filename
+    subset_flag : string, optional
+        name of the subset to load.
 
     Returns
     -------
