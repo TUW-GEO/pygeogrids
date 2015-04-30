@@ -182,6 +182,14 @@ class Test_2Dgrid(unittest.TestCase):
         assert lon == lon_should
         assert lat == lat_should
 
+    def test_tocellgrid(self):
+        """
+        test if to_cell_grid method works correctly
+        """
+        cell_grid = self.grid.to_cell_grid()
+        result = grids.BasicGrid.__eq__(self.grid, cell_grid)
+        assert result
+
 
 def test_genreggrid():
     """

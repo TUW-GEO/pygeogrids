@@ -555,7 +555,8 @@ class BasicGrid(object):
             gpis = None
         else:
             gpis = self.gpis
-        return CellGrid(self.arrlon, self.arrlat, cells, gpis=gpis, subset=self.subset)
+        return CellGrid(self.arrlon, self.arrlat, cells, gpis=gpis, subset=self.subset,
+                        shape=self.shape)
 
     def __eq__(self, other):
         """
