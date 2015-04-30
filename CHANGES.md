@@ -1,6 +1,7 @@
 # v0.x #
 - added support for saving more subsets and loading a certain one in/from a netcdf grid file
 - fix #15 by setting correct shape for derived cell grids
+- fix issue #14 of gpi2rowcol input types
 
 # v0.1 #
 - Initial version pulled out of pytesmo

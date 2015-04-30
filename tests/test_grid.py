@@ -144,6 +144,17 @@ class Test_2Dgrid(unittest.TestCase):
         assert row == row_should
         assert column == column_should
 
+    def test_gpi2rowcol_np_int(self):
+        """
+        test if gpi to row column lookup works correctly
+        """
+        gpi = np.array([200])[0]
+        row_should = 1
+        column_should = 200 - 144
+        row, column = self.grid.gpi2rowcol(gpi)
+        assert row == row_should
+        assert column == column_should
+
     def test_gpi2rowcol_iterable(self):
         """
         test if gpi to row column lookup works correctly
