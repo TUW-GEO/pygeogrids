@@ -414,7 +414,7 @@ class BasicGrid(object):
         try:
             gpi[0]
             iterable = True
-        except TypeError:
+        except (TypeError, IndexError):
             iterable = False
         gpi = np.atleast_1d(gpi)
         if len(self.shape) == 2:
