@@ -23,3 +23,9 @@ For now the main features are:
 # Test Coverage
 
 [![Coverage Status](https://coveralls.io/repos/TUW-GEO/pygeogrids/badge.svg?branch=master)](https://coveralls.io/r/TUW-GEO/pygeogrids?branch=master)
+
+#Citing, DOI
+
+If you want to cite pygeogrids then please use the DOI of the version you used.
+
+[![DOI](https://zenodo.org/badge/12761/TUW-GEO/pygeogrids.svg)](http://dx.doi.org/10.5281/zenodo.17406)
