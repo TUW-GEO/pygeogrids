@@ -67,6 +67,14 @@ class TestFindNearestNeighbor(unittest.TestCase):
         assert lat[0] == 45.5
         assert lat[1] == -16.5
 
+    def test_nearest_neighbor_numpy_single(self):
+        gpi, dist = self.grid.find_nearest_gpi(
+            np.array([145.1, 90.2])[0], np.array([45.8, -16.3])[0])
+        assert gpi == 16165
+        lon, lat = self.grid.gpi2lonlat(gpi)
+        assert lon == 145.5
+        assert lat == 45.5
+
 
 class TestCellGrid(unittest.TestCase):
 
@@ -99,6 +107,14 @@ class TestCellGrid(unittest.TestCase):
         gpi = [200, 255]
         cell = self.cellgrid.gpi2cell(gpi)
         assert np.all(cell == [1043, 2015])
+
+    def test_gpi2cell_numpy_single(self):
+        """
+        test if gpi to row column lookup works correctly
+        """
+        gpi = np.array([200, 255])[0]
+        cell = self.cellgrid.gpi2cell(gpi)
+        assert cell == 1043
 
     def test_gpi2cell_custom_gpis(self):
         """

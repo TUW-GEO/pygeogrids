@@ -350,11 +350,7 @@ class BasicGrid(object):
             At the moment not on a great circle but in spherical cartesian coordinates
         """
         # check if input is iterable
-        try:
-            lon[0]
-            iterable = True
-        except TypeError:
-            iterable = False
+        iterable = _element_iterable(lon)
 
         if self.kdTree is None:
             self._setup_kdtree()
@@ -411,11 +407,8 @@ class BasicGrid(object):
             column in 2D array
         """
         # check if iterable
-        try:
-            gpi[0]
-            iterable = True
-        except (TypeError, IndexError):
-            iterable = False
+        iterable = _element_iterable(gpi)
+
         gpi = np.atleast_1d(gpi)
         if len(self.shape) == 2:
             if self.gpidirect:
@@ -660,11 +653,8 @@ class CellGrid(BasicGrid):
             Cell number of GPI.
         """
         # check if iterable
-        try:
-            gpi[0]
-            iterable = True
-        except TypeError:
-            iterable = False
+        iterable = _element_iterable(gpi)
+
         gpi = np.atleast_1d(gpi)
         if self.gpidirect:
             cell = self.arrcell[gpi]
@@ -914,3 +904,27 @@ def genreg_grid(grd_spc_lat=1, grd_spc_lon=1,
     lat_dim = np.arange(maxlat - grd_spc_lat / 2.0, minlat, -grd_spc_lat)
 
     return gridfromdims(lon_dim, lat_dim)
+
+
+def _element_iterable(el):
+    """
+    Test if a element is iterable
+
+    Parameters
+    ----------
+    el: object
+
+
+    Returns
+    -------
+    iterable: boolean
+       if True then then el is iterable
+       if Fales then not
+    """
+    try:
+        el[0]
+        iterable = True
+    except (TypeError, IndexError):
+        iterable = False
+
+    return iterable

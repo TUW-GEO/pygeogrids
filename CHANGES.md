@@ -1,3 +1,6 @@
+# v0.1.2 #
+- fix issue #19 by refactoring the iterable checking into own function
+
 # v0.1.1 #
 - added support for saving more subsets and loading a certain one in/from a netcdf grid file
 - fix #15 by setting correct shape for derived cell grids
