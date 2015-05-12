@@ -11,6 +11,10 @@ For now the main features are:
 - Storage of grids and loading grids from CF-compatible netCDF files
 - Calculation of lookup tables between grids
 
+## Optional Requirements
+
+- [pykdtree](https://github.com/storpipfugl/pykdtree) or [scipy](http://www.scipy.org/) if you want to use the nearest neighbor search. pykdtree is much faster than the scipy implementation but it is at the moment not available for Windows systems.
+
 # Documentation
 
 [![Documentation Status](https://readthedocs.org/projects/pygeogrids/badge/?version=latest)](http://pygeogrids.readthedocs.org/)
