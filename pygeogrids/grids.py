@@ -128,13 +128,12 @@ class BasicGrid(object):
     shape : tuple, optional
         if given during initialization then this is
         the shape the grid can be reshaped to
-        this only makes sense for regular lat,lon grids
     latdim : numpy.array, optional
-        if shape is given this attribute has contains
-        all latitudes that make up the regular lat,lon grid
+        if shape is given this attribute contains all latitudes according to
+        the provided shape that make up the grid
     londim : numpy.array, optional
-        if shape is given this attribute has contains
-        all longitudes that make up the regular lat,lon grid
+        if shape is given this attribute contains all longitudes according to
+        the provided shape that make up the grid
     """
 
     def __init__(self, lon, lat, gpis=None, subset=None, setup_kdTree=True,
@@ -165,10 +164,8 @@ class BasicGrid(object):
                                           " Length of lon array is not divisible by shape[1] without rest")
 
             self.shape = shape
-            self.latdim = np.reshape(
-                self.arrlat, (self.shape[1], self.shape[0]))[:, 0]
-            self.londim = np.reshape(
-                self.arrlon, (self.shape[1], self.shape[0]))[0, :]
+            self.latdim = np.reshape(self.arrlat, self.shape)
+            self.londim = np.reshape(self.arrlon, self.shape)
 
         else:
             self.shape = tuple([len(self.arrlon)])
@@ -420,8 +417,8 @@ class BasicGrid(object):
                 pos = np.searchsorted(self.gpis[gpisorted], gpi)
                 index = gpisorted[pos]
 
-            index_lat = (index / len(self.londim)).astype(np.int)
-            index_lon = index % len(self.londim)
+            index_lat = (index / self.shape[0]).astype(np.int)
+            index_lon = index % self.shape[0]
             if not iterable:
                 index_lat = index_lat[0]
                 index_lon = index_lon[0]

@@ -175,9 +175,9 @@ class Test_2Dgrid(unittest.TestCase):
         """
         test if gpi to row column lookup works correctly
         """
-        gpi = [200, 255]
-        row_should = [1, 1]
-        column_should = [200 - 144, 255 - 144]
+        gpi = [143, 200, 255]
+        row_should = [0, 1, 1]
+        column_should = [143, 200 - 144, 255 - 144]
         row, column = self.grid.gpi2rowcol(gpi)
         assert np.all(row == row_should)
         assert np.all(column == column_should)
