@@ -75,14 +75,14 @@ class BasicGrid(object):
         if set (default) then the kdTree for nearest neighbour
         search will be built on initialization
     shape : tuple, optional
-        The regular shape of the array along dimensions (lon, lat).
+        The shape of the grid array in 2-d space.
         e.g. for a 1x1 degree global regular grid the shape would be (360,180).
         if given the grid can be reshaped into the given shape
         this indicates that it is a regular grid and fills the
-        attributes self.londim and self.latdim which
-        define the grid only be the meridian coordinates(self.londim) and
-        the coordinates of the circles of latitude(self.latdim).
-        The shape has to be given as (latdim, londim)
+        attributes self.lon2d and self.lat2d which
+        define the grid only be the meridian coordinates(self.lon2d) and
+        the coordinates of the circles of latitude(self.lat2d).
+        The shape has to be given as (lon2d, lat2d)
         It it is not given the shape is set to the length of the input
         lon and lat arrays.
 
@@ -128,12 +128,12 @@ class BasicGrid(object):
     shape : tuple, optional
         if given during initialization then this is
         the shape the grid can be reshaped to
-    latdim : numpy.array, optional
+    lat2d : numpy.array, optional
         if shape is given this attribute contains all latitudes according to
-        the provided shape that make up the grid
-    londim : numpy.array, optional
+        the provided 2d-shape that make up the grid
+    lon2d : numpy.array, optional
         if shape is given this attribute contains all longitudes according to
-        the provided shape that make up the grid
+        the provided 2d-shape that make up the grid
     """
 
     def __init__(self, lon, lat, gpis=None, subset=None, setup_kdTree=True,
@@ -164,8 +164,8 @@ class BasicGrid(object):
                                           " Length of lon array is not divisible by shape[1] without rest")
 
             self.shape = shape
-            self.latdim = np.reshape(self.arrlat, self.shape)
-            self.londim = np.reshape(self.arrlon, self.shape)
+            self.lat2d = np.reshape(self.arrlat, self.shape)
+            self.lon2d = np.reshape(self.arrlon, self.shape)
 
         else:
             self.shape = tuple([len(self.arrlon)])
