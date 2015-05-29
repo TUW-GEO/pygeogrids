@@ -1,4 +1,4 @@
-# v0.1.x #
+# v0.1.3 #
 
 - change meaning and rename grid dimensions to lon2d, lat2d. They do now
   represent 2d arrays of latitudes and longitudes which means that they no
