@@ -1,3 +1,10 @@
+# v0.1.x #
+
+- change meaning and rename grid dimensions to lon2d, lat2d. They do now
+  represent 2d arrays of latitudes and longitudes which means that they no
+  longer have to be regular in order to be able to have a shape. This is useful
+  for e.g. orbit data
+
 # v0.1.2 #
 - fix issue #19 by refactoring the iterable checking into own function
 - made pykdtree an optional requirement see issue #18
