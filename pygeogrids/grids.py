@@ -562,6 +562,24 @@ class BasicGrid(object):
         return CellGrid(self.arrlon, self.arrlat, cells, gpis=gpis,
                         subset=self.subset, shape=self.shape)
 
+    def subgrid_from_gpis(self, gpis):
+        """
+        Generate a subgrid for given gpis.
+
+        Parameters
+        ----------
+        gpis : int, numpy.ndarray
+            Grid point indices.
+
+        Returns
+        -------
+        grid : BasicGrid
+            Subgrid.
+        """
+        sublons, sublats = self.gpi2lonlat(gpis)
+
+        return BasicGrid(sublons, sublats, gpis)
+
     def __eq__(self, other):
         """
         Compare arrlon, arrlat, gpis, subsets and shape.
@@ -728,14 +746,14 @@ class CellGrid(BasicGrid):
                     self.subarrlats[n],
                     self.subcells[n])
 
-    def grid_points_for_cell(self, cell):
+    def grid_points_for_cell(self, cells):
         """
         Get all grid points for a given cell number.
 
         Parameters
         ----------
-        cell : int
-            Cell number.
+        cell : int, numpy.ndarray
+            Cell numbers.
 
         Returns
         -------
@@ -746,11 +764,22 @@ class CellGrid(BasicGrid):
         lats : numpy.array
             Latitudes belonging to the gpis.
         """
-        cell_index = np.where(cell == self.activearrcell)
+        cells = np.atleast_1d(cells)
 
-        return (self.activegpis[cell_index],
-                self.activearrlon[cell_index],
-                self.activearrlat[cell_index])
+        gpis = []
+        lons = []
+        lats = []
+        for cell in cells:
+            cell_index = np.where(cell == self.activearrcell)
+            gpis.append(self.activegpis[cell_index])
+            lons.append(self.activearrlon[cell_index])
+            lats.append(self.activearrlat[cell_index])
+
+        gpis = np.array(gpis)
+        lons = np.array(lons)
+        lats = np.array(lats)
+
+        return gpis, lons, lats
 
     def split(self, n):
         """
@@ -821,6 +850,25 @@ class CellGrid(BasicGrid):
             for gpi in cell_gpis:
                 yield self.subgpis[n][gpi], self.subarrlons[n][gpi], \
                     self.subarrlats[n][gpi], cell
+
+    def subgrid_from_cells(self, cells):
+        """
+        Generate a subgrid for given cells.
+
+        Parameters
+        ----------
+        cells : int, numpy.ndarray
+            Cell numbers.
+
+        Returns
+        -------
+        grid : CellGrid
+            Subgrid.
+        """
+        subgpis, sublons, sublats = self.grid_points_for_cell(cells)
+        subcells = self.gpi2cell(subgpis)
+
+        return CellGrid(sublons, sublats, subcells, subgpis)
 
     def __eq__(self, other):
         """
