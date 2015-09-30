@@ -1,3 +1,7 @@
+# v0.1.4
+
+- fix bug in lookuptable generation when gpis have custom ordering
+
 # v0.1.3 #
 
 - change meaning and rename grid dimensions to lon2d, lat2d. They do now
