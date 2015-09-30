@@ -1,4 +1,5 @@
 language: python
+sudo: false
 notifications:
   email: false
 python:
@@ -6,8 +7,8 @@ python:
   - "2.7"
   - "3.3"
   - "3.4"
+  - "3.5"
 install:
-  - sudo apt-get update
   # You may want to periodically update this, although the conda update
   # conda line below will keep everything up-to-date.  We do this
   # conditionally because it saves us some downloading if the version is
