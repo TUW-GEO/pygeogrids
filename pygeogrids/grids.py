@@ -475,6 +475,10 @@ class BasicGrid(object):
                 gpi_lut = np.empty_like(self.gpis)
                 gpi_lut.fill(-1)
                 gpi_lut[self.subset] = active_lut
+            elif not self.gpidirect:
+                gpi_lut = np.empty(np.max(self.activegpis)+1, dtype=np.int64)
+                gpi_lut.fill(-1)
+                gpi_lut[self.activegpis] = active_lut
             else:
                 gpi_lut = active_lut
 
