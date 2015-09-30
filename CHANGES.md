@@ -1,6 +1,7 @@
 # v0.1.4
 
 - fix bug in lookuptable generation when gpis have custom ordering
+- add functions for getting subgrids from cells and gpis
 
 # v0.1.3 #
 

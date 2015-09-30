@@ -147,6 +147,13 @@ class BasicGrid(object):
         necessary
 
         """
+        lon = np.asanyarray(lon)
+        lat = np.asanyarray(lat)
+        if gpis is not None:
+            gpis = np.asanyarray(gpis)
+        if subset is not None:
+            subset = np.asanyarray(subset)
+
         if lat.shape != lon.shape:
             raise GridDefinitionError(
                 "lat and lon np.arrays have to have equal shapes")
@@ -662,6 +669,8 @@ class CellGrid(BasicGrid):
         super(CellGrid, self).__init__(lon, lat, gpis=gpis, subset=subset,
                                        setup_kdTree=setup_kdTree, **kwargs)
 
+        cells = np.asanyarray(cells)
+
         if self.arrlon.shape != cells.shape:
             raise GridDefinitionError(
                 "lat, lon and cells np.arrays have to have equal shapes")
@@ -854,6 +863,25 @@ class CellGrid(BasicGrid):
             for gpi in cell_gpis:
                 yield self.subgpis[n][gpi], self.subarrlons[n][gpi], \
                     self.subarrlats[n][gpi], cell
+
+    def subgrid_from_gpis(self, gpis):
+        """
+        Generate a subgrid for given gpis.
+
+        Parameters
+        ----------
+        gpis : int, numpy.ndarray
+            Grid point indices.
+
+        Returns
+        -------
+        grid : BasicGrid
+            Subgrid.
+        """
+        sublons, sublats = self.gpi2lonlat(gpis)
+        subcells = self.gpi2cell(gpis)
+
+        return CellGrid(sublons, sublats, subcells, gpis)
 
     def subgrid_from_cells(self, cells):
         """

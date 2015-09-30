@@ -164,12 +164,13 @@ class TestCellGrid(unittest.TestCase):
         cell = self.custom_gpi_cell_grid.gpi2cell(gpi)
         assert cell == 1549
 
-    def test_subgrid(self):
+    def test_subgrid_from_cells(self):
         """
         Test subgrid selection.
         """
         cells = [1549, 577]
         subgrid = self.cellgrid.subgrid_from_cells(cells)
+        assert type(subgrid) == type(self.cellgrid)
 
         for cell in cells:
             gpis, lons, lats = subgrid.grid_points_for_cell(cell)
@@ -178,6 +179,36 @@ class TestCellGrid(unittest.TestCase):
             nptest.assert_equal(gpis, orig_gpis)
             nptest.assert_equal(lons, orig_lons)
             nptest.assert_equal(lats, orig_lats)
+
+    def test_subgrid_from_gpis(self):
+        """
+        Test subgrid selection.
+        """
+        gpis = [200, 255]
+        subgrid = self.cellgrid.subgrid_from_gpis(gpis)
+        assert type(subgrid) == type(self.cellgrid)
+        lons_should, lats_should = self.cellgrid.gpi2lonlat(gpis)
+        cells_should = self.cellgrid.gpi2cell(gpis)
+        subgrid_should = grids.CellGrid(
+            lons_should, lats_should, cells_should, gpis=gpis)
+        assert subgrid == subgrid_should
+
+
+def test_setup_grid_with_lists():
+
+    grid = grids.BasicGrid([1, 2, 3, 4, 5], [1, 2, 3, 4, 5])
+
+    nptest.assert_allclose(grid.arrlon, np.array([1, 2, 3, 4, 5]))
+    nptest.assert_allclose(grid.arrlat, np.array([1, 2, 3, 4, 5]))
+
+
+def test_setup_cellgrid_with_lists():
+
+    grid = grids.CellGrid([1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 1, 1, 1, 1])
+
+    nptest.assert_allclose(grid.arrlon, np.array([1, 2, 3, 4, 5]))
+    nptest.assert_allclose(grid.arrlat, np.array([1, 2, 3, 4, 5]))
+    nptest.assert_allclose(grid.arrcell, np.array([1, 1, 1, 1, 1]))
 
 
 class Test_2Dgrid(unittest.TestCase):
