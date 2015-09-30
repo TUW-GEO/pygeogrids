@@ -263,12 +263,11 @@ class Test_2Dgrid(unittest.TestCase):
         """
         Test if gpi to row column lookup works correctly.
         """
-        self.custom_gpi_grid = \
-            grids.BasicGrid(self.lon.flatten(),
-                            self.lat.flatten(),
-                            shape=(len(self.londim),
-                                   len(self.latdim)),
-                            gpis=np.arange(len(self.lat.flatten()))[::-1])
+        self.custom_gpi_grid = grids.BasicGrid(self.lon.flatten(),
+                                               self.lat.flatten(),
+                                               shape=(len(self.londim),
+                                                      len(self.latdim)),
+                                               gpis=np.arange(len(self.lat.flatten()))[::-1])
         gpi = [200, 255]
         row_should = [70, 70]
         column_should = [87, 32]
