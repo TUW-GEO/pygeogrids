@@ -788,9 +788,9 @@ class CellGrid(BasicGrid):
             lons.append(self.activearrlon[cell_index])
             lats.append(self.activearrlat[cell_index])
 
-        gpis = np.array(gpis)
-        lons = np.array(lons)
-        lats = np.array(lats)
+        gpis = np.hstack(gpis)
+        lons = np.hstack(lons)
+        lats = np.hstack(lats)
 
         return gpis, lons, lats
 

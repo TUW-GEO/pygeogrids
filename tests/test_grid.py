@@ -174,11 +174,13 @@ class TestCellGrid(unittest.TestCase):
 
         for cell in cells:
             gpis, lons, lats = subgrid.grid_points_for_cell(cell)
-            orig_gpis, orig_lons, orig_lats = \
-                self.cellgrid.grid_points_for_cell(cell)
-            nptest.assert_equal(gpis, orig_gpis)
-            nptest.assert_equal(lons, orig_lons)
-            nptest.assert_equal(lats, orig_lats)
+            cell_index = np.where(cell == self.cellgrid.activearrcell)
+            orig_gpis = self.cellgrid.activegpis[cell_index]
+            orig_lons = self.cellgrid.activearrlon[cell_index]
+            orig_lats = self.cellgrid.activearrlat[cell_index]
+            nptest.assert_array_equal(gpis, orig_gpis)
+            nptest.assert_array_equal(lons, orig_lons)
+            nptest.assert_array_equal(lats, orig_lats)
 
     def test_subgrid_from_gpis(self):
         """
