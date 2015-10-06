@@ -1,3 +1,7 @@
+# v0.1.5
+
+- bugfix of subgrid creation which returned wrongly shaped subarrays
+
 # v0.1.4
 
 - fix bug in lookuptable generation when gpis have custom ordering
