@@ -15,7 +15,7 @@ from sphinx import apidoc
 
 import mock
 
-MOCK_MODULES = ['numpy', 'pykdtree', 'netCDF4']
+MOCK_MODULES = ['numpy', 'numpy.testing', 'pykdtree', 'netCDF4']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
