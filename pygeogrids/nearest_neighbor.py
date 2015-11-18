@@ -31,6 +31,7 @@ Created on Jul 30, 2013
 '''
 
 import numpy as np
+from pygeogrids.geodatic_datum import GeodaticDatum
 
 try:
     import pykdtree.kdtree as pykd
@@ -58,8 +59,9 @@ class findGeoNN(object):
         longitudes of the points in the grid
     lat : numpy.array or list
         latitudes of the points in the grid
-    R : float, optional
-        Radius of the earth to use for calculating 3D coordinates
+    geodatum : string, optional
+        String defining the geodatic datum (reference ellipsoid) associated
+        with lons/lats coordinates
     grid : boolean, optional
         if True then lon and lat are assumed to be the coordinates of a grid
         and will be used in numpy.meshgrid to get coordinates for all
@@ -73,8 +75,9 @@ class findGeoNN(object):
 
     Attributes
     ----------
-    R : float
-        earth radius to use in computation of x,y,z coordinates
+    geodatum : object
+        pygeogrids.geodatic_datum.GeodaticDatum object used for
+        x,y,z  coordinates calculations
     coords : numpy.array
         3D array of cartesian x,y,z coordinates
     kd_tree_name: string
@@ -95,7 +98,8 @@ class findGeoNN(object):
 
     """
 
-    def __init__(self, lon, lat, R=6370997.0, grid=False, kd_tree_name='pykdtree'):
+    def __init__(self, lon, lat, geodatum='WGS84', grid=False,
+                 kd_tree_name='pykdtree'):
         """
         init method, prepares lon and lat arrays for _transform_lonlats if
         necessary
@@ -114,7 +118,7 @@ class findGeoNN(object):
             lat_init = lat
             lon_init = lon
         # Earth radius
-        self.R = R
+        self.geodatum = GeodaticDatum(geodatum)
         self.kd_tree_name = kd_tree_name
         self.coords = self._transform_lonlats(lon_init, lat_init)
         self.kdtree = None
@@ -138,14 +142,9 @@ class findGeoNN(object):
         """
         lon = np.array(lon)
         lat = np.array(lat)
-        coords = np.zeros((lon.size, 3))
-        # calculated in float64, otherwise numerical inconsistencies happened
-        # on different systems
-        lons_rad = np.radians(lon, dtype=np.float64)
-        lats_rad = np.radians(lat, dtype=np.float64)
-        coords[:, 0] = self.R * np.cos(lats_rad) * np.cos(lons_rad)
-        coords[:, 1] = self.R * np.cos(lats_rad) * np.sin(lons_rad)
-        coords[:, 2] = self.R * np.sin(lats_rad)
+        coords = np.zeros((lon.size, 3), dtype=np.float64)
+        coords[:, 0], coords[:, 1], \
+         coords[:, 2] = self.geodatum.toECEF(lon, lat)
 
         return coords
 

@@ -1,5 +1,6 @@
 # Add your requirements here like:
 numpy
 netcdf4
-# scipy>=0.9
+pyproj
+pykdtree
 

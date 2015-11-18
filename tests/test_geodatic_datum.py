@@ -1,0 +1,80 @@
+# Copyright (c) 2015
+# Vienna University of Technology, Department of Geodesy and Geoinformation
+# All rights reserved.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#   * Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#   * Neither the name of the <organization> nor the
+#     names of its contributors may be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+
+"""
+Created on Nov 12, 2015
+
+@author: Christoph Reimer christoph.reimer@geo.tuwien.ac.at
+"""
+
+import unittest
+import numpy.testing as nptest
+import numpy as np
+from pygeogrids.geodatic_datum import GeodaticDatum
+
+
+class test_GeodaticDatum(unittest.TestCase):
+
+    def setUp(self):
+        self.datum = GeodaticDatum('WGS84')
+
+    def test_toECEF(self):
+        x, y, z = self.datum.toECEF(0, 90)
+        nptest.assert_almost_equal(np.array([0, 0, self.datum.b]),
+                                   np.array([x, y, z]),
+                                   decimal=5)
+
+        x, y, z = self.datum.toECEF(0, 0)
+        nptest.assert_almost_equal(np.array([self.datum.a, 0, 0]),
+                                   np.array([x, y, z]),
+                                   decimal=5)
+
+    def test_ParallelRadi(self):
+        r = self.datum.ParallelRadi(0.)
+        nptest.assert_almost_equal(r, self.datum.a, decimal=5)
+
+        r = self.datum.ParallelRadi(90.)
+        nptest.assert_almost_equal(r, 0., decimal=5)
+
+    def test_GeocentricDistance(self):
+        r = self.datum.GeocentricDistance(0., 0.)
+        nptest.assert_almost_equal(r, self.datum.a, decimal=5)
+
+        r = self.datum.GeocentricDistance(0., 90.)
+        nptest.assert_almost_equal(r, self.datum.b, decimal=5)
+
+    def test_ParallelArcDist(self):
+        dist = self.datum.ParallelArcDist(0., 0., 360.)
+        nptest.assert_almost_equal(dist, self.datum.a * 2 * np.pi)
+
+
+
+
+
+if __name__ == "__main__":
+    unittest.main()

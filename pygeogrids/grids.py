@@ -65,6 +65,8 @@ class BasicGrid(object):
         longitudes of the points in the grid
     lat : numpy.array
         latitudes of the points in the grid
+    geodatum : basestring
+        Name of the geodatic datum associated with the grid
     gpis : numpy.array, optional
         if the gpi numbers are in a different order than the
         lon and lat arrays an array containing the gpi numbers
@@ -123,6 +125,9 @@ class BasicGrid(object):
         array of gpis that are active, is defined by
         gpis[subset] if a subset is given otherwise equal to
         gpis
+    geodatum : object
+        pygeogrids.geodatic_datum object (reference ellipsoid) associated
+        with the grid
     issplit : boolean
         if True then the array was split in n parts with
         the self.split function
@@ -140,8 +145,8 @@ class BasicGrid(object):
         the provided 2d-shape that make up the grid
     """
 
-    def __init__(self, lon, lat, gpis=None, subset=None, setup_kdTree=True,
-                 shape=None):
+    def __init__(self, lon, lat, geodatum='WGS84', gpis=None, subset=None,
+                 setup_kdTree=True, shape=None):
         """
         init method, prepares lon and lat arrays for _transform_lonlats if
         necessary
@@ -185,6 +190,8 @@ class BasicGrid(object):
         else:
             self.shape = tuple([len(self.arrlon)])
 
+        self.geodatum = geodatum
+
         if gpis is None:
             self.gpis = np.arange(self.n_gpi)
             self.gpidirect = True
@@ -219,7 +226,8 @@ class BasicGrid(object):
         Setup kdTree
         """
         if self.kdTree is None:
-            self.kdTree = NN.findGeoNN(self.activearrlon, self.activearrlat)
+            self.kdTree = NN.findGeoNN(self.activearrlon, self.activearrlat,
+                                       geodatum=self.geodatum)
             self.kdTree._build_kdtree()
 
     def split(self, n):
