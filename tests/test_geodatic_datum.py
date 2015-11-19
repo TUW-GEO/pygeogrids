@@ -35,13 +35,13 @@ Created on Nov 12, 2015
 import unittest
 import numpy.testing as nptest
 import numpy as np
-from pygeogrids.geodatic_datum import GeodaticDatum
+from pygeogrids.geodetic_datum import GeodeticDatum
 
 
 class test_GeodaticDatum(unittest.TestCase):
 
     def setUp(self):
-        self.datum = GeodaticDatum('WGS84')
+        self.datum = GeodeticDatum('WGS84')
 
     def test_toECEF(self):
         x, y, z = self.datum.toECEF(0, 90)

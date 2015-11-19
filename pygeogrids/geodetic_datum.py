@@ -37,7 +37,7 @@ import numpy as np
 import pyproj
 
 
-class GeodaticDatum(pyproj.Geod):
+class GeodeticDatum(pyproj.Geod):
     """
     Class representing a geodatic datum providing transformation and
     calculation functionality
@@ -50,7 +50,7 @@ class GeodaticDatum(pyproj.Geod):
     """
     def __new__(self, ellString, **kwargs):
         kwargs['ellps'] = ellString
-        return super(GeodaticDatum, self).__new__(self, None, **kwargs)
+        return super(GeodeticDatum, self).__new__(self, None, **kwargs)
 
     def __init__(self, ellString, **kwargs):
         self.e = np.sqrt(self.es)

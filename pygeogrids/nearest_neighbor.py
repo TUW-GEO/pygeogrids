@@ -31,7 +31,7 @@ Created on Jul 30, 2013
 '''
 
 import numpy as np
-from pygeogrids.geodatic_datum import GeodaticDatum
+from pygeogrids.geodetic_datum import GeodeticDatum
 
 try:
     import pykdtree.kdtree as pykd
@@ -76,7 +76,7 @@ class findGeoNN(object):
     Attributes
     ----------
     geodatum : object
-        pygeogrids.geodatic_datum.GeodaticDatum object used for
+        pygeogrids.geodatic_datum.GeodeticDatum object used for
         x,y,z  coordinates calculations
     coords : numpy.array
         3D array of cartesian x,y,z coordinates
@@ -118,7 +118,7 @@ class findGeoNN(object):
             lat_init = lat
             lon_init = lon
         # Earth radius
-        self.geodatum = GeodaticDatum(geodatum)
+        self.geodatum = GeodeticDatum(geodatum)
         self.kd_tree_name = kd_tree_name
         self.coords = self._transform_lonlats(lon_init, lat_init)
         self.kdtree = None
