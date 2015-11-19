@@ -1,3 +1,7 @@
+# v0.1.6
+
+- add geodatic datum functionality to grid objects
+
 # v0.1.5
 
 - bugfix of subgrid creation which returned wrongly shaped subarrays
