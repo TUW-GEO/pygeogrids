@@ -42,6 +42,7 @@ except ImportError:
     pass  # python3
 
 import pygeogrids.nearest_neighbor as NN
+from pygeogrids.geodetic_datum import GeodeticDatum
 
 
 class GridDefinitionError(Exception):
@@ -145,7 +146,7 @@ class BasicGrid(object):
         the provided 2d-shape that make up the grid
     """
 
-    def __init__(self, lon, lat, geodatum='WGS84', gpis=None, subset=None,
+    def __init__(self, lon, lat, gpis=None, geodatum='WGS84', subset=None,
                  setup_kdTree=True, shape=None):
         """
         init method, prepares lon and lat arrays for _transform_lonlats if
@@ -190,7 +191,7 @@ class BasicGrid(object):
         else:
             self.shape = tuple([len(self.arrlon)])
 
-        self.geodatum = geodatum
+        self.geodatum = GeodeticDatum(geodatum)
 
         if gpis is None:
             self.gpis = np.arange(self.n_gpi)
@@ -227,7 +228,7 @@ class BasicGrid(object):
         """
         if self.kdTree is None:
             self.kdTree = NN.findGeoNN(self.activearrlon, self.activearrlat,
-                                       geodatum=self.geodatum)
+                                       self.geodatum)
             self.kdTree._build_kdtree()
 
     def split(self, n):
@@ -597,7 +598,7 @@ class BasicGrid(object):
         """
         sublons, sublats = self.gpi2lonlat(gpis)
 
-        return BasicGrid(sublons, sublats, gpis)
+        return BasicGrid(sublons, sublats, gpis, geodatum=self.geodatum.name)
 
     def __eq__(self, other):
         """
@@ -634,7 +635,13 @@ class BasicGrid(object):
         else:
             shapesame = False
 
-        return np.all([lonsame, latsame, gpisame, subsetsame, shapesame])
+        if self.geodatum.name == other.geodatum.name:
+            geosame = True
+        else:
+            geosame = False
+
+        return np.all([lonsame, latsame, gpisame, subsetsame, shapesame,
+                       geosame])
 
 
 class CellGrid(BasicGrid):
@@ -671,10 +678,11 @@ class CellGrid(BasicGrid):
         if a subset is given otherwise equal to arrlon.
     """
 
-    def __init__(self, lon, lat, cells, gpis=None, subset=None,
-                 setup_kdTree=False, **kwargs):
+    def __init__(self, lon, lat, cells, gpis=None, geodatum='WGS84',
+                 subset=None, setup_kdTree=False, **kwargs):
 
-        super(CellGrid, self).__init__(lon, lat, gpis=gpis, subset=subset,
+        super(CellGrid, self).__init__(lon, lat, gpis=gpis,
+                                       geodatum=geodatum, subset=subset,
                                        setup_kdTree=setup_kdTree, **kwargs)
 
         cells = np.asanyarray(cells)
@@ -889,7 +897,8 @@ class CellGrid(BasicGrid):
         sublons, sublats = self.gpi2lonlat(gpis)
         subcells = self.gpi2cell(gpis)
 
-        return CellGrid(sublons, sublats, subcells, gpis)
+        return CellGrid(sublons, sublats, subcells, gpis,
+                        geodatum=self.geodatum.name)
 
     def subgrid_from_cells(self, cells):
         """
@@ -908,7 +917,8 @@ class CellGrid(BasicGrid):
         subgpis, sublons, sublats = self.grid_points_for_cell(cells)
         subcells = self.gpi2cell(subgpis)
 
-        return CellGrid(sublons, sublats, subcells, subgpis)
+        return CellGrid(sublons, sublats, subcells, subgpis,
+                        geodatum=self.geodatum.name)
 
     def __eq__(self, other):
         """
@@ -957,7 +967,7 @@ def lonlat2cell(lon, lat, cellsize=5., cellsize_lon=None, cellsize_lat=None):
     return np.int32(x * (np.double(180.0) / cellsize_lat) + y)
 
 
-def gridfromdims(londim, latdim):
+def gridfromdims(londim, latdim, **kwargs):
     """
     Defines new grid object from latitude and longitude dimensions. Latitude
     and longitude dimensions are 1D arrays that give the latitude and
@@ -977,11 +987,11 @@ def gridfromdims(londim, latdim):
     """
     lons, lats = np.meshgrid(londim, latdim)
     return BasicGrid(lons.flatten(), lats.flatten(),
-                     shape=(len(londim), len(latdim)))
+                     shape=(len(londim), len(latdim)), **kwargs)
 
 
 def genreg_grid(grd_spc_lat=1, grd_spc_lon=1, minlat=-90.0, maxlat=90.0,
-                minlon=-180.0, maxlon=180.0):
+                minlon=-180.0, maxlon=180.0, **kwargs):
     """
     Define a global regular lon lat grid which starts in the North Western
     Corner of minlon, maxlat. The grid points are defined to be in the middle
@@ -1006,7 +1016,7 @@ def genreg_grid(grd_spc_lat=1, grd_spc_lon=1, minlat=-90.0, maxlat=90.0,
     lon_dim = np.arange(minlon + grd_spc_lon / 2.0, maxlon, grd_spc_lon)
     lat_dim = np.arange(maxlat - grd_spc_lat / 2.0, minlat, -grd_spc_lat)
 
-    return gridfromdims(lon_dim, lat_dim)
+    return gridfromdims(lon_dim, lat_dim, **kwargs)
 
 
 def _element_iterable(el):
