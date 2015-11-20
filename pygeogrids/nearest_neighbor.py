@@ -31,7 +31,6 @@ Created on Jul 30, 2013
 '''
 
 import numpy as np
-from pygeogrids.geodetic_datum import GeodeticDatum
 
 try:
     import pykdtree.kdtree as pykd
@@ -59,9 +58,9 @@ class findGeoNN(object):
         longitudes of the points in the grid
     lat : numpy.array or list
         latitudes of the points in the grid
-    geodatum : string, optional
-        String defining the geodatic datum (reference ellipsoid) associated
-        with lons/lats coordinates
+    geodatum : object
+        pygeogrids.geodatic_datum.GeodeticDatum object associated with
+        lons/lats coordinates
     grid : boolean, optional
         if True then lon and lat are assumed to be the coordinates of a grid
         and will be used in numpy.meshgrid to get coordinates for all
@@ -98,7 +97,7 @@ class findGeoNN(object):
 
     """
 
-    def __init__(self, lon, lat, geodatum='WGS84', grid=False,
+    def __init__(self, lon, lat, geodatum, grid=False,
                  kd_tree_name='pykdtree'):
         """
         init method, prepares lon and lat arrays for _transform_lonlats if
@@ -118,7 +117,7 @@ class findGeoNN(object):
             lat_init = lat
             lon_init = lon
         # Earth radius
-        self.geodatum = GeodeticDatum(geodatum)
+        self.geodatum = geodatum
         self.kd_tree_name = kd_tree_name
         self.coords = self._transform_lonlats(lon_init, lat_init)
         self.kdtree = None

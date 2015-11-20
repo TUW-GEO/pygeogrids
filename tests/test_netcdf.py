@@ -33,6 +33,7 @@ import numpy as np
 import numpy.testing as nptest
 from netCDF4 import Dataset
 
+from pygeogrids.geodetic_datum import GeodeticDatum
 import pygeogrids.netcdf as grid_nc
 import pygeogrids as grids
 import tempfile
@@ -64,7 +65,9 @@ class Test(unittest.TestCase):
 
     def test_save_lonlat_nc(self):
         grid_nc.save_lonlat(self.testfile,
-                            self.lons, self.lats, self.cells,
+                            self.lons, self.lats,
+                            GeodeticDatum('WGS84'),
+                            self.cells,
                             subsets={'subset_flag': {'points': self.subset,
                                                      'meaning': 'test_flag'}},
                             global_attrs={'test': 'test_attribute'})

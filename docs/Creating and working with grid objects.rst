@@ -70,7 +70,7 @@ longitude and latitude
 
 .. parsed-literal::
 
-    (235, array([ 426227.83684784]))
+    (235, 424808.51317782089)
     (15, 25)
 
 
@@ -153,11 +153,10 @@ calculate a lookup table once and reuse it later.
 
 .. parsed-literal::
 
-    [ -1.54836122e+01  -1.35887580e+00  -4.78383560e-02   4.78709682e+00
-       1.11369002e+01   3.12077283e+01  -8.71094503e+01   2.20725149e+00
-       6.64563916e+01   7.87705109e+01]
-    [ 121.05539154  111.61193334 -131.22315478  -46.73641204   15.1126928
-     -165.14751769 -115.24386825  -56.14158745    9.9695647   143.61467711]
+    [-67.7701097   79.03856366 -71.6134622   63.7418792  -25.91579334
+      19.20630556 -79.29563693  11.49060401  33.88811903  41.03189655]
+    [ -65.98506205  -86.16694426  112.33747512  -49.55645505  -22.02287726
+      132.29787487   91.23860579  -92.31842844   94.96203201  -66.00963993]
 
 
 Now lets calculate a lookup table to the regular 10x10° grid we created
@@ -171,7 +170,7 @@ earlier
 
 .. parsed-literal::
 
-    [390 353 328 301 271 181 618 300  90  68]
+    [551  45 605  85 411 283 603 260 207 155]
 
 
 The lookup table contains the grid point indices of the other grid,
@@ -186,8 +185,8 @@ autogrid in this case.
 
 .. parsed-literal::
 
-    [-15.  -5.  -5.   5.  15.  35. -85.   5.  65.  75.]
-    [ 125.  115. -135.  -45.   15. -165. -115.  -55.    5.  145.]
+    [-65.  75. -75.  65. -25.  15. -75.  15.  35.  45.]
+    [ -65.  -85.  115.  -45.  -25.  135.   95.  -95.   95.  -65.]
 
 
 Storing and loading grids
@@ -206,13 +205,76 @@ Grids can be stored to disk as CF compliant netCDF files
 
 .. code:: python
 
-    loadedgrid == randgrid
+    loadedgrid
 
 
 
 
 .. parsed-literal::
 
-    True
+    <pygeogrids.grids.BasicGrid at 0x7f21801b31d0>
+
+
+
+.. code:: python
+
+    randgrid
+
+
+
+
+.. parsed-literal::
+
+    <pygeogrids.grids.BasicGrid at 0x7f218019ec90>
+
+
+
+Define geodetic datum for grid
+==============================
+
+.. code:: python
+
+    grid_WGS84 = grids.BasicGrid(randlon, randlat, geodatum='WGS84')
+
+.. code:: python
+
+    grid_GRS80 = grids.BasicGrid(randlon, randlat, geodatum='GRS80')
+
+.. code:: python
+
+    grid_WGS84.geodatum.a
+
+
+
+
+.. parsed-literal::
+
+    6378137.0
+
+
+
+.. code:: python
+
+    grid_GRS80.geodatum.a
+
+
+
+
+.. parsed-literal::
+
+    6378137.0
+
+
+
+.. code:: python
+
+    grid_WGS84.kdTree.geodatum.sphere
+
+
+
+
+.. parsed-literal::
+
+    False
 
 

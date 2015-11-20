@@ -39,13 +39,13 @@ import pyproj
 
 class GeodeticDatum(pyproj.Geod):
     """
-    Class representing a geodatic datum providing transformation and
+    Class representing a geodetic datum providing transformation and
     calculation functionality
 
     Parameters
     ----------
     ellString : string
-        String of geodatic datum (ellipsoid) as provided in pyproj
+        String of geodetic datum (ellipsoid) as provided in pyproj
 
     """
     def __new__(self, ellString, **kwargs):
@@ -53,6 +53,7 @@ class GeodeticDatum(pyproj.Geod):
         return super(GeodeticDatum, self).__new__(self, None, **kwargs)
 
     def __init__(self, ellString, **kwargs):
+        self.name = ellString
         self.e = np.sqrt(self.es)
 
     def getParameter(self):

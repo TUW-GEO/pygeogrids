@@ -39,7 +39,7 @@ from datetime import datetime
 from pygeogrids import CellGrid, BasicGrid
 
 
-def save_lonlat(filename, arrlon, arrlat, arrcell=None,
+def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
                 gpis=None, subsets={}, global_attrs=None):
     """
     saves grid information to netCDF file
@@ -52,6 +52,8 @@ def save_lonlat(filename, arrlon, arrlat, arrcell=None,
         array of longitudes
     arrlat : numpy.array
         array of latitudes
+    geodatum : object
+        pygeogrids.geodetic_datum.GeodeticDatum object associated with lon/lat
     arrcell : numpy.array, optional
         array of cell numbers
     gpis : numpy.array, optional
@@ -97,6 +99,13 @@ def save_lonlat(filename, arrlon, arrlat, arrcell=None,
                 gpivalues = gpis
 
         dim = list(ncfile.dimensions.keys())
+
+        crs = ncfile.createVariable('crs', np.dtype('int32').char)
+        setattr(crs, 'grid_mapping_name', 'latitude_longitude')
+        setattr(crs, 'longitude_of_prime_meridian', 0.)
+        setattr(crs, 'semi_major_axis', geodatum.a)
+        setattr(crs, 'inverse_flattening', 1. / geodatum.f)
+        setattr(crs, 'ellipsoid_name', geodatum.name)
 
         gpi = ncfile.createVariable('gpi', np.dtype('int32').char, dim)
 
@@ -217,8 +226,9 @@ def save_grid(filename, grid, subset_name='subset_flag',
 
     subsets = {subset_name: {'points': grid.subset, 'meaning': subset_meaning}}
 
-    save_lonlat(filename, grid.arrlon, grid.arrlat, arrcell=arrcell,
-                gpis=gpis, subsets=subsets, global_attrs=global_attrs)
+    save_lonlat(filename, grid.arrlon, grid.arrlat, grid.geodatum,
+                arrcell=arrcell, gpis=gpis, subsets=subsets,
+                global_attrs=global_attrs)
 
 
 def load_grid(filename, subset_flag='subset_flag'):
@@ -289,11 +299,14 @@ def load_grid(filename, subset_flag='subset_flag'):
             if subset_flag in nc_data.variables.keys():
                 subset = np.where(nc_data.variables[subset_flag][:] == 1)[0]
 
+        geodatumName = nc_data.variables['crs'].getncattr('ellipsoid_name')
+
         if arrcell is None:
             # BasicGrid
             return BasicGrid(lons,
                              lats,
                              gpis=gpis,
+                             geodatum=geodatumName,
                              subset=subset,
                              shape=shape)
         else:
@@ -302,5 +315,6 @@ def load_grid(filename, subset_flag='subset_flag'):
                             nc_data.variables['lat'][:],
                             arrcell,
                             gpis=gpis,
+                            geodatum=geodatumName,
                             subset=subset,
                             shape=shape)
