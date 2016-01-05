@@ -299,7 +299,11 @@ def load_grid(filename, subset_flag='subset_flag'):
             if subset_flag in nc_data.variables.keys():
                 subset = np.where(nc_data.variables[subset_flag][:] == 1)[0]
 
-        geodatumName = nc_data.variables['crs'].getncattr('ellipsoid_name')
+        if nc_data.variables.has_key('crs'):
+            geodatumName = nc_data.variables['crs'].getncattr('ellipsoid_name')
+        else:
+            # ellipsoid information is missing, use WGS84 by default
+            geodatumName = 'WGS84'
 
         if arrcell is None:
             # BasicGrid
