@@ -1,3 +1,7 @@
+# v0.1.7
+
+- bugfix in gpi2lonlat. Now supports array as input.
+
 # v0.1.6
 
 - add geodatic datum functionality to grid objects

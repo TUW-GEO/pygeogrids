@@ -409,11 +409,25 @@ class BasicGrid(object):
         lat : float
             Latitude of gpi
         """
+        # check if iterable
+        iterable = _element_iterable(gpi)
+
+        gpi = np.atleast_1d(gpi)
         if self.gpidirect:
-            return self.arrlon[gpi], self.arrlat[gpi]
+            lons, lats = self.arrlon[gpi], self.arrlat[gpi]
         else:
-            index = np.where(self.activegpis == gpi)[0][0]
-            return self.activearrlon[index], self.activearrlat[index]
+            # get the indices that would sort the gpis
+            gpisorted = np.argsort(self.gpis)
+            # find the position where the gpis fit in the sorted array
+            pos = np.searchsorted(self.gpis[gpisorted], gpi)
+            index = gpisorted[pos]
+            lons, lats = self.activearrlon[index], self.activearrlat[index]
+
+        if not iterable:
+            lons = lons[0]
+            lats = lats[0]
+
+        return lons, lats
 
     def gpi2rowcol(self, gpi):
         """

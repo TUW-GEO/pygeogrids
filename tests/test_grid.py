@@ -107,6 +107,96 @@ class TestFindNearestNeighbor(unittest.TestCase):
         assert lat == 45.5
 
 
+class TestCellGridNotGpiDirect(unittest.TestCase):
+
+    """
+    Setup simple 2D grid 2.5 degree global grid (144x72) which starts at the
+    North Western corner of 90 -180 Test for cell specific features.
+    """
+
+    def setUp(self):
+        self.latdim = np.arange(90, -90, -2.5)
+        self.londim = np.arange(-180, 180, 2.5)
+        self.lon, self.lat = np.meshgrid(self.londim, self.latdim)
+        self.grid = grids.BasicGrid(self.lon.flatten(), self.lat.flatten(),
+                                    gpis=np.arange(self.lon.flatten().size),
+                                    shape=(len(self.londim),
+                                           len(self.latdim)))
+        self.cellgrid = self.grid.to_cell_grid()
+
+    def test_gpi2cell(self):
+        """
+        Test if gpi to row column lookup works correctly.
+        """
+        gpi = 200
+        cell = self.cellgrid.gpi2cell(gpi)
+        assert cell == 1043
+
+    def test_gpi2cell_iterable(self):
+        """
+        Test if gpi to row column lookup works correctly.
+        """
+        gpi = [200, 255]
+        cell = self.cellgrid.gpi2cell(gpi)
+        assert np.all(cell == [1043, 2015])
+
+    def test_gpi2cell_numpy_single(self):
+        """
+        test if gpi to row column lookup works correctly
+        """
+        gpi = np.array([200, 255])[0]
+        cell = self.cellgrid.gpi2cell(gpi)
+        assert cell == 1043
+
+    def test_gpi2cell_custom_gpis(self):
+        """
+        Test if gpi to row column lookup works correctly.
+        """
+        self.custom_gpi_grid = \
+            grids.BasicGrid(self.lon.flatten(), self.lat.flatten(),
+                            shape=(len(self.londim),
+                                   len(self.latdim)),
+                            gpis=np.arange(len(self.lat.flatten()))[::-1])
+        self.custom_gpi_cell_grid = self.custom_gpi_grid.to_cell_grid()
+        gpi = [200, 255]
+        cell = self.custom_gpi_cell_grid.gpi2cell(gpi)
+        assert np.all(cell == [1549, 577])
+        gpi = 200
+        cell = self.custom_gpi_cell_grid.gpi2cell(gpi)
+        assert cell == 1549
+
+    def test_subgrid_from_cells(self):
+        """
+        Test subgrid selection.
+        """
+        cells = [1549, 577]
+        subgrid = self.cellgrid.subgrid_from_cells(cells)
+        assert type(subgrid) == type(self.cellgrid)
+
+        for cell in cells:
+            gpis, lons, lats = subgrid.grid_points_for_cell(cell)
+            cell_index = np.where(cell == self.cellgrid.activearrcell)
+            orig_gpis = self.cellgrid.activegpis[cell_index]
+            orig_lons = self.cellgrid.activearrlon[cell_index]
+            orig_lats = self.cellgrid.activearrlat[cell_index]
+            nptest.assert_array_equal(gpis, orig_gpis)
+            nptest.assert_array_equal(lons, orig_lons)
+            nptest.assert_array_equal(lats, orig_lats)
+
+    def test_subgrid_from_gpis(self):
+        """
+        Test subgrid selection.
+        """
+        gpis = [200, 255]
+        subgrid = self.cellgrid.subgrid_from_gpis(gpis)
+        assert type(subgrid) == type(self.cellgrid)
+        lons_should, lats_should = self.cellgrid.gpi2lonlat(gpis)
+        cells_should = self.cellgrid.gpi2cell(gpis)
+        subgrid_should = grids.CellGrid(
+            lons_should, lats_should, cells_should, gpis=gpis)
+        assert subgrid == subgrid_should
+
+
 class TestCellGrid(unittest.TestCase):
 
     """
