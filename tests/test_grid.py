@@ -59,6 +59,16 @@ class Test_lonlat2cell(unittest.TestCase):
             cells.flatten(), bins=len(np.unique(cells)))
         nptest.assert_allclose(hist, np.zeros_like(hist) + 72)
 
+    def testlonlat2cell_edge(self):
+        """
+        Use points on the 180 degree longitude and see if they fall into
+        the correct cell
+        """
+        lats = [69.8242, 69.122, 68.42]
+        lons = [180, 180, 180]
+        cells = lonlat2cell(lons, lats)
+        assert list(cells) == [31, 31, 31]
+
 
 class TestFindNearestNeighbor(unittest.TestCase):
 

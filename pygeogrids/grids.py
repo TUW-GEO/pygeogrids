@@ -978,7 +978,12 @@ def lonlat2cell(lon, lat, cellsize=5., cellsize_lon=None, cellsize_lat=None):
                           (np.double(90.0) + 1e-9)) / cellsize_lat), 0, 180)
     x = np.clip(np.floor((np.double(lon) + (np.double(180.0) + 1e-9))
                          / cellsize_lon), 0, 360)
-    return np.int32(x * (np.double(180.0) / cellsize_lat) + y)
+    cells = np.int32(x * (np.double(180.0) / cellsize_lat) + y)
+
+    max_cells = ((np.double(180.0) / cellsize_lat) *
+                 (np.double(360.0)) / cellsize_lon)
+    cells = np.where(cells > max_cells - 1, cells - max_cells, cells)
+    return np.int32(cells)
 
 
 def gridfromdims(londim, latdim, **kwargs):
