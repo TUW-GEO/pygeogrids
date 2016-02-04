@@ -1,3 +1,7 @@
+# v0.1.8
+
+- bugfix in lonlat2cell. Improvements in dependency installation and documentation.
+
 # v0.1.7
 
 - bugfix in gpi2lonlat. Now supports array as input.
