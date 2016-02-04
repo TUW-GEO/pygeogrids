@@ -9,35 +9,34 @@
 # serve to show the default.
 
 import sys
-import os
-import inspect
-from sphinx import apidoc
-
-import mock
-
-MOCK_MODULES = ['numpy', 'numpy.testing', 'pykdtree', 'netCDF4']
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
-
-__location__ = os.path.join(os.getcwd(), os.path.dirname(
-    inspect.getfile(inspect.currentframe())))
-
-package = "pygeogrids"
-namespace = []
-root_pkg = namespace[0] if namespace else package
-namespace_pkg = ".".join([namespace[-1], package]) if namespace else package
-output_dir = os.path.join(__location__, "../docs/_rst")
-module_dir = os.path.join(__location__, "..", root_pkg)
-cmd_line_template = "sphinx-apidoc -f -o {outputdir} {moduledir}"
-cmd_line = cmd_line_template.format(outputdir=output_dir, moduledir=module_dir)
-apidoc.main(cmd_line.split(" "))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 # sys.path.insert(0, os.path.abspath('.'))
 
-# -- General configuration -----------------------------------------------
+# -- Hack for ReadTheDocs ------------------------------------------------------
+# This hack is necessary since RTD does not issue `sphinx-apidoc` before running
+# `sphinx-build -b html . _build/html`. See Issue:
+# https://github.com/rtfd/readthedocs.org/issues/1139
+# DON'T FORGET: Check the box "Install your project inside a virtualenv using
+# setup.py install" in the RTD Advanced Settings.
+import os
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if on_rtd:
+    import inspect
+    from sphinx import apidoc
+
+    __location__ = os.path.join(os.getcwd(), os.path.dirname(
+        inspect.getfile(inspect.currentframe())))
+
+    output_dir = os.path.join(__location__, "../docs/api")
+    module_dir = os.path.join(__location__, "../pygeogrids")
+    cmd_line_template = "sphinx-apidoc -f -o {outputdir} {moduledir}"
+    cmd_line = cmd_line_template.format(outputdir=output_dir, moduledir=module_dir)
+    apidoc.main(cmd_line.split(" "))
+
+# -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
@@ -46,7 +45,8 @@ apidoc.main(cmd_line.split(" "))
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.todo',
               'sphinx.ext.autosummary', 'sphinx.ext.viewcode', 'sphinx.ext.coverage',
-              'sphinx.ext.doctest', 'sphinx.ext.ifconfig', 'sphinx.ext.pngmath', 'numpydoc']
+              'sphinx.ext.doctest', 'sphinx.ext.ifconfig', 'sphinx.ext.pngmath',
+              'sphinx.ext.napoleon']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -62,7 +62,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pygeogrids'
-copyright = u'2015, Christoph Paulik'
+copyright = u'2016, Christoph Paulik'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -111,19 +111,11 @@ pygments_style = 'sphinx'
 # keep_warnings = False
 
 
-# -- Options for HTML output ---------------------------------------------
-# on_rtd is whether we are on readthedocs.org, this line of code grabbed
-# from docs.readthedocs.org
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+# -- Options for HTML output ---------------------------------------------------
 
-if on_rtd:
-    # add package path to python path
-    sys.path.append('..')
-
-if not on_rtd:  # only import and set the theme if we're building docs locally
-    import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+# The theme to use for HTML and HTML Help pages.  See the documentation for
+# a list of builtin themes.
+html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -136,7 +128,7 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
 try:
-    from namespace_pkg import __version__ as version
+    from pygeogrids import __version__ as version
 except ImportError:
     pass
 else:
@@ -204,24 +196,24 @@ html_static_path = ['_static']
 htmlhelp_basename = 'pygeogrids-doc'
 
 
-# -- Options for LaTeX output --------------------------------------------
+# -- Options for LaTeX output --------------------------------------------------
 
 latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    # 'papersize': 'letterpaper',
+# The paper size ('letterpaper' or 'a4paper').
+# 'papersize': 'letterpaper',
 
-    # The font size ('10pt', '11pt' or '12pt').
-    # 'pointsize': '10pt',
+# The font size ('10pt', '11pt' or '12pt').
+# 'pointsize': '10pt',
 
-    # Additional stuff for the LaTeX preamble.
-    # 'preamble': '',
+# Additional stuff for the LaTeX preamble.
+# 'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'user_guide.tex', u'pygeogrids Documentation',
-     u'Christoph Paulik', 'manual'),
+  ('index', 'user_guide.tex', u'pygeogrids Documentation',
+   u'Christoph Paulik', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -244,7 +236,7 @@ latex_documents = [
 # If false, no module index is generated.
 # latex_domain_indices = True
 
-# -- External mapping ----------------------------------------------------
+# -- External mapping ------------------------------------------------------------
 python_version = '.'.join(map(str, sys.version_info[0:2]))
 intersphinx_mapping = {
     'sphinx': ('http://sphinx.pocoo.org', None),

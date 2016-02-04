@@ -1,5 +1,7 @@
-from ._version import get_versions
 from .grids import BasicGrid, CellGrid, genreg_grid, lonlat2cell
+import pkg_resources
 
-__version__ = get_versions()['version']
-del get_versions
+try:
+    __version__ = pkg_resources.get_distribution(__name__).version
+except:
+    __version__ = 'unknown'

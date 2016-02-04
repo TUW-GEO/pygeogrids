@@ -33,6 +33,7 @@ Contents
    :maxdepth: 2
                
    Creating and working with grid objects.rst
+   changes.rst
    License <license>
    Module Reference <_rst/modules>
 
