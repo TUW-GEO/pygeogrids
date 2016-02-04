@@ -142,8 +142,9 @@ class findGeoNN(object):
         lon = np.array(lon)
         lat = np.array(lat)
         coords = np.zeros((lon.size, 3), dtype=np.float64)
-        coords[:, 0], coords[:, 1], \
-         coords[:, 2] = self.geodatum.toECEF(lon, lat)
+        (coords[:, 0],
+         coords[:, 1],
+         coords[:, 2]) = self.geodatum.toECEF(lon, lat)
 
         return coords
 
@@ -154,7 +155,7 @@ class findGeoNN(object):
         if self.kd_tree_name == 'pykdtree' and pykdtree_installed:
             self.kdtree = pykd.KDTree(self.coords)
         elif scipy_installed:
-            self.kdtree = sc_spat.KDTree(self.coords)
+            self.kdtree = sc_spat.cKDTree(self.coords)
         else:
             raise Exception("No supported kdtree implementation installed.\
                              Please install pykdtree or scipy.")

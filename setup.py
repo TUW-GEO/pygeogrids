@@ -507,7 +507,7 @@ def setup_package():
           author=metadata['author'],
           author_email=metadata['author_email'],
           license=metadata['license'],
-          long_description=read('README.md'),
+          long_description=read('README.rst'),
           classifiers=metadata['classifiers'],
           test_suite='tests',
           packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
