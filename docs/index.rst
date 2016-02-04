@@ -35,12 +35,4 @@ Contents
    Creating and working with grid objects.rst
    changes.rst
    License <license>
-   Module Reference <_rst/modules>
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   api/modules.rst

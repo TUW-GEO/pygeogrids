@@ -2,7 +2,7 @@
 Changelog
 =========
 
-v0.1.8
+v0.1.9
 ======
 
 -  bugfix in lonlat2cell. Improvements in dependency installation and
