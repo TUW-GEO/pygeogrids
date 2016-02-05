@@ -144,6 +144,10 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
 
         if arrcell is not None:
             cell = ncfile.createVariable('cell', np.dtype('int16').char, dim)
+
+            if len(dim) == 2:
+                arrcell = arrcell.reshape(latsize,
+                                          lonsize)
             cell[:] = arrcell
             setattr(cell, 'long_name', 'Cell')
             setattr(cell, 'units', '')
@@ -252,13 +256,13 @@ def load_grid(filename, subset_flag='subset_flag'):
         # determine if it is a cell grid or a basic grid
         arrcell = None
         if 'cell' in nc_data.variables.keys():
-            arrcell = nc_data.variables['cell'][:]
+            arrcell = nc_data.variables['cell'][:].flatten()
 
         # determine if gpis are in order or custom order
         if nc_data.gpidirect == 0x1b:
             gpis = None  # gpis can be calculated through np.arange..
         else:
-            gpis = nc_data.variables['gpi'][:]
+            gpis = nc_data.variables['gpi'][:].flatten()
 
         shape = None
         if hasattr(nc_data, 'shape'):
@@ -315,8 +319,8 @@ def load_grid(filename, subset_flag='subset_flag'):
                              shape=shape)
         else:
             # CellGrid
-            return CellGrid(nc_data.variables['lon'][:],
-                            nc_data.variables['lat'][:],
+            return CellGrid(lons,
+                            lats,
                             arrcell,
                             gpis=gpis,
                             geodatum=geodatumName,
