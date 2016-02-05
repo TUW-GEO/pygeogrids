@@ -50,6 +50,11 @@ class Test(unittest.TestCase):
                                                size=500, replace=False))
         self.basic = grids.BasicGrid(self.lons, self.lats, subset=self.subset,
                                      shape=(360, 180))
+
+        self.basic_shape_gpis = grids.BasicGrid(self.lons, self.lats,
+                                                gpis=np.arange(self.lats.size),
+                                                subset=self.subset,
+                                                shape=(360, 180))
         self.basic_generated = grids.genreg_grid(1, 1)
         self.basic_irregular = grids.BasicGrid(np.random.random(360 * 180) * 360 - 180,
                                                np.random.random(
@@ -57,6 +62,10 @@ class Test(unittest.TestCase):
                                                subset=self.subset)
         self.cellgrid = grids.CellGrid(self.lons, self.lats, self.cells,
                                        subset=self.subset)
+
+        self.cellgrid_shape = grids.CellGrid(self.lons, self.lats, self.cells,
+                                             subset=self.subset,
+                                             shape=(360, 180))
 
         self.testfile = tempfile.NamedTemporaryFile().name
 
@@ -150,6 +159,13 @@ class Test(unittest.TestCase):
         loaded_grid = grid_nc.load_grid(self.testfile)
         assert self.basic == loaded_grid
 
+    def test_save_load_basicgrid_shape_gpis(self):
+        grid_nc.save_grid(self.testfile,
+                          self.basic_shape_gpis)
+
+        loaded_grid = grid_nc.load_grid(self.testfile)
+        assert self.basic_shape_gpis == loaded_grid
+
     def test_save_load_basicgrid_irregular(self):
         grid_nc.save_grid(self.testfile,
                           self.basic_irregular)
@@ -163,6 +179,13 @@ class Test(unittest.TestCase):
 
         loaded_grid = grid_nc.load_grid(self.testfile)
         assert self.cellgrid == loaded_grid
+
+    def test_save_load_cellgrid_shape(self):
+        grid_nc.save_grid(self.testfile,
+                          self.cellgrid_shape)
+
+        loaded_grid = grid_nc.load_grid(self.testfile)
+        assert self.cellgrid_shape == loaded_grid
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

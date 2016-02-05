@@ -2,6 +2,11 @@
 Changelog
 =========
 
+v0.1.10
+=======
+
+- fix bug in storing/loading grids with shape attribute set.
+
 v0.1.9
 ======
 
