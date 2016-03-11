@@ -1,4 +1,4 @@
-# Copyright (c) 2015
+# Copyright (c) 2016
 # Vienna University of Technology, Department of Geodesy and Geoinformation
 # All rights reserved.
 
@@ -25,13 +25,6 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-
-"""
-Created on Nov 12, 2015
-
-@author: Christoph Reimer christoph.reimer@geo.tuwien.ac.at
-"""
-
 import unittest
 import numpy.testing as nptest
 import numpy as np
@@ -45,35 +38,32 @@ class test_GeodaticDatum(unittest.TestCase):
 
     def test_toECEF(self):
         x, y, z = self.datum.toECEF(0, 90)
-        nptest.assert_almost_equal(np.array([0, 0, self.datum.b]),
+        nptest.assert_almost_equal(np.array([0, 0, self.datum.geod.b]),
                                    np.array([x, y, z]),
                                    decimal=5)
 
         x, y, z = self.datum.toECEF(0, 0)
-        nptest.assert_almost_equal(np.array([self.datum.a, 0, 0]),
+        nptest.assert_almost_equal(np.array([self.datum.geod.a, 0, 0]),
                                    np.array([x, y, z]),
                                    decimal=5)
 
     def test_ParallelRadi(self):
         r = self.datum.ParallelRadi(0.)
-        nptest.assert_almost_equal(r, self.datum.a, decimal=5)
+        nptest.assert_almost_equal(r, self.datum.geod.a, decimal=5)
 
         r = self.datum.ParallelRadi(90.)
         nptest.assert_almost_equal(r, 0., decimal=5)
 
     def test_GeocentricDistance(self):
         r = self.datum.GeocentricDistance(0., 0.)
-        nptest.assert_almost_equal(r, self.datum.a, decimal=5)
+        nptest.assert_almost_equal(r, self.datum.geod.a, decimal=5)
 
         r = self.datum.GeocentricDistance(0., 90.)
-        nptest.assert_almost_equal(r, self.datum.b, decimal=5)
+        nptest.assert_almost_equal(r, self.datum.geod.b, decimal=5)
 
     def test_ParallelArcDist(self):
         dist = self.datum.ParallelArcDist(0., 0., 360.)
-        nptest.assert_almost_equal(dist, self.datum.a * 2 * np.pi)
-
-
-
+        nptest.assert_almost_equal(dist, self.datum.geod.a * 2 * np.pi)
 
 
 if __name__ == "__main__":
