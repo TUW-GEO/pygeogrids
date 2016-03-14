@@ -103,8 +103,8 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
         crs = ncfile.createVariable('crs', np.dtype('int32').char)
         setattr(crs, 'grid_mapping_name', 'latitude_longitude')
         setattr(crs, 'longitude_of_prime_meridian', 0.)
-        setattr(crs, 'semi_major_axis', geodatum.a)
-        setattr(crs, 'inverse_flattening', 1. / geodatum.f)
+        setattr(crs, 'semi_major_axis', geodatum.geod.a)
+        setattr(crs, 'inverse_flattening', 1. / geodatum.geod.f)
         setattr(crs, 'ellipsoid_name', geodatum.name)
 
         gpi = ncfile.createVariable('gpi', np.dtype('int32').char, dim)
