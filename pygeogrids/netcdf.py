@@ -92,17 +92,24 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
             lonsize = global_attrs['shape'][0]
             ncfile.createDimension("lat", latsize)
             ncfile.createDimension("lon", lonsize)
-            arrlat = np.unique(arrlat)[::-1]  # sorts arrlat descending
-            arrlon = np.unique(arrlon)
-
             gpisize = global_attrs['shape'][0] * global_attrs['shape'][1]
             if gpis is None:
                 gpivalues = np.arange(gpisize,
                                       dtype=np.int32).reshape(latsize,
                                                               lonsize)
-                gpivalues = gpivalues[::-1]
             else:
                 gpivalues = gpis.reshape(latsize, lonsize)
+
+            lons = arrlon.reshape(latsize, lonsize)
+            lats = arrlat.reshape(latsize, lonsize)
+            # sort arrlon, arrlat and gpis
+            arrlon_sorted, arrlat_sorted, gpivalues = sort_for_netcdf(
+                lons, lats, gpivalues)
+
+            # sorts arrlat descending
+            arrlat_store = np.unique(arrlat_sorted)[::-1]
+            arrlon_store = np.unique(arrlon_sorted)
+
         else:
             ncfile.createDimension("gp", arrlon.size)
             gpisize = arrlon.size
@@ -110,6 +117,8 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
                 gpivalues = np.arange(arrlon.size, dtype=np.int32)
             else:
                 gpivalues = gpis
+            arrlon_store = arrlon
+            arrlat_store = arrlat
 
         dim = list(ncfile.dimensions.keys())
 
@@ -143,7 +152,7 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
                                          dim[0],
                                          shuffle=shuffle,
                                          zlib=zlib, complevel=complevel)
-        latitude[:] = arrlat
+        latitude[:] = arrlat_store
         setattr(latitude, 'long_name', 'Latitude')
         setattr(latitude, 'units', 'degree_north')
         setattr(latitude, 'standard_name', 'latitude')
@@ -157,7 +166,7 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
                                           londim,
                                           shuffle=shuffle,
                                           zlib=zlib, complevel=complevel)
-        longitude[:] = arrlon
+        longitude[:] = arrlon_store
         setattr(longitude, 'long_name', 'Longitude')
         setattr(longitude, 'units', 'degree_east')
         setattr(longitude, 'standard_name', 'longitude')
@@ -172,6 +181,7 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
             if len(dim) == 2:
                 arrcell = arrcell.reshape(latsize,
                                           lonsize)
+                _, _, arrcell = sort_for_netcdf(lons, lats, arrcell)
             cell[:] = arrcell
             setattr(cell, 'long_name', 'Cell')
             setattr(cell, 'units', '')
@@ -191,6 +201,7 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
                 lf[subsets[subset_name]['points']] = 1
                 if len(dim) == 2:
                     lf = lf.reshape(latsize, lonsize)
+                    _, _, lf = sort_for_netcdf(lons, lats, lf)
 
                 flag[:] = lf
                 setattr(flag, 'long_name', subset_name)
@@ -295,17 +306,18 @@ def save_grid(filename, grid, subset_name='subset_flag',
     except AttributeError:
         arrcell = None
 
-    if grid.gpidirect is True:
-        gpis = None
-    else:
-        gpis = grid.gpis
+    gpis = grid.gpis
 
     if grid.shape is not None:
         if global_attrs is None:
             global_attrs = {}
         global_attrs['shape'] = grid.shape
 
-    subsets = {subset_name: {'points': grid.subset, 'meaning': subset_meaning}}
+    if grid.subset is not None:
+        subsets = {subset_name: {
+            'points': grid.subset, 'meaning': subset_meaning}}
+    else:
+        subsets = None
 
     save_lonlat(filename, grid.arrlon, grid.arrlat, grid.geodatum,
                 arrcell=arrcell, gpis=gpis, subsets=subsets,
@@ -335,11 +347,7 @@ def load_grid(filename, subset_flag='subset_flag'):
         if 'cell' in nc_data.variables.keys():
             arrcell = nc_data.variables['cell'][:].flatten()
 
-        # determine if gpis are in order or custom order
-        if nc_data.gpidirect == 0x1b:
-            gpis = None  # gpis can be calculated through np.arange..
-        else:
-            gpis = nc_data.variables['gpi'][:].flatten()
+        gpis = nc_data.variables['gpi'][:].flatten()
 
         shape = None
         if hasattr(nc_data, 'shape'):
@@ -364,9 +372,9 @@ def load_grid(filename, subset_flag='subset_flag'):
         # check if grid has regular shape
         if len(shape) == 2:
             lons, lats = np.meshgrid(nc_data.variables['lon'][:],
-                                     nc_data.variables['lat'][::-1])
-            lons = lons.flatten('F')
-            lats = lats.flatten('F')
+                                     nc_data.variables['lat'][:])
+            lons = lons.flatten()
+            lats = lats.flatten()
 
             if subset_flag in nc_data.variables.keys():
                 subset = np.where(
