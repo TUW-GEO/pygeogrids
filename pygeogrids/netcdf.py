@@ -219,6 +219,56 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
             ncfile.setncatts(global_attrs)
 
 
+def sort_for_netcdf(lons, lats, values):
+    """
+    Sort an 2D array for storage in a netCDF file.
+    This mans that the latitudes are stored from
+    90 to -90 and the longitudes from -180 to 180.
+    Input arrays have to have shape latdim, londim
+    which would mean for a global 10 degree grid (18, 36).
+
+    Parameters
+    ----------
+    lons: numpy.ndarray
+        2D numpy array of longitudes
+    lats: numpy.ndarray
+        2D numpy array of latitudes
+    values: numpy.ndarray
+        2D numpy array of values to sort
+
+    Returns
+    -------
+    lons: numpy.ndarray
+        2D numpy array of longitudes, sorted
+    lats: numpy.ndarray
+        2D numpy array of latitudes, sorted
+    values: numpy.ndarray
+        2D numpy array of values to sort, sorted
+    """
+
+    arrlat = lats.flatten()
+    arrlon = lons.flatten()
+    arrval = values.flatten()
+    idxlatsrt = np.argsort(arrlat)[::-1]
+    idxlat = np.argsort(arrlat[idxlatsrt].
+                        reshape(lats.shape),
+                        axis=0)[::-1]
+    idxlon = np.argsort(arrlon[idxlatsrt].
+                        reshape(lons.shape)
+                        [idxlat, np.arange(lons.shape[1])], axis=1)
+
+    values = arrval[idxlatsrt].reshape(*lons.shape)\
+        [idxlat, np.arange(lons.shape[1])]\
+        [np.arange(lons.shape[0])[:, None], idxlon]
+    lons = arrlon[idxlatsrt].reshape(*lons.shape)\
+        [idxlat, np.arange(lons.shape[1])]\
+        [np.arange(lons.shape[0])[:, None], idxlon]
+    lats = arrlat[idxlatsrt].reshape(*lons.shape)\
+        [idxlat, np.arange(lons.shape[1])]\
+        [np.arange(lons.shape[0])[:, None], idxlon]
+    return lons, lats, values
+
+
 def save_grid(filename, grid, subset_name='subset_flag',
               subset_meaning='water land', global_attrs=None):
     """
