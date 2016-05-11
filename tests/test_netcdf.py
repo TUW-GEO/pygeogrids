@@ -89,23 +89,6 @@ class Test(unittest.TestCase):
                 self.subset, np.where(nc_data.variables['subset_flag'][:] == 1)[0])
             assert nc_data.test == 'test_attribute'
 
-    def test_save_basicgrid_nc(self):
-        grid_nc.save_grid(self.testfile,
-                          self.basic,
-                          global_attrs={'test': 'test_attribute'})
-
-        with Dataset(self.testfile) as nc_data:
-            nptest.assert_array_equal(np.unique(self.lats)[::-1],
-                                      nc_data.variables['lat'][:])
-            nptest.assert_array_equal(np.unique(self.lons),
-                                      nc_data.variables['lon'][:])
-
-            nptest.assert_array_equal(self.subset,
-                                      np.where(nc_data.variables['subset_flag'][:].flatten() == 1)[0])
-            assert nc_data.test == 'test_attribute'
-            assert nc_data.shape[1] == 180
-            assert nc_data.shape[0] == 360
-
     def test_save_basicgrid_generated(self):
         grid_nc.save_grid(self.testfile,
                           self.basic,
@@ -117,8 +100,12 @@ class Test(unittest.TestCase):
             nptest.assert_array_equal(np.unique(self.lons),
                                       nc_data.variables['lon'][:])
 
-            nptest.assert_array_equal(self.subset,
-                                      np.where(nc_data.variables['subset_flag'][:].flatten() == 1)[0])
+            # subsets have to identify the same gpis in the original grid and
+            # the stored one.
+            stored_subset = np.where(nc_data.variables['subset_flag'][
+                                     :].flatten() == 1)[0]
+            nptest.assert_array_equal(sorted(self.basic.gpis[self.subset]),
+                                      sorted(nc_data.variables['gpi'][:].flatten()[stored_subset]))
             assert nc_data.test == 'test_attribute'
             assert nc_data.shape[1] == 180
             assert nc_data.shape[0] == 360
@@ -150,7 +137,6 @@ class Test(unittest.TestCase):
             nptest.assert_array_equal(
                 self.subset, np.where(nc_data.variables['subset_flag'][:] == 1)[0])
             assert nc_data.test == 'test_attribute'
-            assert nc_data.gpidirect == 0x1b
 
     def test_save_load_basicgrid(self):
         grid_nc.save_grid(self.testfile,
@@ -186,6 +172,78 @@ class Test(unittest.TestCase):
 
         loaded_grid = grid_nc.load_grid(self.testfile)
         assert self.cellgrid_shape == loaded_grid
+
+
+def test_store_load_regular_2D_grid_custom_gpis():
+    """
+    Test the storing/loading of a 2D grid when the gpis are in a custom
+    ordering.
+    """
+    londim = np.arange(-180.0, 180.0, 60)
+    latdim = np.arange(-90.0, 90.0, 30)
+    lons, lats = np.meshgrid(londim, latdim)
+    gpis = np.arange(lons.flatten().size).reshape(lons.shape)
+    grid = grids.BasicGrid(lons.flatten(), lats.flatten(),
+                           gpis.flatten(), shape=lons.shape)
+    testfile = tempfile.NamedTemporaryFile().name
+    grid_nc.save_grid(testfile, grid)
+    grid_loaded = grid_nc.load_grid(testfile)
+    assert grid == grid_loaded
+
+
+def test_store_load_regular_2D_grid():
+    """
+    Test the storing/loading of a 2D grid when the gpis are in a custom
+    ordering.
+    """
+    londim = np.arange(-180.0, 180.0, 60)
+    latdim = np.arange(90.0, -90.0, -30)
+    lons, lats = np.meshgrid(londim, latdim)
+    gpis = np.arange(lons.flatten().size).reshape(lons.shape)
+    grid = grids.BasicGrid(lons.flatten(), lats.flatten(),
+                           gpis.flatten(), shape=lons.shape)
+    testfile = tempfile.NamedTemporaryFile().name
+    grid_nc.save_grid(testfile, grid)
+    grid_loaded = grid_nc.load_grid(testfile)
+    assert grid == grid_loaded
+
+
+def test_sort_lon_lat_for_netcdf_transposed():
+    """
+    Test the sorting of an array for netcdf storage
+    """
+    londim = np.arange(-180.0, 180.0, 60)
+    latdim = np.arange(90.0, -90.0, -30)
+    lats, lons = np.meshgrid(latdim, londim)
+    gpis = np.arange(lons.flatten().size).reshape(lons.shape)
+    rand_idx = np.random.permutation(gpis.flatten().size)
+    lons_rand = lons.flatten()[rand_idx].reshape(lons.shape)
+    lats_rand = lats.flatten()[rand_idx].reshape(lats.shape)
+    gpis_rand = gpis.flatten()[rand_idx].reshape(gpis.shape)
+    lons_sorted, lats_sorted, gpis_sorted = grid_nc.sort_for_netcdf(
+        lons_rand, lats_rand, gpis_rand)
+    nptest.assert_almost_equal(lons_sorted, lons.T)
+    nptest.assert_almost_equal(lats_sorted, lats.T)
+    nptest.assert_almost_equal(gpis_sorted, gpis.T)
+
+
+def test_sort_lon_lat_for_netcdf():
+    """
+    Test the sorting of an array for netcdf storage
+    """
+    londim = np.arange(-180.0, 180.0, 60)
+    latdim = np.arange(90.0, -90.0, -30)
+    lons, lats = np.meshgrid(londim, latdim)
+    gpis = np.arange(lons.flatten().size).reshape(lons.shape)
+    rand_idx = np.random.permutation(gpis.flatten().size)
+    lons_rand = lons.flatten()[rand_idx].reshape(lons.shape)
+    lats_rand = lats.flatten()[rand_idx].reshape(lats.shape)
+    gpis_rand = gpis.flatten()[rand_idx].reshape(gpis.shape)
+    lons_sorted, lats_sorted, gpis_sorted = grid_nc.sort_for_netcdf(
+        lons_rand, lats_rand, gpis_rand)
+    nptest.assert_almost_equal(lons_sorted, lons)
+    nptest.assert_almost_equal(lats_sorted, lats)
+    nptest.assert_almost_equal(gpis_sorted, gpis)
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

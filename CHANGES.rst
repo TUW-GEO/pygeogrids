@@ -2,10 +2,12 @@
 Changelog
 =========
 
-v0.1.10
+v0.1.xx
 =======
 
 - fix bug in storing/loading grids with shape attribute set.
+- change equality check of grids to be more flexible. Now only a match of the
+  tuples gpi, lon, lat, cell is checked. The order does no longer matter.
 
 v0.1.9
 ======

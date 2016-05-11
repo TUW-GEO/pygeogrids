@@ -624,19 +624,26 @@ class BasicGrid(object):
             Returns True if grids are equal.
         """
         # only test to certain significance for float variables
+        # grids are assumed to be the same if the gpi, lon, lat tuples are the
+        # same
+        idx_gpi = np.argsort(self.gpis)
+        idx_gpi_other = np.argsort(other.gpis)
+        gpisame = np.all(self.gpis[idx_gpi] == other.gpis[idx_gpi_other])
         try:
-            nptest.assert_allclose(self.arrlon, other.arrlon)
+            nptest.assert_allclose(self.arrlon[idx_gpi],
+                                   other.arrlon[idx_gpi_other])
             lonsame = True
         except AssertionError:
             lonsame = False
         try:
-            nptest.assert_allclose(self.arrlat, other.arrlat)
+            nptest.assert_allclose(self.arrlat[idx_gpi],
+                                   other.arrlat[idx_gpi_other])
             latsame = True
         except AssertionError:
             latsame = False
-        gpisame = np.all(self.gpis == other.gpis)
         if self.subset is not None and other.subset is not None:
-            subsetsame = np.all(self.subset == other.subset)
+            subsetsame = np.all(
+                sorted(self.gpis[self.subset]) == sorted(other.gpis[other.subset]))
         elif self.subset is None and other.subset is None:
             subsetsame = True
         else:
@@ -944,7 +951,10 @@ class CellGrid(BasicGrid):
             Returns true if equal.
         """
         basicsame = super(CellGrid, self).__eq__(other)
-        cellsame = np.all(self.arrcell == other.arrcell)
+        idx_gpi = np.argsort(self.gpis)
+        idx_gpi_other = np.argsort(other.gpis)
+        cellsame = np.all(self.arrcell[idx_gpi]
+                          == other.arrcell[idx_gpi_other])
         return np.all([basicsame, cellsame])
 
 
