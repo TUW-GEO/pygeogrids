@@ -89,23 +89,6 @@ class Test(unittest.TestCase):
                 self.subset, np.where(nc_data.variables['subset_flag'][:] == 1)[0])
             assert nc_data.test == 'test_attribute'
 
-    def test_save_basicgrid_nc(self):
-        grid_nc.save_grid(self.testfile,
-                          self.basic,
-                          global_attrs={'test': 'test_attribute'})
-
-        with Dataset(self.testfile) as nc_data:
-            nptest.assert_array_equal(np.unique(self.lats)[::-1],
-                                      nc_data.variables['lat'][:])
-            nptest.assert_array_equal(np.unique(self.lons),
-                                      nc_data.variables['lon'][:])
-
-            nptest.assert_array_equal(self.subset,
-                                      np.where(nc_data.variables['subset_flag'][:].flatten() == 1)[0])
-            assert nc_data.test == 'test_attribute'
-            assert nc_data.shape[1] == 180
-            assert nc_data.shape[0] == 360
-
     def test_save_basicgrid_generated(self):
         grid_nc.save_grid(self.testfile,
                           self.basic,
