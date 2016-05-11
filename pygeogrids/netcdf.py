@@ -220,7 +220,7 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
 
 
 def save_grid(filename, grid, subset_name='subset_flag',
-              subset_meaning="water, land", global_attrs=None):
+              subset_meaning='water land', global_attrs=None):
     """
     save a BasicGrid or CellGrid to netCDF
     it is assumed that a subset should be used as land_points
