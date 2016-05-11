@@ -35,12 +35,13 @@ from netCDF4 import Dataset
 import numpy as np
 import os
 from datetime import datetime
-
+from collections import OrderedDict
 from pygeogrids import CellGrid, BasicGrid
 
 
+
 def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
-                gpis=None, subsets={}, global_attrs=None):
+                gpis=None, subsets={}, global_attrs=None, **argv):
     """
     saves grid information to netCDF file
 
@@ -63,13 +64,48 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
         values : dict with the following keys: points, meaning
         e.g. subsets = {'subset_flag': {'points': numpy.array,
                                         'meaning': 'water, land'}}
-    global_attrs : dict, optional
+    global_attrs : dict or OderedDict, optional
         if given will be written as global attributs into netCDF file
+    **argv['ncformat']: choose either from one of these NetCDF formats
+                        'NETCDF4' (default, if ncformat not specified)
+                        'NETCDF4_CLASSIC' (default, if ncformat specified)
+                        'NETCDF3_CLASSIC'
+                        'NETCDF3_64BIT'
+    **argv['nccompression']: dictionary of (default):
+          {'zlib': False, 'shuffle': True, 'complevel': 4}
     """
 
     nc_name = filename
-
-    with Dataset(nc_name, 'w', format='NETCDF4') as ncfile:
+    
+    if 'ncformat' in argv:
+        frmt = argv['ncformat']
+        if frmt not in ['NETCDF4','NETCDF4_CLASSIC',
+                        'NETCDF3_CLASSIC', 'NETCDF3_64BIT']:
+            frmt = 'NETCDF4_CLASSIC'
+    else:
+        frmt = 'NETCDF4'
+    if 'nccompression' in argv:
+        nccomp = argv['nccompression']
+        if 'zlib' in nccomp:
+            nczlib = True if nccomp['zlib'] else False
+        else:
+            nczlib = False
+        if 'ncshuffle' in nccomp:    
+            ncshuffle = True if nccomp['shuffle'] else False
+        else:
+            ncshuffle = True
+        if (('complevel' in nccomp) and 
+           (isinstance(nccomp['complevel'], (int, long))) and
+           ((nccomp['complevel'] >= 1) or (nccomp['complevel'] <= 9))):
+            nccomplevel = nccomp['complevel']
+        else:
+            nccomplevel = 4      
+    else:
+        nczlib = False
+        ncshuffle = True
+        nccomplevel = 4
+            
+    with Dataset(nc_name, 'w', format=frmt) as ncfile:
 
         if (global_attrs is not None and 'shape' in global_attrs and
                 type(global_attrs['shape']) is not int and
@@ -79,17 +115,30 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
             lonsize = global_attrs['shape'][0]
             ncfile.createDimension("lat", latsize)
             ncfile.createDimension("lon", lonsize)
-            arrlat = np.unique(arrlat)[::-1]  # sorts arrlat descending
-            arrlon = np.unique(arrlon)
 
+            idxlatsrt = np.argsort(arrlat)[::-1]
+            idxlat = np.argsort(arrlat[idxlatsrt].
+                                reshape((latsize, lonsize)),
+                                axis=0)[::-1]
+            idxlon = np.argsort(arrlon[idxlatsrt].
+                                reshape((latsize, lonsize))
+                                [idxlat, np.arange(lonsize)], axis=1)
+            
             gpisize = global_attrs['shape'][0] * global_attrs['shape'][1]
             if gpis is None:
                 gpivalues = np.arange(gpisize,
                                       dtype=np.int32).reshape(latsize,
                                                               lonsize)
                 gpivalues = gpivalues[::-1]
+                
             else:
-                gpivalues = gpis.reshape(latsize, lonsize)
+                gpivalues = gpis[idxlatsrt].reshape(latsize, lonsize)\
+                            [idxlat, np.arange(lonsize)]\
+                            [np.arange(latsize)[:, None], idxlon]
+
+            arrlat = np.unique(arrlat)[::-1]  # sorts arrlat descending
+            arrlon = np.unique(arrlon)
+                 
         else:
             ncfile.createDimension("gp", arrlon.size)
             gpisize = arrlon.size
@@ -100,14 +149,18 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
 
         dim = list(ncfile.dimensions.keys())
 
-        crs = ncfile.createVariable('crs', np.dtype('int32').char)
+        crs = ncfile.createVariable('crs', np.dtype('int32').char,
+                                    shuffle=ncshuffle,
+                                    zlib=nczlib, complevel=nccomplevel)
         setattr(crs, 'grid_mapping_name', 'latitude_longitude')
         setattr(crs, 'longitude_of_prime_meridian', 0.)
         setattr(crs, 'semi_major_axis', geodatum.geod.a)
         setattr(crs, 'inverse_flattening', 1. / geodatum.geod.f)
         setattr(crs, 'ellipsoid_name', geodatum.name)
 
-        gpi = ncfile.createVariable('gpi', np.dtype('int32').char, dim)
+        gpi = ncfile.createVariable('gpi', np.dtype('int32').char, dim,
+                                    shuffle=ncshuffle,
+                                    zlib=nczlib, complevel=nccomplevel)
 
         if gpis is None:
             gpi[:] = gpivalues
@@ -123,7 +176,9 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
             gpidirect = 0x0b
 
         latitude = ncfile.createVariable('lat', np.dtype('float64').char,
-                                         dim[0])
+                                         dim[0],
+                                         shuffle=ncshuffle,
+                                         zlib=nczlib, complevel=nccomplevel)
         latitude[:] = arrlat
         setattr(latitude, 'long_name', 'Latitude')
         setattr(latitude, 'units', 'degree_north')
@@ -135,7 +190,9 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
         else:
             londim = dim[0]
         longitude = ncfile.createVariable('lon', np.dtype('float64').char,
-                                          londim)
+                                          londim,
+                                          shuffle=ncshuffle,
+                                          zlib=nczlib, complevel=nccomplevel)
         longitude[:] = arrlon
         setattr(longitude, 'long_name', 'Longitude')
         setattr(longitude, 'units', 'degree_east')
@@ -143,11 +200,18 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
         setattr(longitude, 'valid_range', [-180.0, 180.0])
 
         if arrcell is not None:
-            cell = ncfile.createVariable('cell', np.dtype('int16').char, dim)
+            cell = ncfile.createVariable('cell', np.dtype('int16').char,
+                                         dim,
+                                         shuffle=ncshuffle,
+                                         zlib=nczlib, complevel=nccomplevel)
 
             if len(dim) == 2:
-                arrcell = arrcell.reshape(latsize,
-                                          lonsize)
+                arrcell = arrcell[idxlatsrt].reshape(latsize, lonsize)\
+                                 [idxlat, np.arange(lonsize)]\
+                                 [np.arange(latsize)[:, None], idxlon]
+                #arrcell = arrcell.reshape(latsize,
+                #                          lonsize)
+                
             cell[:] = arrcell
             setattr(cell, 'long_name', 'Cell')
             setattr(cell, 'units', '')
@@ -156,7 +220,9 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
         if subsets:
             for subset_name in subsets.keys():
                 flag = ncfile.createVariable(subset_name, np.dtype('int8').char,
-                                             dim)
+                                             dim,
+                                             shuffle=ncshuffle,
+                                             zlib=nczlib, complevel=nccomplevel)
 
                 # create flag array based on shape of data
                 lf = np.zeros_like(gpivalues)
@@ -164,7 +230,9 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
                     lf = lf.flatten()
                 lf[subsets[subset_name]['points']] = 1
                 if len(dim) == 2:
-                    lf = lf.reshape(latsize, lonsize)
+                    lf = lf[idxlatsrt].reshape(latsize, lonsize)\
+                           [idxlat, np.arange(lonsize)]\
+                           [np.arange(latsize)[:, None], idxlon]
 
                 flag[:] = lf
                 setattr(flag, 'long_name', subset_name)
@@ -188,12 +256,15 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
                 }
 
         ncfile.setncatts(attr)
-        if global_attrs is not None and type(global_attrs) is dict:
+        
+        if global_attrs is not None and (
+                (type(global_attrs) is dict) or
+                (isinstance(global_attrs, OrderedDict))):
             ncfile.setncatts(global_attrs)
 
 
 def save_grid(filename, grid, subset_name='subset_flag',
-              subset_meaning="water, land", global_attrs=None):
+              subset_meaning='water land', global_attrs=None):
     """
     save a BasicGrid or CellGrid to netCDF
     it is assumed that a subset should be used as land_points
