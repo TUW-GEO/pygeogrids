@@ -187,6 +187,43 @@ class Test(unittest.TestCase):
         loaded_grid = grid_nc.load_grid(self.testfile)
         assert self.cellgrid_shape == loaded_grid
 
+def test_sort_lon_lat_for_netcdf_transposed():
+    """
+    Test the sorting of an array for netcdf storage
+    """
+    londim = np.arange(-180.0, 180.0, 60)
+    latdim = np.arange(90.0, -90.0, -30)
+    lats, lons = np.meshgrid(latdim, londim)
+    gpis = np.arange(lons.flatten().size).reshape(lons.shape)
+    rand_idx = np.random.permutation(gpis.flatten().size)
+    lons_rand = lons.flatten()[rand_idx].reshape(lons.shape)
+    lats_rand = lats.flatten()[rand_idx].reshape(lats.shape)
+    gpis_rand = gpis.flatten()[rand_idx].reshape(gpis.shape)
+    lons_sorted, lats_sorted, gpis_sorted = grid_nc.sort_for_netcdf(
+        lons_rand, lats_rand, gpis_rand)
+    nptest.assert_almost_equal(lons_sorted, lons.T)
+    nptest.assert_almost_equal(lats_sorted, lats.T)
+    nptest.assert_almost_equal(gpis_sorted, gpis.T)
+
+
+def test_sort_lon_lat_for_netcdf():
+    """
+    Test the sorting of an array for netcdf storage
+    """
+    londim = np.arange(-180.0, 180.0, 60)
+    latdim = np.arange(90.0, -90.0, -30)
+    lons, lats = np.meshgrid(londim, latdim)
+    gpis = np.arange(lons.flatten().size).reshape(lons.shape)
+    rand_idx = np.random.permutation(gpis.flatten().size)
+    lons_rand = lons.flatten()[rand_idx].reshape(lons.shape)
+    lats_rand = lats.flatten()[rand_idx].reshape(lats.shape)
+    gpis_rand = gpis.flatten()[rand_idx].reshape(gpis.shape)
+    lons_sorted, lats_sorted, gpis_sorted = grid_nc.sort_for_netcdf(
+        lons_rand, lats_rand, gpis_rand)
+    nptest.assert_almost_equal(lons_sorted, lons)
+    nptest.assert_almost_equal(lats_sorted, lats)
+    nptest.assert_almost_equal(gpis_sorted, gpis)
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
