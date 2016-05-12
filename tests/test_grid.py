@@ -207,6 +207,49 @@ class TestCellGridNotGpiDirect(unittest.TestCase):
         assert subgrid == subgrid_should
 
 
+class TestCellGridNotGpiDirectSubset(unittest.TestCase):
+
+    """Setup simple 2D grid 2.5 degree global grid (144x72) which starts at the
+    North Western corner of 90 -180 Test for cell specific features. This grid
+    also has a subset with only the first half of points active.
+    """
+
+    def setUp(self):
+        self.latdim = np.arange(90, -90, -2.5)
+        self.londim = np.arange(-180, 180, 2.5)
+        self.lon, self.lat = np.meshgrid(self.londim, self.latdim)
+        self.grid = grids.BasicGrid(self.lon.flatten(), self.lat.flatten(),
+                                    gpis=np.arange(self.lon.flatten().size),
+                                    shape=(len(self.londim),
+                                           len(self.latdim)),
+                                    subset=np.arange(self.lon.flatten().size / 2))
+        self.cellgrid = self.grid.to_cell_grid()
+
+    def test_gpi2cell(self):
+        """
+        Test if gpi to row column lookup works correctly.
+        """
+        gpi = 5185
+        cell = self.cellgrid.gpi2cell(gpi)
+        assert cell == 18
+
+    def test_gpi2cell_iterable(self):
+        """
+        Test if gpi to row column lookup works correctly.
+        """
+        gpi = [200, 5185]
+        cell = self.cellgrid.gpi2cell(gpi)
+        assert np.all(cell == [1043, 18])
+
+    def test_gpi2cell_numpy_single(self):
+        """
+        test if gpi to row column lookup works correctly
+        """
+        gpi = np.array([5185, 255])[0]
+        cell = self.cellgrid.gpi2cell(gpi)
+        assert cell == 18
+
+
 class TestCellGrid(unittest.TestCase):
 
     """
