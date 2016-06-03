@@ -26,7 +26,7 @@ install:
   # Useful for debugging any issues with conda
   - conda info -a
 
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy netCDF4 pytest pip
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy netCDF4 pytest pip pyproj
   - source activate test-environment
   - pip install pykdtree
   - python setup.py install
