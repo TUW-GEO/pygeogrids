@@ -130,8 +130,8 @@ class TestCellGridNotGpiDirect(unittest.TestCase):
         self.lon, self.lat = np.meshgrid(self.londim, self.latdim)
         self.grid = grids.BasicGrid(self.lon.flatten(), self.lat.flatten(),
                                     gpis=np.arange(self.lon.flatten().size),
-                                    shape=(len(self.londim),
-                                           len(self.latdim)))
+                                    shape=(len(self.latdim),
+                                           len(self.londim)))
         self.cellgrid = self.grid.to_cell_grid()
 
     def test_gpi2cell(self):
@@ -164,8 +164,8 @@ class TestCellGridNotGpiDirect(unittest.TestCase):
         """
         self.custom_gpi_grid = \
             grids.BasicGrid(self.lon.flatten(), self.lat.flatten(),
-                            shape=(len(self.londim),
-                                   len(self.latdim)),
+                            shape=(len(self.latdim),
+                                   len(self.londim)),
                             gpis=np.arange(len(self.lat.flatten()))[::-1])
         self.custom_gpi_cell_grid = self.custom_gpi_grid.to_cell_grid()
         gpi = [200, 255]
@@ -219,8 +219,8 @@ class TestCellGrid(unittest.TestCase):
         self.londim = np.arange(-180, 180, 2.5)
         self.lon, self.lat = np.meshgrid(self.londim, self.latdim)
         self.grid = grids.BasicGrid(self.lon.flatten(), self.lat.flatten(),
-                                    shape=(len(self.londim),
-                                           len(self.latdim)))
+                                    shape=(len(self.latdim),
+                                           len(self.londim)))
         self.cellgrid = self.grid.to_cell_grid()
 
     def test_gpi2cell(self):
@@ -325,8 +325,8 @@ class Test_2Dgrid(unittest.TestCase):
         self.londim = np.arange(-180, 180, 2.5)
         self.lon, self.lat = np.meshgrid(self.londim, self.latdim)
         self.grid = grids.BasicGrid(self.lon.flatten(), self.lat.flatten(),
-                                    shape=(len(self.londim),
-                                           len(self.latdim)))
+                                    shape=(len(self.latdim),
+                                           len(self.londim)))
 
     def test_gpi2rowcol(self):
         """
@@ -367,8 +367,8 @@ class Test_2Dgrid(unittest.TestCase):
         """
         self.custom_gpi_grid = grids.BasicGrid(self.lon.flatten(),
                                                self.lat.flatten(),
-                                               shape=(len(self.londim),
-                                                      len(self.latdim)),
+                                               shape=(len(self.latdim),
+                                                      len(self.londim)),
                                                gpis=np.arange(len(self.lat.flatten()))[::-1])
         gpi = [200, 255]
         row_should = [70, 70]
@@ -388,6 +388,13 @@ class Test_2Dgrid(unittest.TestCase):
         assert lon == lon_should
         assert lat == lat_should
 
+    def test_lonlat2d(self):
+        """
+        Test if lonlat 2d grids are the same as the grids used for making the grid.
+        """
+        assert np.all(self.lon == self.grid.lon2d)
+        assert np.all(self.lat == self.grid.lat2d)
+
     def test_tocellgrid(self):
         """
         test if to_cell_grid method works correctly
@@ -402,10 +409,13 @@ def test_genreggrid():
     Test generation of regular grids.
     """
     grid = grids.genreg_grid()
-    assert grid.shape == (360, 180)
+    assert grid.shape == (180, 360)
     lon, lat = grid.gpi2lonlat(3)
     assert lon == -176.5
     assert lat == 89.5
+    lon, lat = grid.gpi2lonlat(360)
+    assert lon == -179.5
+    assert lat == 88.5
 
 
 if __name__ == "__main__":

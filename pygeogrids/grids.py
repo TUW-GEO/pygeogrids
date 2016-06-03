@@ -83,13 +83,13 @@ class BasicGrid(object):
         search will be built on initialization
     shape : tuple, optional
         The shape of the grid array in 2-d space.
-        e.g. for a 1x1 degree global regular grid the shape would be (360,180).
+        e.g. for a 1x1 degree global regular grid the shape would be (180,360).
         if given the grid can be reshaped into the given shape
         this indicates that it is a regular grid and fills the
         attributes self.lon2d and self.lat2d which
         define the grid only be the meridian coordinates(self.lon2d) and
         the coordinates of the circles of latitude(self.lat2d).
-        The shape has to be given as (lon2d, lat2d)
+        The shape has to be given as (lat2d, lon2d)
         It it is not given the shape is set to the length of the input
         lon and lat arrays.
 
@@ -461,8 +461,8 @@ class BasicGrid(object):
                 pos = np.searchsorted(self.gpis[gpisorted], gpi)
                 index = gpisorted[pos]
 
-            index_lat = (index / self.shape[0]).astype(np.int)
-            index_lon = index % self.shape[0]
+            index_lat = (index / self.shape[1]).astype(np.int)
+            index_lon = index % self.shape[1]
             if not iterable:
                 index_lat = index_lat[0]
                 index_lon = index_lon[0]
@@ -1016,7 +1016,7 @@ def gridfromdims(londim, latdim, **kwargs):
     """
     lons, lats = np.meshgrid(londim, latdim)
     return BasicGrid(lons.flatten(), lats.flatten(),
-                     shape=(len(londim), len(latdim)), **kwargs)
+                     shape=(len(latdim), len(londim)), **kwargs)
 
 
 def genreg_grid(grd_spc_lat=1, grd_spc_lon=1, minlat=-90.0, maxlat=90.0,

@@ -2,12 +2,17 @@
 Changelog
 =========
 
-v0.1.xx
+v0.2.xx
 =======
 
 - fix bug in storing/loading grids with shape attribute set.
 - change equality check of grids to be more flexible. Now only a match of the
   tuples gpi, lon, lat, cell is checked. The order does no longer matter.
+- Shape definition changed to correspond to what one would expect. Now a 1x1
+  regular global grid has the shape (180, 360) corresponding to the 180 rows and
+  360 columns that the array has. This was necessary since the genreg_grid
+  function produced grids with wrong lon2d, lat2d arrays because the shape was
+  not correct
 
 v0.1.9
 ======
