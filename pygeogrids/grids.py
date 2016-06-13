@@ -744,7 +744,7 @@ class CellGrid(BasicGrid):
             # find the position where the gpis fit in the sorted array
             pos = np.searchsorted(self.gpis[gpisorted], gpi)
             index = gpisorted[pos]
-            cell = self.activearrcell[index]
+            cell = self.arrcell[index]
 
         if not iterable:
             cell = cell[0]
