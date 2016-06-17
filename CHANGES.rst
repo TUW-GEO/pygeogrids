@@ -2,8 +2,8 @@
 Changelog
 =========
 
-v0.2.xx
-=======
+v0.2.0
+======
 
 - fix bug in storing/loading grids with shape attribute set.
 - change equality check of grids to be more flexible. Now only a match of the
