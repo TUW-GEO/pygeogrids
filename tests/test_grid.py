@@ -227,7 +227,7 @@ class TestCellGridNotGpiDirectSubset(unittest.TestCase):
 
     def test_gpi2cell(self):
         """
-        Test if gpi to row column lookup works correctly.
+        Test if gpi to cell lookup works correctly.
         """
         gpi = 5185
         cell = self.cellgrid.gpi2cell(gpi)
@@ -235,7 +235,7 @@ class TestCellGridNotGpiDirectSubset(unittest.TestCase):
 
     def test_gpi2cell_iterable(self):
         """
-        Test if gpi to row column lookup works correctly.
+        Test if gpi to cell lookup works correctly.
         """
         gpi = [200, 5185]
         cell = self.cellgrid.gpi2cell(gpi)
@@ -243,11 +243,38 @@ class TestCellGridNotGpiDirectSubset(unittest.TestCase):
 
     def test_gpi2cell_numpy_single(self):
         """
-        test if gpi to row column lookup works correctly
+        test if gpi to cell lookup works correctly
         """
         gpi = np.array([5185, 255])[0]
         cell = self.cellgrid.gpi2cell(gpi)
         assert cell == 18
+
+    def test_gpi2lonlat(self):
+        """
+        Test if gpi to lon lat lookup works correctly.
+        """
+        gpi = 5185
+        lon, lat = self.cellgrid.gpi2lonlat(gpi)
+        assert lon == -177.5
+        assert lat == 0.0
+
+    def test_gpi2lonlat_iterable(self):
+        """
+        Test if gpi to lon lat lookup works correctly.
+        """
+        gpi = [200, 5185]
+        lon, lat = self.cellgrid.gpi2lonlat(gpi)
+        assert np.all(lon == [-40.0, -177.5])
+        assert np.all(lat == [87.5, 0.0])
+
+    def test_gpi2lonlat_numpy_single(self):
+        """
+        test if gpi to lon lat lookup works correctly
+        """
+        gpi = np.array([5185, 255])[0]
+        lon, lat = self.cellgrid.gpi2lonlat(gpi)
+        assert lon == -177.5
+        assert lat == 0.0
 
 
 class TestCellGrid(unittest.TestCase):
