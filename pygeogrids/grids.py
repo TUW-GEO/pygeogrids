@@ -421,7 +421,7 @@ class BasicGrid(object):
             # find the position where the gpis fit in the sorted array
             pos = np.searchsorted(self.gpis[gpisorted], gpi)
             index = gpisorted[pos]
-            lons, lats = self.activearrlon[index], self.activearrlat[index]
+            lons, lats = self.arrlon[index], self.arrlat[index]
 
         if not iterable:
             lons = lons[0]
