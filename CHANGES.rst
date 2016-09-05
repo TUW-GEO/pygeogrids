@@ -2,6 +2,12 @@
 Changelog
 =========
 
+v0.2.1
+======
+
+- Fix bug in gpi2lonlat with subset, see #42
+- Add simple script for plotting a global cell partitioning.
+
 v0.2.0
 ======
 
