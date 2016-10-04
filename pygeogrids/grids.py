@@ -606,18 +606,21 @@ class BasicGrid(object):
             longitudes of gpis, if coords=True
         """
 
-        index = np.where((self.activearrlat <= latmax) &
-                         (self.activearrlat >= latmin) &
-                         (self.activearrlon <= lonmax) &
-                         (self.activearrlon >= lonmin))
+        gp_info = np.array(list(self.grid_points()))
+        gpis = gp_info[:, 0]
+        lons = gp_info[:, 1]
+        lats = gp_info[:, 2]
+        index = np.where((lats <= latmax) &
+                         (lats >= latmin) &
+                         (lons <= lonmax) &
+                         (lons >= lonmin))
 
-        if coords:
-            return self.activearrlat[index], self.activearrlon[index]
+        if coords is True:
+            return lats[index], lons[index]
         elif both:
-            return self.activegpis[index], self.activearrlat[index], \
-                self.activearrlon[index]
+            return gpis[index], lats[index], lons[index]
         else:
-            return self.activegpis[index]
+            return gpis[index]
 
     def to_cell_grid(self, cellsize=5.0, cellsize_lat=None, cellsize_lon=None):
         """
