@@ -324,7 +324,8 @@ def save_grid(filename, grid, subset_name='subset_flag',
                 global_attrs=global_attrs)
 
 
-def load_grid(filename, subset_flag='subset_flag'):
+def load_grid(filename, subset_flag='subset_flag',
+              location_var_name='gpi'):
     """
     load a grid from netCDF file
 
@@ -334,6 +335,9 @@ def load_grid(filename, subset_flag='subset_flag'):
         filename
     subset_flag : string, optional
         name of the subset to load.
+    location_var_name: string, optional
+        variable name under which the grid point locations
+        are stored
 
     Returns
     -------
@@ -347,7 +351,7 @@ def load_grid(filename, subset_flag='subset_flag'):
         if 'cell' in nc_data.variables.keys():
             arrcell = nc_data.variables['cell'][:].flatten()
 
-        gpis = nc_data.variables['gpi'][:].flatten()
+        gpis = nc_data.variables[location_var_name][:].flatten()
 
         shape = None
         if hasattr(nc_data, 'shape'):
