@@ -2,6 +2,11 @@
 Changelog
 =========
 
+v0.2.2
+======
+
+- Add option to load grids with non standard variable name for gpis.
+
 v0.2.1
 ======
 
