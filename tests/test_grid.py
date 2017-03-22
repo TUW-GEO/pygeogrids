@@ -132,6 +132,11 @@ class TestCellGridNotGpiDirect(unittest.TestCase):
                                     gpis=np.arange(self.lon.flatten().size),
                                     shape=(len(self.latdim),
                                            len(self.londim)))
+        self.reverse_gpi_grid = grids.BasicGrid(
+            self.lon.flatten(), self.lat.flatten(),
+            gpis=np.arange(self.lon.flatten().size)[::-1],
+            shape=(len(self.latdim),
+                   len(self.londim)))
         self.cellgrid = self.grid.to_cell_grid()
 
     def test_gpi2cell(self):
@@ -157,6 +162,14 @@ class TestCellGridNotGpiDirect(unittest.TestCase):
         gpi = np.array([200, 255])[0]
         cell = self.cellgrid.gpi2cell(gpi)
         assert cell == 1043
+
+    def test_calc_lut(self):
+        """
+        Test calcuation of lookuptable into reverse gpi grid.
+        This must result in a lookuptable that reverses the gpis.
+        """
+        lut = self.grid.calc_lut(self.reverse_gpi_grid)
+        nptest.assert_allclose(lut[::-1], self.grid.gpis)
 
     def test_gpi2cell_custom_gpis(self):
         """
@@ -205,6 +218,38 @@ class TestCellGridNotGpiDirect(unittest.TestCase):
         subgrid_should = grids.CellGrid(
             lons_should, lats_should, cells_should, gpis=gpis)
         assert subgrid == subgrid_should
+
+
+class TestLutCalculation(unittest.TestCase):
+
+    def setUp(self):
+        """
+        Setup two grids with similar gpis but with different subset/gpi ordering.
+        The lookup tables should still give the correct results.
+        The gpi's of the two grids are identical.
+        """
+        self.lats = np.array([1, 2, 3, 4])
+        self.lons = np.array([1, 2, 3, 4])
+        self.gpis = [0, 1, 2, 3]
+        self.subset = [3, 2]
+        self.lats2 = np.array([3, 4, 2, 1])
+        self.lons2 = np.array([3, 4, 2, 1])
+        self.gpis2 = [2, 3, 1, 0]
+        self.subset2 = [0, 1]
+        self.grid1 = grids.BasicGrid(self.lons, self.lats, gpis=self.gpis,
+                                     subset=self.subset)
+        self.grid2 = grids.BasicGrid(self.lons2, self.lats2, gpis=self.gpis2,
+                                     subset=self.subset2)
+
+    def test_calc_lut(self):
+        lut = self.grid1.calc_lut(self.grid2)
+        nptest.assert_array_equal(lut, [-1, -1, 2, 3])
+        nptest.assert_array_equal(
+            lut[self.grid2.activegpis], self.grid2.activegpis)
+        lut2 = self.grid2.calc_lut(self.grid1)
+        nptest.assert_array_equal(lut2, [-1, -1, 2, 3])
+        nptest.assert_array_equal(
+            lut2[self.grid1.activegpis], self.grid1.activegpis)
 
 
 class TestCellGridNotGpiDirectSubset(unittest.TestCase):

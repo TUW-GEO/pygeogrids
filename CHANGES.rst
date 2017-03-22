@@ -2,6 +2,11 @@
 Changelog
 =========
 
+v0.2.3
+======
+
+- Fix bug in calc_lut in case of differently ordered subset of a grid.
+
 v0.2.2
 ======
 
