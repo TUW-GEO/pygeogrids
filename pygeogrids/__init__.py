@@ -1,4 +1,4 @@
-from .grids import BasicGrid, CellGrid, genreg_grid, lonlat2cell
+from .grids import BasicGrid, CellGrid, genreg_grid, lonlat2cell, reorder_to_cellsize
 import pkg_resources
 
 try:

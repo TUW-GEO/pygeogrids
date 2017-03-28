@@ -1070,3 +1070,44 @@ def _element_iterable(el):
         iterable = False
 
     return iterable
+
+
+def reorder_to_cellsize(grid, cellsize_lat, cellsize_lon):
+    """
+    Reorder grid points in one grid to follow the
+    ordering of differently sized cells. This is useful if
+    e.g. a 10x10 degree CellGrid should be traversed
+    in an order compatible with a 5x5 degree CellGrid.
+
+    Parameters
+    ----------
+    grid: :py:class:`pygeogrids.grids.CellGrid`
+        input grid
+    cellsize_lat: float
+        cellsize in latitude direction
+    cellsize_lon: float
+        cellsize in longitude direction
+
+    Returns
+    -------
+    new_grid: :py:class:`pygeogrids.grids.CellGrid`
+        output grid with original cell sizes but
+        different ordering.
+    """
+
+    cell_grid = grid.to_cell_grid(cellsize_lat=cellsize_lat,
+                                  cellsize_lon=cellsize_lon)
+    cell_sort = np.argsort(cell_grid.arrcell)
+    new_arrlon = grid.arrlon[cell_sort]
+    new_arrlat = grid.arrlat[cell_sort]
+    new_arrcell = grid.arrcell[cell_sort]
+    new_gpis = grid.gpis[cell_sort]
+    new_subset = None
+    if grid.subset is not None:
+        full_subset = np.zeros(new_arrlon.size)
+        full_subset[grid.subset] = 1
+        new_full_subset = full_subset[cell_sort]
+        new_subset = np.where(new_full_subset == 1)[0]
+    return CellGrid(new_arrlon, new_arrlat, new_arrcell,
+                    gpis=new_gpis,
+                    subset=new_subset)
