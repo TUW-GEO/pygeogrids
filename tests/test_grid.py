@@ -533,5 +533,25 @@ def test_genreggrid():
     assert lat == 88.5
 
 
+def test_reorder_to_cellsize():
+    """
+    Test reordering to different cellsize
+    """
+    lons = np.array([-177, -177, -176, -176])
+    lats = np.array([51, 57, 51, 57])
+    gpis = np.array([1, 2, 3, 4])
+    cells = np.array([14, 14, 14, 14])
+    orig_grid = grids.CellGrid(lons, lats, cells, gpis=gpis)
+    reordered_grid = grids.reorder_to_cellsize(orig_grid, 5.0, 5.0)
+    nptest.assert_almost_equal(reordered_grid.gpis,
+                               np.array([1, 3, 2, 4]))
+    nptest.assert_almost_equal(reordered_grid.arrlon,
+                               np.array([-177, -176, -177, -176]))
+    nptest.assert_almost_equal(reordered_grid.arrlat,
+                               np.array([51, 51, 57, 57]))
+    nptest.assert_almost_equal(reordered_grid.arrcell,
+                               np.array([14, 14, 14, 14]))
+
+
 if __name__ == "__main__":
     unittest.main()

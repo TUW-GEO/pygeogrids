@@ -6,6 +6,7 @@ v0.2.3
 ======
 
 - Fix bug in calc_lut in case of differently ordered subset of a grid.
+- Add function to reorder grid based on different cell size. (See grids.reorder_to_cellsize)
 
 v0.2.2
 ======
