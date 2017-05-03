@@ -267,7 +267,8 @@ class TestCellGridNotGpiDirectSubset(unittest.TestCase):
                                     gpis=np.arange(self.lon.flatten().size),
                                     shape=(len(self.londim),
                                            len(self.latdim)),
-                                    subset=np.arange(self.lon.flatten().size / 2))
+                                    subset=np.arange(self.lon.flatten().size / 2,
+                                                     dtype=np.int))
         self.cellgrid = self.grid.to_cell_grid()
 
     def test_gpi2cell(self):
