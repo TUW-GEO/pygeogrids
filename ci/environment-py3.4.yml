@@ -1,0 +1,24 @@
+name: pygeogrids
+dependencies:
+- curl=7.45.0
+- hdf5=1.8.15.1
+- libnetcdf=4.3.3.1
+- mkl=11.3.3
+- netcdf4=1.2.2
+- numpy=1.11.0
+- openssl=1.0.2h
+- pip=8.1.1
+- proj4=4.9.1
+- py=1.4.31
+- pyproj=1.9
+- pytest=2.9.1
+- python=3.4
+- readline=6.2
+- setuptools=21.2.1
+- sqlite=3.13.0
+- tk=8.5.18
+- wheel=0.29.0
+- zlib=1.2.8
+- pip:
+  - pykdtree==1.1.1
+
