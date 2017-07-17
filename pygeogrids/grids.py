@@ -35,6 +35,7 @@ The grids module defines the grid classes.
 
 import numpy as np
 import numpy.testing as nptest
+from osgeo import ogr
 
 try:
     from itertools import izip as zip
@@ -527,8 +528,47 @@ class BasicGrid(object):
 
             return gpi_lut
 
+    def get_shp_grid_points(self, ply, coords=False):
+        """
+        Returns all grid points located in a submitted shapefile,
+        optinal as coordinates. Currently only works in WGS84
+
+        Parameters
+        ----------
+        ply: shp,
+            the Geometry of the feature
+        coords : boolean, optional
+            set to True if coordinates should be returned
+
+        Returns
+        -------
+        gpi : numpy.ndarray
+            grid point indices, if coords=False
+        lat : numpy.ndarray
+            longitudes of gpis, if coords=True
+        lon : numpy.ndarray
+            longitudes of gpis, if coords=True
+        """
+        lonmin, lonmax, latmin, latmax,  = ply.GetEnvelope()
+        gpis, lats, lons = self.get_bbox_grid_points(latmin, latmax, lonmin, lonmax, both=True)
+        #Put the title of the field you are interested in here
+        lon_ip = []
+        lat_ip = []
+        gpi_ip = []
+
+        for gpi, lon, lat in zip(gpis, lons, lats):
+            #Create a point
+            pt = ogr.Geometry(ogr.wkbPoint)
+            pt.SetPoint_2D(0, lon, lat)
+            if ply.Contains(pt):
+                lon_ip.append(lon)
+                lat_ip.append(lat)
+                gpi_ip.append(gpi)
+#        return gpi_ip, lon_ip, lat_ip
+        return BasicGrid(lon_ip, lat_ip, gpi_ip)
+
     def get_bbox_grid_points(self, latmin=-90, latmax=90, lonmin=-180,
-                             lonmax=180, coords=False):
+                             lonmax=180, coords=False, both=False):
         """
         Returns all grid points located in a submitted geographic box,
         optinal as coordinates
@@ -545,6 +585,8 @@ class BasicGrid(object):
             maximum latitude
         coords : boolean, optional
             set to True if coordinates should be returned
+        both: boolean, optional
+            set to True if gpis and coordinates should be returned
 
         Returns
         -------
@@ -561,8 +603,11 @@ class BasicGrid(object):
                          (self.activearrlon <= lonmax) &
                          (self.activearrlon >= lonmin))
 
-        if coords is True:
+        if coords:
             return self.activearrlat[index], self.activearrlon[index]
+        elif both:
+            return self.activegpis[index], self.activearrlat[index], \
+                self.activearrlon[index]
         else:
             return self.activegpis[index]
 

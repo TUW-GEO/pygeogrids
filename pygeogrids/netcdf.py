@@ -46,7 +46,6 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
                 shuffle=True):
     """
     saves grid information to netCDF file
-
     Parameters
     ----------
     filename : string
