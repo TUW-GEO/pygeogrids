@@ -528,15 +528,63 @@ class BasicGrid(object):
 
             return gpi_lut
 
+    def get_gad_grid_points(self, gadm_shp_path, level, name=None, oid=None,
+                            coords=False):
+        """
+        Returns all grid points located in a administrative region. For this
+        function the files from
+        http://biogeo.ucdavis.edu/data/gadm2.8/gadm28_levels.shp.zip
+        need to be available in the folder gadm_shp_path
+        optinal as coordinates. Currently only works in WGS84.
+
+        Parameters
+        ----------
+        gadm_shp_path: path
+            Location to GADM28 shapefiles
+        level: int
+            Global Administrative Database Level
+            0 : country
+            1 : province/county/state/region/municipality/...
+            2 : municipality/District/county/...
+        name: str
+            name of region at indicated level
+        oid: int
+            OBJECTID of feature. This only works with the correct level shp.
+        coords : boolean, optional
+            set to True if coordinates should be returned
+
+        Returns
+        -------
+        gpi : numpy.ndarray
+            grid point indices, if coords=False
+        lat : numpy.ndarray
+            longitudes of gpis, if coords=True
+        lon : numpy.ndarray
+            longitudes of gpis, if coords=True
+        """
+        drv = ogr.GetDriverByName('ESRI Shapefile')
+        ds_in = drv.Open(gadm_shp_path + 'gadm28_adm{:}.shp'.format(level))
+        lyr_in = ds_in.GetLayer(0)
+        if name:
+            lyr_in.SetAttributeFilter("NAME_%s = '%s'" % (level, name))
+
+        if oid:
+            lyr_in.SetAttributeFilter("OBJECTID = '%s'" % (oid))
+
+        feature = lyr_in.GetNextFeature()
+        ply = feature.GetGeometryRef()
+
+        return self.get_shp_grid_points(ply, coords)
+
     def get_shp_grid_points(self, ply, coords=False):
         """
         Returns all grid points located in a submitted shapefile,
-        optinal as coordinates. Currently only works in WGS84
+        optinal as coordinates. Currently only works in WGS84.
 
         Parameters
         ----------
         ply: shp,
-            the Geometry of the feature
+            the Geometry of the Feature
         coords : boolean, optional
             set to True if coordinates should be returned
 
@@ -551,21 +599,25 @@ class BasicGrid(object):
         """
         lonmin, lonmax, latmin, latmax,  = ply.GetEnvelope()
         gpis, lats, lons = self.get_bbox_grid_points(latmin, latmax, lonmin, lonmax, both=True)
-        #Put the title of the field you are interested in here
+
         lon_ip = []
         lat_ip = []
         gpi_ip = []
 
-        for gpi, lon, lat in zip(gpis, lons, lats):
-            #Create a point
-            pt = ogr.Geometry(ogr.wkbPoint)
-            pt.SetPoint_2D(0, lon, lat)
-            if ply.Contains(pt):
-                lon_ip.append(lon)
-                lat_ip.append(lat)
-                gpi_ip.append(gpi)
+        if len(gpis) > 0:
+            for gpi, lon, lat in zip(gpis, lons, lats):
+                #Create a point
+                pt = ogr.Geometry(ogr.wkbPoint)
+                pt.SetPoint_2D(0, lon, lat)
+                if ply.Contains(pt):
+                    lon_ip.append(lon)
+                    lat_ip.append(lat)
+                    gpi_ip.append(gpi)
 #        return gpi_ip, lon_ip, lat_ip
-        return BasicGrid(lon_ip, lat_ip, gpi_ip)
+            return BasicGrid(lon_ip, lat_ip, gpi_ip)
+        else:
+            return None
+
 
     def get_bbox_grid_points(self, latmin=-90, latmax=90, lonmin=-180,
                              lonmax=180, coords=False, both=False):
