@@ -25,9 +25,9 @@ install:
   # Useful for debugging any issues with conda
   - conda info -a
 
-  - REQ="ci/environment-py${TRAVIS_PYTHON_VERSION}.yml"
-  - conda env create -f ${REQ}
+  - conda create -n pygeogrids python=${TRAVIS_PYTHON_VERSION}
   - source activate pygeogrids
+  - conda env update -f environment.yml
   - python setup.py install
 
 script:
