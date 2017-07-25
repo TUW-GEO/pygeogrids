@@ -32,10 +32,11 @@
 """
 Testing grid functionality.
 """
-
+import os
 import unittest
 import numpy.testing as nptest
 import numpy as np
+from osgeo import ogr, osr
 
 from pygeogrids.grids import lonlat2cell
 import pygeogrids as grids
@@ -553,6 +554,50 @@ def test_reorder_to_cellsize():
     nptest.assert_almost_equal(reordered_grid.arrcell,
                                np.array([14, 14, 14, 14]))
 
+
+def TestShpGrid():
+    def setUp(self):
+        """
+        Setup grid and shp_file to check if grid points fall in shp.
+        """
+        lat = np.arange(-90, 90, 1)
+        lon = np.arange(-180, 180, 1)
+        self.lons, self.lats = np.meshgrid(lon, lat)
+        self.grid = grids.BasicGrid(self.lon.flatten(), self.lat.flatten())
+
+        ring = ogr.Geometry(ogr.wkbLinearRing)
+        ring.AddPoint(14, 45)
+        ring.AddPoint(14, 47)
+        ring.AddPoint(16, 47)
+        ring.AddPoint(16, 45)
+        ring.AddPoint(14, 45)
+
+        poly = ogr.Geometry(ogr.wkbPolygon)
+        poly.AddGeometry(ring)
+
+        self.fname = 'test.shp'
+        drv = ogr.GetDriverByName('ESRI Shapefile')
+        ds = drv.CreateDataSource(self.fname)
+        srs = osr.SpatialReference()
+        srs.ImportFromEPSG(4326)
+        layer = ds.CreateLayer(self.fname, srs, ogr.wkbPolygon)
+        featureDefn = layer.GetLayerDefn()
+
+        feature = ogr.Feature(featureDefn)
+        feature.SetGeometry(poly)
+        layer.CreateFeature(feature)
+        self.shp = feature.GetGeometryRef()
+
+    def test_shpgrid(self):
+        '''
+        Check if gridpoints fall in polygon.
+        '''
+        subgrid = self.grid.get_shp_grid_points(self.shp, coords=True)
+        assert subgrid.activearrlon == 15
+        assert subgrid.activearrlat == 46
+
+    def tearDown(self):
+        os.remove(self.fname)
 
 if __name__ == "__main__":
     unittest.main()
