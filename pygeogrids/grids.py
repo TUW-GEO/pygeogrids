@@ -532,7 +532,7 @@ class BasicGrid(object):
 
             return gpi_lut
 
-    def get_shp_grid_points(self, ply, coords=False):
+    def get_shp_grid_points(self, ply):
         """
         Returns all grid points located in a submitted shapefile,
         optinal as coordinates. Currently only works in WGS84.
@@ -541,17 +541,11 @@ class BasicGrid(object):
         ----------
         ply: object, OGRGeometryShadow
             the Geometry of the Feature as returned from ogr.GetGeometryRef
-        coords : boolean, optional
-            set to True if coordinates should be returned
 
         Returns
         -------
-        gpi : numpy.ndarray
-            grid point indices, if coords=False
-        lat : numpy.ndarray
-            longitudes of gpis, if coords=True
-        lon : numpy.ndarray
-            longitudes of gpis, if coords=True
+        grid : BasicGrid
+            Subgrid.
         """
 
         if ogr_installed:
@@ -572,6 +566,7 @@ class BasicGrid(object):
                         lon_ip.append(lon)
                         lat_ip.append(lat)
                         gpi_ip.append(gpi)
+            if len(gpi_ip) > 0:
                 return self.subgrid_from_gpis(gpi_ip)
             else:
                 return None

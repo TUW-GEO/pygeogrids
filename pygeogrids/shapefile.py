@@ -38,7 +38,7 @@ except ImportError:
 
 
 def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None,
-                        coords=False):
+                        ):
     """
     Returns all grid points located in a administrative area. For this
     function the files from
@@ -61,17 +61,11 @@ def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None,
         name of region at indicated level
     oid: int
         OBJECTID of feature. This only works with the correct level shp.
-    coords : boolean, optional
-        set to True if coordinates should be returned
 
     Returns
     -------
-    gpi : numpy.ndarray
-        grid point indices, if coords=False
-    lat : numpy.ndarray
-        longitudes of gpis, if coords=True
-    lon : numpy.ndarray
-        longitudes of gpis, if coords=True
+    grid : BasicGrid
+            Subgrid.
     """
     if ogr_installed:
         drv = ogr.GetDriverByName('ESRI Shapefile')
