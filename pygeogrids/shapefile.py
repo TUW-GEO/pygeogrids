@@ -37,8 +37,7 @@ except ImportError:
     ogr_installed = False
 
 
-def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None,
-                        ):
+def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None):
     """
     Returns all grid points located in a administrative area. For this
     function the files from
@@ -80,7 +79,7 @@ def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None,
         feature = lyr_in.GetNextFeature()
         ply = feature.GetGeometryRef()
 
-        return grid.get_shp_grid_points(ply, coords)
+        return grid.get_shp_grid_points(ply)
 
     else:
         raise Exception("No supported implementation installed.\

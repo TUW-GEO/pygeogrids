@@ -549,7 +549,7 @@ class BasicGrid(object):
         """
 
         if ogr_installed:
-            lonmin, lonmax, latmin, latmax,  = ply.GetEnvelope()
+            lonmin, lonmax, latmin, latmax = ply.GetEnvelope()
             gpis, lats, lons = self.get_bbox_grid_points(latmin, latmax,
                                                          lonmin, lonmax,
                                                          both=True)
