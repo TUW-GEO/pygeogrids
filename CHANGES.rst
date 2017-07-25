@@ -2,6 +2,14 @@
 Changelog
 =========
 
+v0.2.4
+======
+
+- Add option to subset a grid with a shape file (OGRGeometry) in get_shp_grid_points.
+- Add shapefile module for reading shapefiles from
+  http://biogeo.ucdavis.edu/data/gadm2.8/gadm28_levels.shp.zip by Global
+  Administrative Level
+
 v0.2.3
 ======
 
