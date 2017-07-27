@@ -48,7 +48,6 @@ def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None):
     Parameters
     ----------
     grid: object
-
     gadm_shp_path: path
         Location to GADM28 shapefiles
     level: int
@@ -57,7 +56,7 @@ def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None):
         1 : province/county/state/region/municipality/...
         2 : municipality/District/county/...
     name: str
-        name of region at indicated level
+        name of region at indicated level. For countries the english name
     oid: int
         OBJECTID of feature. This only works with the correct level shp.
 
@@ -71,15 +70,17 @@ def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None):
         ds_in = drv.Open(gadm_shp_path + 'gadm28_adm{:}.shp'.format(level))
         lyr_in = ds_in.GetLayer(0)
         if name:
-            lyr_in.SetAttributeFilter("NAME_%s = '%s'" % (level, name))
+            if level == 0:
+                lyr_in.SetAttributeFilter("NAME_ENGLI = '%s'" % (name))
+            else:
+                lyr_in.SetAttributeFilter("NAME_%s = '%s'" % (level, name))
 
         if oid:
             lyr_in.SetAttributeFilter("OBJECTID = '%s'" % (oid))
-
-        feature = lyr_in.GetNextFeature()
-        ply = feature.GetGeometryRef()
-
-        return grid.get_shp_grid_points(ply)
+        if lyr_in.GetFeatureCount() > 0:
+            feature = lyr_in.GetNextFeature()
+            ply = feature.GetGeometryRef()
+            return grid.get_shp_grid_points(ply)
 
     else:
         raise Exception("No supported implementation installed.\
