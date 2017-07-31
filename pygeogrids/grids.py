@@ -561,7 +561,7 @@ class BasicGrid(object):
             if len(gpis) > 0:
                 for gpi, lon, lat in zip(gpis, lons, lats):
                     pt = ogr.Geometry(ogr.wkbPoint)
-                    pt.SetPoint_2D(0, lon, lat)
+                    pt.SetPoint_2D(0, float(lon), float(lat))
                     if ply.Contains(pt):
                         lon_ip.append(lon)
                         lat_ip.append(lat)
