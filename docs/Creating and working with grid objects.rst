@@ -1,7 +1,4 @@
 
-Examples
-========
-
 .. code:: python
 
     import pygeogrids.grids as grids
