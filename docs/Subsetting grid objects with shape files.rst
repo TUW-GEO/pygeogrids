@@ -29,17 +29,6 @@ We can the plot the resulting grid using a simple scatterplot.
     import matplotlib.pyplot as plt
     %matplotlib inline
     plt.scatter(austria.arrlon, austria.arrlat)
-    plt.show
-
-
-
-
-.. parsed-literal::
-
-    <function matplotlib.pyplot.show>
-
-
-
 
 .. image:: subsetting_grids_with_shape_files/output_6_1.png
 
@@ -63,17 +52,6 @@ We can also use this directly using any ``ogr.Geometry`` object.
     subgrid = austria.get_shp_grid_points(poly)
     plt.scatter(austria.arrlon, austria.arrlat)
     plt.scatter(subgrid.arrlon, subgrid.arrlat, c='orange')
-    plt.show
-
-
-
-
-.. parsed-literal::
-
-    <function matplotlib.pyplot.show>
-
-
-
 
 .. image:: subsetting_grids_with_shape_files/output_8_1.png
 
