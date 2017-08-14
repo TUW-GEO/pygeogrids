@@ -64,6 +64,11 @@ def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None):
     -------
     grid : BasicGrid
             Subgrid.
+
+    Raises
+    ------
+    ValueError: If name or oid are not found in shapefile of given level
+    ImportError: If gdal or osgeo are not installed
     """
     if ogr_installed:
         drv = ogr.GetDriverByName('ESRI Shapefile')
@@ -81,7 +86,9 @@ def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None):
             feature = lyr_in.GetNextFeature()
             ply = feature.GetGeometryRef()
             return grid.get_shp_grid_points(ply)
+        else:
+            raise ValueError("Requested Object not found in shapefile.")
 
     else:
-        raise Exception("No supported implementation installed.\
-                        Please install gdal and osgeo.")
+        raise ImportError("No supported implementation installed."
+                          "Please install gdal and osgeo.")
