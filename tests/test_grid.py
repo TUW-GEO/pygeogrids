@@ -156,6 +156,14 @@ class TestCellGridNotGpiDirect(unittest.TestCase):
         cell = self.cellgrid.gpi2cell(gpi)
         assert np.all(cell == [1043, 2015])
 
+    def test_gpi2cell_numpy(self):
+        """
+        test if gpi to cell lookup works correctly
+        """
+        gpi = np.array([200, 255])
+        cell = self.cellgrid.gpi2cell(gpi)
+        assert np.all(cell == [1043, 2015])
+
     def test_gpi2cell_numpy_single(self):
         """
         test if gpi to row column lookup works correctly
@@ -412,6 +420,52 @@ class TestCellGrid(unittest.TestCase):
             lons_should, lats_should, cells_should, gpis=gpis)
         assert subgrid == subgrid_should
 
+    def test_get_bbox_grid_points(self):
+        gpis = self.cellgrid.get_bbox_grid_points(latmin=-10,
+                                                  latmax=-5,
+                                                  lonmin=-10,
+                                                  lonmax=-5)
+        nptest.assert_allclose(gpis,
+                               np.array([5684, 5685, 5828, 5829,
+                                         5540, 5541, 5686, 5830, 5542]))
+        # gpis should come back sorted by cells
+        nptest.assert_allclose(self.cellgrid.gpi2cell(gpis),
+                               np.array([1240, 1240, 1240, 1240,
+                                         1241, 1241, 1276, 1276, 1277]))
+        lats, lons = self.cellgrid.get_bbox_grid_points(latmin=-10,
+                                                        latmax=-5,
+                                                        lonmin=-10,
+                                                        lonmax=-5,
+                                                        coords=True)
+        lats_should = np.array([-7.5, -7.5, -10., -10.,
+                                -5., -5., -7.5, -10., -5.])
+        lons_should = np.array([-10.,  -7.5, -10.,  -7.5,
+                                -10.,  -7.5,  -5.,  -5.,  -5.])
+        nptest.assert_allclose(lats,
+                               lats_should)
+        nptest.assert_allclose(lons,
+                               lons_should)
+        gpis, lats, lons = self.cellgrid.get_bbox_grid_points(latmin=-10,
+                                                              latmax=-5,
+                                                              lonmin=-10,
+                                                              lonmax=-5,
+                                                              both=True)
+        lats_should = np.array([-7.5, -7.5, -10., -10.,
+                                -5., -5., -7.5, -10., -5.])
+        lons_should = np.array([-10.,  -7.5, -10.,  -7.5,
+                                -10.,  -7.5,  -5.,  -5.,  -5.])
+        nptest.assert_allclose(lats,
+                               lats_should)
+        nptest.assert_allclose(lons,
+                               lons_should)
+        nptest.assert_allclose(gpis,
+                               np.array([5684, 5685, 5828, 5829,
+                                         5540, 5541, 5686, 5830, 5542]))
+        # gpis should come back sorted by cells
+        nptest.assert_allclose(self.cellgrid.gpi2cell(gpis),
+                               np.array([1240, 1240, 1240, 1240,
+                                         1241, 1241, 1276, 1276, 1277]))
+
 
 def test_setup_grid_with_lists():
 
@@ -585,6 +639,7 @@ class Test_ShpGrid(unittest.TestCase):
         subgrid = self.grid.get_shp_grid_points(self.shp)
         assert subgrid.activearrlon == 15
         assert subgrid.activearrlat == 46
+
 
 if __name__ == "__main__":
     unittest.main()

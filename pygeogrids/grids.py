@@ -199,7 +199,7 @@ class BasicGrid(object):
         self.geodatum = GeodeticDatum(geodatum)
 
         if gpis is None:
-            self.gpis = np.arange(self.n_gpi)
+            self.gpis = np.arange(self.n_gpi, dtype=int)
             self.gpidirect = True
         else:
             if lat.shape != gpis.shape:
@@ -607,7 +607,7 @@ class BasicGrid(object):
         """
 
         gp_info = np.array(list(self.grid_points()))
-        gpis = gp_info[:, 0]
+        gpis = gp_info[:, 0].astype(int)
         lons = gp_info[:, 1]
         lats = gp_info[:, 2]
         index = np.where((lats <= latmax) &
