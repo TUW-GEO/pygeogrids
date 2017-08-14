@@ -230,7 +230,7 @@ Grids can be stored to disk as CF compliant netCDF files
 
 
 Define geodetic datum for grid
-==============================
+------------------------------
 
 .. code:: python
 
