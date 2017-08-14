@@ -54,4 +54,4 @@ you used.
 .. |Coverage Status| image:: https://coveralls.io/repos/TUW-GEO/pygeogrids/badge.svg?branch=master
    :target: https://coveralls.io/r/TUW-GEO/pygeogrids?branch=master
 .. |DOI| image:: https://zenodo.org/badge/12761/TUW-GEO/pygeogrids.svg
-   :target: http://dx.doi.org/10.5281/zenodo.17406
+   :target: https://doi.org/10.5281/zenodo.596401
