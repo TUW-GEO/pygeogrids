@@ -1,3 +1,4 @@
 mock
 numpydoc
 sphinx_rtd_theme
+ipython

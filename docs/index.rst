@@ -33,6 +33,7 @@ Contents
    :maxdepth: 2
                
    Creating and working with grid objects.rst
+   Subsetting grid objects with shape files.rst
    changes.rst
    License <license>
    api/modules.rst
