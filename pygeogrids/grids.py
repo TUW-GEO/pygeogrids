@@ -762,6 +762,7 @@ class CellGrid(BasicGrid):
                                        geodatum=geodatum, subset=subset,
                                        setup_kdTree=setup_kdTree, **kwargs)
 
+        self.gpi_lut = None
         cells = np.asanyarray(cells)
 
         if self.arrlon.shape != cells.shape:
@@ -795,12 +796,11 @@ class CellGrid(BasicGrid):
         if self.gpidirect:
             cell = self.arrcell[gpi]
         else:
-            # get the indices that would sort the gpis
-            gpisorted = np.argsort(self.gpis)
-            # find the position where the gpis fit in the sorted array
-            pos = np.searchsorted(self.gpis[gpisorted], gpi)
-            index = gpisorted[pos]
-            cell = self.arrcell[index]
+            if self.gpi_lut is None:
+                self.gpi_lut = np.zeros(self.gpis.max() + 1, dtype=np.int32)
+                self.gpi_lut[self.gpis] = np.arange(self.gpis.size)
+
+            cell = self.arrcell[self.gpi_lut[gpi]]
 
         if not iterable:
             cell = cell[0]
