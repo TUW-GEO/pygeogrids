@@ -2,6 +2,12 @@
 Changelog
 =========
 
+v0.2.5
+======
+
+- Fix speed bug of gpi2cell
+- Update copyright header
+
 v0.2.4
 ======
 
