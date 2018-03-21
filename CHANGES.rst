@@ -2,6 +2,11 @@
 Changelog
 =========
 
+v0.2.X
+======
+
+- Update readme
+
 v0.2.5
 ======
 
