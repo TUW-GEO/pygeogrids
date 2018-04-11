@@ -6,6 +6,7 @@ v0.2.X
 ======
 
 - Update readme
+- Update to PyScaffold 2.5.9
 
 v0.2.5
 ======
