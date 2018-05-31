@@ -199,7 +199,7 @@ class GeodeticDatum():
         Parameters
         ----------
         lat : numpy.array, list or float
-            Geodatic latitudes of the points in the grid
+            Geodatic latitudes of the points in the grid in degrees
 
         Returns
         -------
@@ -270,10 +270,9 @@ class GeodeticDatum():
         dist : np.array, float
             Parallel arc distance
         """
-        lat = np.deg2rad(lat)
         lon1 = np.deg2rad(lon1)
         lon2 = np.deg2rad(lon2)
-        return self.EllN(lat) * np.cos(lat) * (lon2 - lon1)
+        return self.EllN(lat) * np.cos(np.deg2rad(lat)) * (lon2 - lon1)
 
     def MeridianArcDist(self, lat1, lat2):
         """
