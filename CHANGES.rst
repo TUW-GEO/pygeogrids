@@ -5,6 +5,7 @@ Changelog
 v0.2.X
 ======
 
+- Fix ParallelArcDist function (two calls of deg2rad(lat))
 - Update readme
 - Update to PyScaffold 2.5.9
 
