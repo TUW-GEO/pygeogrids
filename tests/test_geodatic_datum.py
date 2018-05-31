@@ -65,6 +65,13 @@ class test_GeodaticDatum(unittest.TestCase):
         dist = self.datum.ParallelArcDist(0., 0., 360.)
         nptest.assert_almost_equal(dist, self.datum.geod.a * 2 * np.pi)
 
+        lat, lon1, lon2 = 45., -5., 5.
+        __, __, great_circle_dist = self.datum.geod.inv(lon1, lat, lon2, lat)
+        parallel_dist = self.datum.ParallelArcDist(lat, lon1, lon2)
+
+        assert great_circle_dist < parallel_dist, \
+            (great_circle_dist, parallel_dist)
+
 
 if __name__ == "__main__":
     unittest.main()
