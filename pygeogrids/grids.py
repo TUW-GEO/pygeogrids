@@ -170,6 +170,9 @@ class BasicGrid(object):
         self.arrlon = lon
         self.arrlat = lat
 
+        self.ulon = np.unique(lon)
+        self.ulat = np.unique(lat)
+
         self.shape = None
 
         if shape is not None and len(shape) == 2:
@@ -720,7 +723,7 @@ class BasicGrid(object):
 class CellGrid(BasicGrid):
 
     """
-    Grid that has lat,lon coordinates as well as cell informatin. It can find
+    Grid that has lat,lon coordinates as well as cell information. It can find
     nearest neighbour. It can also yield the gpi, lat, lon, cell information
     in cell order. This is important if the data on the grid is saved in cell
     files on disk as we can go through all grid points with optimized
