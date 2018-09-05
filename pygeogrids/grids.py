@@ -100,6 +100,10 @@ class BasicGrid(object):
         1D array of all longitudes of the grid
     arrlat : numpy.array
         1D array of all latitudes of the grid
+    ulon : np.array
+        1D array containing the unique longitudes of the grid
+    ulat : np.array
+        1d array containing the unique latitudes of the grid
     n_gpi : int
         number of gpis in the grid
     gpidirect : boolean
@@ -169,6 +173,9 @@ class BasicGrid(object):
 
         self.arrlon = lon
         self.arrlat = lat
+
+        self.ulon = np.unique(lon)
+        self.ulat = np.unique(lat)
 
         self.shape = None
 
@@ -720,7 +727,7 @@ class BasicGrid(object):
 class CellGrid(BasicGrid):
 
     """
-    Grid that has lat,lon coordinates as well as cell informatin. It can find
+    Grid that has lat,lon coordinates as well as cell information. It can find
     nearest neighbour. It can also yield the gpi, lat, lon, cell information
     in cell order. This is important if the data on the grid is saved in cell
     files on disk as we can go through all grid points with optimized
