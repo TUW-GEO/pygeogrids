@@ -100,6 +100,10 @@ class BasicGrid(object):
         1D array of all longitudes of the grid
     arrlat : numpy.array
         1D array of all latitudes of the grid
+    ulon : np.array
+        1D array containing the unique longitudes of the grid
+    ulat : np.array
+        1d array containing the unique latitudes of the grid
     n_gpi : int
         number of gpis in the grid
     gpidirect : boolean
