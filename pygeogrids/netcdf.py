@@ -319,7 +319,7 @@ def save_grid(filename, grid, subset_name='subset_flag',
                 global_attrs=global_attrs)
 
 
-def load_grid(filename, subset_flag='subset_flag',
+def load_grid(filename, subset_flag='subset_flag', subset_value=1.,
               location_var_name='gpi'):
     """
     load a grid from netCDF file
@@ -328,9 +328,10 @@ def load_grid(filename, subset_flag='subset_flag',
     ----------
     filename : string
         filename
-    subset_flag : string, optional
+    subset_flag : string, optional (default: 'subset_flag')
         name of the subset to load.
-    location_var_name: string, optional
+    subset_value : float, optional (default: 1.)
+    location_var_name: string, optional (default: 'gpi')
         variable name under which the grid point locations
         are stored
 
@@ -377,7 +378,8 @@ def load_grid(filename, subset_flag='subset_flag',
 
             if subset_flag in nc_data.variables.keys():
                 subset = np.where(
-                    nc_data.variables[subset_flag][:].flatten() == 1)[0]
+                    np.isin(nc_data.variables[subset_flag][:].flatten(), subset_value))[0]
+                    #nc_data.variables[subset_flag][:].flatten() == subset_value)[0]
 
         elif len(shape) == 1:
             lons = nc_data.variables['lon'][:]
@@ -385,7 +387,10 @@ def load_grid(filename, subset_flag='subset_flag',
 
             # determine if it has a subset
             if subset_flag in nc_data.variables.keys():
-                subset = np.where(nc_data.variables[subset_flag][:] == 1)[0]
+                subset = np.where(
+                    np.isin(nc_data.variables[subset_flag][:].flatten(), subset_value))[0]
+
+                    #nc_data.variables[subset_flag][:] == subset_value)[0]
 
         if 'crs' in nc_data.variables:
             geodatumName = nc_data.variables['crs'].getncattr('ellipsoid_name')
