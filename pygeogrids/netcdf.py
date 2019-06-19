@@ -379,7 +379,6 @@ def load_grid(filename, subset_flag='subset_flag', subset_value=1.,
             if subset_flag in nc_data.variables.keys():
                 subset = np.where(
                     np.isin(nc_data.variables[subset_flag][:].flatten(), subset_value))[0]
-                    #nc_data.variables[subset_flag][:].flatten() == subset_value)[0]
 
         elif len(shape) == 1:
             lons = nc_data.variables['lon'][:]
@@ -389,8 +388,6 @@ def load_grid(filename, subset_flag='subset_flag', subset_value=1.,
             if subset_flag in nc_data.variables.keys():
                 subset = np.where(
                     np.isin(nc_data.variables[subset_flag][:].flatten(), subset_value))[0]
-
-                    #nc_data.variables[subset_flag][:] == subset_value)[0]
 
         if 'crs' in nc_data.variables:
             geodatumName = nc_data.variables['crs'].getncattr('ellipsoid_name')
