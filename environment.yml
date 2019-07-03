@@ -3,10 +3,13 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-- gdal
+- gdal=2.4.1
+- geos
+- proj4
 - numpy
 - pandas
 - netcdf4
 - hdf5
 - pyproj
 - pykdtree
+- pytest
