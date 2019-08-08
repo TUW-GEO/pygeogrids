@@ -287,7 +287,7 @@ def save_grid(filename, grid, subset_name='subset_flag', subset_value=1.,
     ----------
     filename : string
         name of file
-    grid :
+    grid : BasicGrid or CellGrid object
         grid whose definition to save to netCDF
     subset_name : string, optional (default: 'subset_flag')
         long_name of the netcdf variable
