@@ -76,6 +76,7 @@ class Test(unittest.TestCase):
                             GeodeticDatum('WGS84'),
                             self.cells,
                             subsets={'subset_flag': {'points': self.subset,
+                                                     'value': 1.,
                                                      'meaning': 'test_flag'}},
                             global_attrs={'test': 'test_attribute'})
 
@@ -246,3 +247,4 @@ def test_sort_lon_lat_for_netcdf():
 
 if __name__ == "__main__":
     unittest.main()
+
