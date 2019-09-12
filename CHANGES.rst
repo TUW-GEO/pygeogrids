@@ -2,9 +2,10 @@
 Changelog
 =========
 
-v0.2.X
+v0.2.6
 ======
 
+- Allow subsetting from non-binary masks
 - Fix ParallelArcDist function (two calls of deg2rad(lat))
 - Update readme
 - Update to PyScaffold 2.5.9
