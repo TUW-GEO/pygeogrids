@@ -63,6 +63,7 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
         keys : long_name of the netcdf variables
         values : dict with the following keys: points, meaning
         e.g. subsets = {'subset_flag': {'points': numpy.array,
+                                        'value': int,
                                         'meaning': 'water, land'}}
     global_attrs : dict, optional
         if given will be written as global attributs into netCDF file
@@ -196,7 +197,8 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
                 lf = np.zeros_like(gpivalues)
                 if len(dim) == 2:
                     lf = lf.flatten()
-                lf[subsets[subset_name]['points']] = 1
+                value = subsets[subset_name]['value']
+                lf[subsets[subset_name]['points']] = value
                 if len(dim) == 2:
                     lf = lf.reshape(latsize, lonsize)
                     _, _, lf = sort_for_netcdf(lons, lats, lf)
@@ -207,7 +209,7 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
                 setattr(flag, 'coordinates', 'lat lon')
                 setattr(flag, 'flag_values', np.arange(2, dtype=np.int8))
                 setattr(flag, 'flag_meanings', subsets[subset_name]['meaning'])
-                setattr(flag, 'valid_range', [0, 1])
+                setattr(flag, 'valid_range', [0, value])
 
         s = "%Y-%m-%d %H:%M:%S"
         date_created = datetime.now().strftime(s)
@@ -275,7 +277,7 @@ def sort_for_netcdf(lons, lats, values):
     return lons, lats, values
 
 
-def save_grid(filename, grid, subset_name='subset_flag',
+def save_grid(filename, grid, subset_name='subset_flag', subset_value=1.,
               subset_meaning='water land', global_attrs=None):
     """
     save a BasicGrid or CellGrid to netCDF
@@ -287,15 +289,16 @@ def save_grid(filename, grid, subset_name='subset_flag',
         name of file
     grid : BasicGrid or CellGrid object
         grid whose definition to save to netCDF
-    subset_name : string, optional
+    subset_name : string, optional (default: 'subset_flag')
         long_name of the netcdf variable
         if the subset symbolises something other than a land/sea mask
-    subset_meaning : string, optional
+    subset_value: float, optional (default: 1.)
+        Value that that the subgrid is written down as in the file.
+    subset_meaning : string, optional (default: 'water land')
         will be written into flag_meanings metadata of variable 'subset_name'
     global_attrs : dict, optional
-        if given will be written as global attributs into netCDF file
+        if given will be written as global attributes into netCDF file
     """
-
     try:
         arrcell = grid.arrcell
     except AttributeError:
@@ -310,16 +313,16 @@ def save_grid(filename, grid, subset_name='subset_flag',
 
     if grid.subset is not None:
         subsets = {subset_name: {
-            'points': grid.subset, 'meaning': subset_meaning}}
+            'points': grid.subset, 'meaning': subset_meaning, 'value': subset_value}}
     else:
         subsets = None
 
     save_lonlat(filename, grid.arrlon, grid.arrlat, grid.geodatum,
-                arrcell=arrcell, gpis=gpis, subsets=subsets,
+                arrcell=arrcell, gpis=gpis, subsets=subsets, zlib=True,
                 global_attrs=global_attrs)
 
 
-def load_grid(filename, subset_flag='subset_flag',
+def load_grid(filename, subset_flag='subset_flag', subset_value=1,
               location_var_name='gpi'):
     """
     load a grid from netCDF file
@@ -328,9 +331,11 @@ def load_grid(filename, subset_flag='subset_flag',
     ----------
     filename : string
         filename
-    subset_flag : string, optional
+    subset_flag : string, optional (default: 'subset_flag')
         name of the subset to load.
-    location_var_name: string, optional
+    subset_value : int or list, optional (default: 1)
+        Value(s) of the subset variable that points are loaded for.
+    location_var_name: string, optional (default: 'gpi')
         variable name under which the grid point locations
         are stored
 
@@ -377,7 +382,7 @@ def load_grid(filename, subset_flag='subset_flag',
 
             if subset_flag in nc_data.variables.keys():
                 subset = np.where(
-                    nc_data.variables[subset_flag][:].flatten() == 1)[0]
+                    np.isin(nc_data.variables[subset_flag][:].flatten(), subset_value))[0]
 
         elif len(shape) == 1:
             lons = nc_data.variables['lon'][:]
@@ -385,7 +390,8 @@ def load_grid(filename, subset_flag='subset_flag',
 
             # determine if it has a subset
             if subset_flag in nc_data.variables.keys():
-                subset = np.where(nc_data.variables[subset_flag][:] == 1)[0]
+                subset = np.where(
+                    np.isin(nc_data.variables[subset_flag][:].flatten(), subset_value))[0]
 
         if 'crs' in nc_data.variables:
             geodatumName = nc_data.variables['crs'].getncattr('ellipsoid_name')

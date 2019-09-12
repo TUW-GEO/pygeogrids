@@ -6,4 +6,3 @@ pykdtree ; sys_platform == 'linux'
 pykdtree ; sys_platform == 'linux2'
 scipy ; sys_platform == 'win32'
 scipy ; sys_platform == 'win64'
-

@@ -78,7 +78,7 @@ class BasicGrid(object):
     subset : numpy.array, optional
         if the active part of the array is only a subset of
         all the points then the subset array which is a index
-        into lon and lat can be given here
+        into lon and lat can be given here.
     setup_kdTree : boolean, optional
         if set (default) then the kdTree for nearest neighbour
         search will be built on initialization
