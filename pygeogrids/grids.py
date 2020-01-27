@@ -367,6 +367,8 @@ class BasicGrid(object):
             Longitude of point.
         lat : float or iterable
             Latitude of point.
+        max_dist : float, optional
+            Maximum distance to consider for search (default: np.Inf).
 
         Returns
         -------
@@ -377,22 +379,50 @@ class BasicGrid(object):
             At the moment not on a great circle but in spherical
             cartesian coordinates.
         """
-        # check if input is iterable
-        iterable = _element_iterable(lon)
+        gpi, distance = self.find_k_nearest_gpi(lon, lat, max_dist=np.Inf, k=1)
 
+        if not _element_iterable(lon):
+            gpi = gpi[0]
+            distance = distance[0]
+
+        return gpi, distance
+
+    def find_k_nearest_gpi(self, lon, lat, max_dist=np.Inf, k=1):
+        """
+        Find k nearest gpi, builds kdTree if it does not yet exist.
+
+        Parameters
+        ----------
+        lon : float or iterable
+            Longitude of point.
+        lat : float or iterable
+            Latitude of point.
+        max_dist : float, optional
+            Maximum distance to consider for search (default: np.Inf).
+        k : int, optional
+            The number of nearest neighbors to return (default: 1).
+
+        Returns
+        -------
+        gpi : long
+            Grid point index.
+        distance : float
+            Distance of gpi to given lon, lat.
+            At the moment not on a great circle but in spherical
+            cartesian coordinates.
+        """
         if self.kdTree is None:
             self._setup_kdtree()
 
-        d, ind = self.kdTree.find_nearest_index(lon, lat, max_dist=max_dist)
-
-        if not iterable:
-            d = d[0]
-            ind = ind[0]
+        distance, ind = self.kdTree.find_nearest_index(
+            lon, lat, max_dist=max_dist, k=k)
 
         if self.gpidirect and self.allpoints:
-            return ind, d
+            gpi = ind
+        else:
+            gpi = self.activegpis[ind]
 
-        return self.activegpis[ind], d
+        return gpi, distance
 
     def gpi2lonlat(self, gpi):
         """

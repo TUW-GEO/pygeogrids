@@ -2,6 +2,11 @@
 Changelog
 =========
 
+v0.2.7
+======
+
+- Add k parameter to nearest neighbor search (number of nearest neighbors to return)
+
 v0.2.6
 ======
 

@@ -113,6 +113,28 @@ class TestFindNearestNeighbor(unittest.TestCase):
         assert lon == 145.5
         assert lat == 45.5
 
+    def test_k_nearest_neighbor(self):
+        gpi, dist = self.grid.find_k_nearest_gpi(14.3, 18.5, k=2)
+        assert gpi[0, 0] == 25754
+        assert gpi[0, 1] == 25753
+        assert dist.shape == (1, 2)
+        lon, lat = self.grid.gpi2lonlat(gpi[0, 0])
+        assert lon == 14.5
+        assert lat == 18.5
+        lon, lat = self.grid.gpi2lonlat(gpi[0, 1])
+        assert lon == 13.5
+        assert lat == 18.5
+
+    def test_k_nearest_neighbor_list(self):
+        gpi, dist = self.grid.find_k_nearest_gpi(
+            [145.1, 90.2], [45.8, -16.3], k=2)
+        assert gpi.shape == (2, 2)
+        assert dist.shape == (2, 2)
+        assert gpi[0, 0] == 16165
+        assert gpi[0, 1] == 16164
+        assert gpi[1, 0] == 38430
+        assert gpi[1, 1] == 38429
+
 
 class TestCellGridNotGpiDirect(unittest.TestCase):
 

@@ -155,7 +155,7 @@ class findGeoNN(object):
             raise Exception("No supported kdtree implementation installed.\
                              Please install pykdtree or scipy.")
 
-    def find_nearest_index(self, lon, lat, max_dist=np.Inf):
+    def find_nearest_index(self, lon, lat, max_dist=np.Inf, k=1):
         """
         finds nearest index, builds kdTree if it does not yet exist
 
@@ -166,7 +166,9 @@ class findGeoNN(object):
         lat : float, list or numpy.array
             latitude of point
         max_dist : float, optional
-            maximum distance to consider for search
+            Maximum distance to consider for search (default: np.Inf).
+        k : int, optional
+            The number of nearest neighbors to return (default: 1).
 
         Returns
         -------
@@ -188,7 +190,8 @@ class findGeoNN(object):
 
         query_coords = self._transform_lonlats(lon, lat)
 
-        d, ind = self.kdtree.query(query_coords, distance_upper_bound=max_dist)
+        d, ind = self.kdtree.query(
+            query_coords, distance_upper_bound=max_dist, k=k)
 
         if not self.grid:
             return d, ind
