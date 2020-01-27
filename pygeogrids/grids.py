@@ -357,9 +357,49 @@ class BasicGrid(object):
                                            self.subarrlats[n])):
             yield self.subgpis[n][i], lon, lat
 
-    def find_nearest_gpi(self, lon, lat, max_dist=np.Inf, k=1):
+    def find_nearest_gpi(self, lon, lat, max_dist=np.Inf):
         """
         Finds nearest gpi, builds kdTree if it does not yet exist.
+
+        Parameters
+        ----------
+        lon : float or iterable
+            Longitude of point.
+        lat : float or iterable
+            Latitude of point.
+        max_dist : float, optional
+            Maximum distance to consider for search (default: np.Inf).
+
+        Returns
+        -------
+        gpi : long
+            Grid point index.
+        distance : float
+            Distance of gpi to given lon, lat.
+            At the moment not on a great circle but in spherical
+            cartesian coordinates.
+        """
+        # check if input is iterable
+        iterable = _element_iterable(lon)
+
+        if self.kdTree is None:
+            self._setup_kdtree()
+
+        d, ind = self.kdTree.find_nearest_index(lon, lat,
+                                                max_dist=max_dist)
+
+        if not iterable:
+            d = d[0]
+            ind = ind[0]
+
+        if self.gpidirect and self.allpoints:
+            return ind, d
+
+        return self.activegpis[ind], d
+
+    def find_k_nearest_gpi(self, lon, lat, max_dist=np.Inf, k=1):
+        """
+        Find k nearest gpi, builds kdTree if it does not yet exist.
 
         Parameters
         ----------
@@ -381,22 +421,21 @@ class BasicGrid(object):
             At the moment not on a great circle but in spherical
             cartesian coordinates.
         """
-        # check if input is iterable
-        # iterable = _element_iterable(lon)
-
         if self.kdTree is None:
             self._setup_kdtree()
 
-        d, ind = self.kdTree.find_nearest_index(lon, lat, max_dist=max_dist, k=k)
+        if k == 1:
+            gpi, distance = self.find_nearest_gpi(lon, lat, max_dist=max_dist)
+        else:
+            distance, ind = self.kdTree.find_nearest_index(
+                lon, lat, max_dist=max_dist, k=k)
 
-        # if not iterable:
-        #     d = d[0]
-        #     ind = ind[0]
+            if self.gpidirect and self.allpoints:
+                gpi = ind
+            else:
+                gpi = self.activegpis[ind]
 
-        if self.gpidirect and self.allpoints:
-            return ind, d
-
-        return self.activegpis[ind], d
+        return gpi, distance
 
     def gpi2lonlat(self, gpi):
         """
