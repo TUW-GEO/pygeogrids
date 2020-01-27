@@ -379,23 +379,13 @@ class BasicGrid(object):
             At the moment not on a great circle but in spherical
             cartesian coordinates.
         """
-        # check if input is iterable
-        iterable = _element_iterable(lon)
+        gpi, distance = self.find_k_nearest_gpi(lon, lat, max_dist=np.Inf, k=1)
 
-        if self.kdTree is None:
-            self._setup_kdtree()
+        if not _element_iterable(lon):
+            gpi = gpi[0]
+            distance = distance[0]
 
-        d, ind = self.kdTree.find_nearest_index(lon, lat,
-                                                max_dist=max_dist)
-
-        if not iterable:
-            d = d[0]
-            ind = ind[0]
-
-        if self.gpidirect and self.allpoints:
-            return ind, d
-
-        return self.activegpis[ind], d
+        return gpi, distance
 
     def find_k_nearest_gpi(self, lon, lat, max_dist=np.Inf, k=1):
         """
@@ -424,16 +414,13 @@ class BasicGrid(object):
         if self.kdTree is None:
             self._setup_kdtree()
 
-        if k == 1:
-            gpi, distance = self.find_nearest_gpi(lon, lat, max_dist=max_dist)
-        else:
-            distance, ind = self.kdTree.find_nearest_index(
-                lon, lat, max_dist=max_dist, k=k)
+        distance, ind = self.kdTree.find_nearest_index(
+            lon, lat, max_dist=max_dist, k=k)
 
-            if self.gpidirect and self.allpoints:
-                gpi = ind
-            else:
-                gpi = self.activegpis[ind]
+        if self.gpidirect and self.allpoints:
+            gpi = ind
+        else:
+            gpi = self.activegpis[ind]
 
         return gpi, distance
 
