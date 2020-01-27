@@ -357,7 +357,7 @@ class BasicGrid(object):
                                            self.subarrlats[n])):
             yield self.subgpis[n][i], lon, lat
 
-    def find_nearest_gpi(self, lon, lat, max_dist=np.Inf):
+    def find_nearest_gpi(self, lon, lat, max_dist=np.Inf, k=1):
         """
         Finds nearest gpi, builds kdTree if it does not yet exist.
 
@@ -367,6 +367,10 @@ class BasicGrid(object):
             Longitude of point.
         lat : float or iterable
             Latitude of point.
+        max_dist : float, optional
+            Maximum distance to consider for search (default: np.Inf).
+        k : int, optional
+            The number of nearest neighbors to return (default: 1).
 
         Returns
         -------
@@ -378,16 +382,16 @@ class BasicGrid(object):
             cartesian coordinates.
         """
         # check if input is iterable
-        iterable = _element_iterable(lon)
+        # iterable = _element_iterable(lon)
 
         if self.kdTree is None:
             self._setup_kdtree()
 
-        d, ind = self.kdTree.find_nearest_index(lon, lat, max_dist=max_dist)
+        d, ind = self.kdTree.find_nearest_index(lon, lat, max_dist=max_dist, k=k)
 
-        if not iterable:
-            d = d[0]
-            ind = ind[0]
+        # if not iterable:
+        #     d = d[0]
+        #     ind = ind[0]
 
         if self.gpidirect and self.allpoints:
             return ind, d
