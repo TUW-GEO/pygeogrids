@@ -1,15 +1,13 @@
-name: pygeogrids
+name: pygeogrids_dev
 channels:
   - conda-forge
-  - defaults
 dependencies:
-- gdal=2.4.1
-- geos
-- proj4
 - numpy
 - pandas
 - netcdf4
+- gdal
+- geos
+- proj4
 - hdf5
 - pyproj
 - pykdtree
-- pytest

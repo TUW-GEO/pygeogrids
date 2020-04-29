@@ -2,27 +2,27 @@
 Changelog
 =========
 
-v0.2.7
-======
+Version 0.2.7
+=============
 
 - Add k parameter to nearest neighbor search (number of nearest neighbors to return)
 
-v0.2.6
-======
+Version 0.2.6
+=============
 
 - Allow subsetting from non-binary masks
 - Fix ParallelArcDist function (two calls of deg2rad(lat))
 - Update readme
 - Update to PyScaffold 2.5.9
 
-v0.2.5
-======
+Version 0.2.5
+=============
 
 - Fix speed bug of gpi2cell
 - Update copyright header
 
-v0.2.4
-======
+Version 0.2.4
+=============
 
 - Add option to subset a grid with a shape file (OGRGeometry) in
   get_shp_grid_points.
@@ -32,25 +32,25 @@ v0.2.4
 - Ensure that `get_bbox_grid_points` returns points while taking cell order into
   account.
 
-v0.2.3
-======
+Version 0.2.3
+=============
 
 - Fix bug in calc_lut in case of differently ordered subset of a grid.
 - Add function to reorder grid based on different cell size. (See grids.reorder_to_cellsize)
 
-v0.2.2
-======
+Version 0.2.2
+=============
 
 - Add option to load grids with non standard variable name for gpis.
 
-v0.2.1
-======
+Version 0.2.1
+=============
 
 - Fix bug in gpi2lonlat with subset, see #42
 - Add simple script for plotting a global cell partitioning.
 
-v0.2.0
-======
+Version 0.2.0
+=============
 
 - fix bug in storing/loading grids with shape attribute set.
 - change equality check of grids to be more flexible. Now only a match of the
@@ -61,57 +61,57 @@ v0.2.0
   function produced grids with wrong lon2d, lat2d arrays because the shape was
   not correct
 
-v0.1.9
-======
+Version 0.1.9
+=============
 
 -  bugfix in lonlat2cell. Improvements in dependency installation and
    documentation.
 
-v0.1.7
-======
+Version 0.1.7
+=============
 
 -  bugfix in gpi2lonlat. Now supports array as input.
 
-v0.1.6
-======
+Version 0.1.6
+=============
 
 -  add geodatic datum functionality to grid objects
 
-v0.1.5
-======
+Version 0.1.5
+=============
 
 -  bugfix of subgrid creation which returned wrongly shaped subarrays
 
-v0.1.4
-======
+Version 0.1.4
+=============
 
 -  fix bug in lookuptable generation when gpis have custom ordering
 -  add functions for getting subgrids from cells and gpis
 
-v0.1.3
-======
+Version 0.1.3
+=============
 
 -  change meaning and rename grid dimensions to lon2d, lat2d. They do
    now represent 2d arrays of latitudes and longitudes which means that
    they no longer have to be regular in order to be able to have a
    shape. This is useful for e.g. orbit data
 
-v0.1.2
-======
+Version 0.1.2
+=============
 
 -  fix issue #19 by refactoring the iterable checking into own function
 -  made pykdtree an optional requirement see issue #18
 
-v0.1.1
-======
+Version 0.1.1
+=============
 
 -  added support for saving more subsets and loading a certain one
    in/from a netcdf grid file
 -  fix #15 by setting correct shape for derived cell grids
 -  fix issue #14 of gpi2rowcol input types
 
-v0.1
-====
+Version 0.1
+===========
 
 -  Initial version pulled out of pytesmo
 -  added support for iterables like lists and numpy arrays to functions

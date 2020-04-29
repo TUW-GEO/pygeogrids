@@ -88,3 +88,9 @@ If you want to contribute please follow these steps:
 - Please include tests for your contributions in one of the test directories.
   We use py.test so a simple function called test_my_feature is enough
 - submit a pull request to our master branch
+
+Note
+====
+
+This project has been set up using PyScaffold 3.2.3. For details and usage
+information on PyScaffold see https://pyscaffold.org/.
