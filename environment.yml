@@ -2,10 +2,10 @@ name: pygeogrids_dev
 channels:
   - conda-forge
 dependencies:
-- numpy=1.17.5
+- numpy
 - pandas
 - netcdf4
-- gdal=3.0.4
+- gdal
 - geos
 - proj4
 - hdf5
