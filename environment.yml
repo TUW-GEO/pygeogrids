@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-- gdal=2.4.4
+- gdal=3.0.1
 - geos
 - proj4
 - numpy
