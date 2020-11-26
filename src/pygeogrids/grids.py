@@ -31,6 +31,7 @@ The grids module defines the grid classes.
 
 import numpy as np
 import numpy.testing as nptest
+import warnings
 try:
     from osgeo import ogr
     ogr_installed = True
@@ -93,6 +94,11 @@ class BasicGrid(object):
         The shape has to be given as (lat2d, lon2d)
         It it is not given the shape is set to the length of the input
         lon and lat arrays.
+    transform_lon : bool or None, optional (default: None)
+        Whether to transform longitudes to values between -180 and 180.
+        By default values are transformed, but a warning is issued.
+        To turn off the warning, set this to ``True``, to turn of
+        transformation set this to ``False``.
 
     Attributes
     ----------
@@ -148,7 +154,7 @@ class BasicGrid(object):
     """
 
     def __init__(self, lon, lat, gpis=None, geodatum='WGS84', subset=None,
-                 setup_kdTree=True, shape=None):
+                 setup_kdTree=True, shape=None, transform_lon=None):
         """
         init method, prepares lon and lat arrays for _transform_lonlats if
         necessary
@@ -166,6 +172,18 @@ class BasicGrid(object):
                 "lat and lon np.arrays have to have equal shapes")
 
         self.n_gpi = len(lon)
+
+        # transfrom longitudes to be between -180 and 180 if they are between 0
+        # and 360
+        if transform_lon or transform_lon is None:
+            if np.any(lon > 180):
+                lon[lon > 180] -= 360
+                if transform_lon is None:
+                    warnings.warn(
+                        "Longitude values have been transformed to be in"
+                        " (-180, 180]. If this was not intended or to suppress"
+                        " this warning set the transform_lon keyword argument"
+                    )
 
         self.arrlon = lon
         self.arrlat = lat
