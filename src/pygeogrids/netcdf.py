@@ -87,8 +87,8 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
                 type(global_attrs['shape']) is not int and
                 len(global_attrs['shape']) == 2):
 
-            latsize = global_attrs['shape'][1]
-            lonsize = global_attrs['shape'][0]
+            latsize = global_attrs['shape'][0]
+            lonsize = global_attrs['shape'][1]
             ncfile.createDimension("lat", latsize)
             ncfile.createDimension("lon", lonsize)
             gpisize = global_attrs['shape'][0] * global_attrs['shape'][1]
