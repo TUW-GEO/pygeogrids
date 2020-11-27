@@ -33,8 +33,10 @@ import unittest
 import numpy.testing as nptest
 import numpy as np
 from osgeo import ogr
+import pytest
+import warnings
 
-from pygeogrids.grids import lonlat2cell
+from pygeogrids.grids import lonlat2cell, BasicGrid
 import pygeogrids as grids
 
 
@@ -657,6 +659,31 @@ class Test_ShpGrid(unittest.TestCase):
         subgrid = self.grid.get_shp_grid_points(self.shp)
         assert subgrid.activearrlon == 15
         assert subgrid.activearrlat == 46
+
+
+@pytest.mark.filterwarnings("error")
+def test_BasicGrid_transform_lon():
+    """
+    Tests whether transforming longitudes works as expected.
+    """
+
+    lat = np.asarray([10, -10, 5, 42])
+    lon_pos = np.asarray([0, 90, 180, 270])
+    lon_centered = np.asarray([0, 90, 180, -90])
+
+    # case 1: warning and transformation
+    with pytest.warns(UserWarning):
+        grid = BasicGrid(lon_pos, lat)
+        assert np.all(grid.arrlon == lon_centered)
+
+    # case 2: no warning and transform
+    grid = BasicGrid(lon_pos, lat, transform_lon=True)
+    assert np.all(grid.arrlon == lon_centered)
+
+    # case 3: no warning and no transform
+    grid = BasicGrid(lon_pos, lat, transform_lon=False)
+    assert np.all(grid.arrlon == lon_pos)
+
 
 
 if __name__ == "__main__":
