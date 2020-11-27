@@ -137,6 +137,19 @@ class TestFindNearestNeighbor(unittest.TestCase):
         assert gpi[1, 0] == 38430
         assert gpi[1, 1] == 38429
 
+    def test_nearest_neighbor_max_dist(self):
+        # test with maxdist higher than nearest point
+        gpi, dist = self.grid.find_nearest_gpi(14.3, 18.5, max_dist=100e3)
+        assert gpi == 25754
+        assert len([dist]) == 1
+        lon, lat = self.grid.gpi2lonlat(gpi)
+        assert lon == 14.5
+        assert lat == 18.5
+
+        # test with maxdist lower than nearest point
+        gpi, dist = self.grid.find_nearest_gpi(14.3, 18.5, max_dist=10e3)
+        assert len(gpi) == 0
+        assert len(dist) == 0
 
 class TestCellGridNotGpiDirect(unittest.TestCase):
 

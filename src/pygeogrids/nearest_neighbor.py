@@ -178,12 +178,22 @@ class findGeoNN(object):
             great circle distance at the moment. This should be OK for
             most applications that look for the nearest neighbor which
             should not be hundreds of kilometers away.
+            If no point was found within the maximum distance to consider, an
+            empty array is returned.
         ind : int, numpy.array
-            indices of nearest neighbor
+            If ``self.grid`` is ``False`` indices of nearest neighbor.
+            If no point was found within the maximum distance to consider, an
+            empty array is returned.
         index_lon : numpy.array, optional
-            if self.grid is True then return index into lon array of grid definition
+            If ``self.grid`` is ``True`` then return index into lon array of
+            grid definition.
+            If no point was found within the maximum distance to consider, an
+            empty array is returned.
         index_lat : numpy.array, optional
-            if self.grid is True then return index into lat array of grid definition
+            If ``self.grid`` is ``True`` then return index into lat array of
+            grid definition.
+            If no point was found within the maximum distance to consider, an
+            empty array is returned.
         """
         if self.kdtree is None:
             self._build_kdtree()
@@ -193,11 +203,15 @@ class findGeoNN(object):
         d, ind = self.kdtree.query(
             query_coords, distance_upper_bound=max_dist, k=k)
 
+        # if no point was found, d == inf
+        if not np.all(np.isfinite(d)):
+            d, ind = np.array([]), np.array([])
+
         if not self.grid:
             return d, ind
         else:
-            # calculate index position in grid definition arrays assuming row-major
-            # flattening of arrays after numpy.meshgrid
+            # calculate index position in grid definition arrays assuming
+            # row-major flattening of arrays after numpy.meshgrid
             index_lat = ind / self.lon_size
             index_lon = ind % self.lon_size
             return d, index_lon.astype(np.int32), index_lat.astype(np.int32)

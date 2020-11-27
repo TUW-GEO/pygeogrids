@@ -399,7 +399,7 @@ class BasicGrid(object):
         """
         gpi, distance = self.find_k_nearest_gpi(lon, lat, max_dist=max_dist, k=1)
 
-        if not _element_iterable(lon):
+        if not _element_iterable(lon) and len(gpi) > 0:
             gpi = gpi[0]
             distance = distance[0]
 
