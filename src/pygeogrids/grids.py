@@ -386,7 +386,7 @@ class BasicGrid(object):
         lat : float or iterable
             Latitude of point.
         max_dist : float, optional
-            Maximum distance to consider for search (default: np.Inf).
+            Maximum distance [m] to consider for search (default: np.Inf).
 
         Returns
         -------
@@ -397,7 +397,7 @@ class BasicGrid(object):
             At the moment not on a great circle but in spherical
             cartesian coordinates.
         """
-        gpi, distance = self.find_k_nearest_gpi(lon, lat, max_dist=np.Inf, k=1)
+        gpi, distance = self.find_k_nearest_gpi(lon, lat, max_dist=max_dist, k=1)
 
         if not _element_iterable(lon):
             gpi = gpi[0]
