@@ -47,12 +47,12 @@ class Test(unittest.TestCase):
         self.subset = np.sort(np.random.choice(np.arange(self.lats.size),
                                                size=500, replace=False))
         self.basic = grids.BasicGrid(self.lons, self.lats, subset=self.subset,
-                                     shape=(360, 180))
+                                     shape=(180, 360))
 
         self.basic_shape_gpis = grids.BasicGrid(self.lons, self.lats,
                                                 gpis=np.arange(self.lats.size),
                                                 subset=self.subset,
-                                                shape=(360, 180))
+                                                shape=(180, 360))
         self.basic_generated = grids.genreg_grid(1, 1)
         self.basic_irregular = grids.BasicGrid(np.random.random(360 * 180) * 360 - 180,
                                                np.random.random(
@@ -63,7 +63,7 @@ class Test(unittest.TestCase):
 
         self.cellgrid_shape = grids.CellGrid(self.lons, self.lats, self.cells,
                                              subset=self.subset,
-                                             shape=(360, 180))
+                                             shape=(180, 360))
 
         self.testfile = tempfile.NamedTemporaryFile().name
 
@@ -106,8 +106,8 @@ class Test(unittest.TestCase):
             nptest.assert_array_equal(sorted(self.basic.gpis[self.subset]),
                                       sorted(nc_data.variables['gpi'][:].flatten()[stored_subset]))
             assert nc_data.test == 'test_attribute'
-            assert nc_data.shape[1] == 180
-            assert nc_data.shape[0] == 360
+            assert nc_data.shape[0] == 180
+            assert nc_data.shape[1] == 360
 
     def test_save_basicgrid_irregular_nc(self):
         grid_nc.save_grid(self.testfile,

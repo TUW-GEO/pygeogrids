@@ -33,8 +33,10 @@ import unittest
 import numpy.testing as nptest
 import numpy as np
 from osgeo import ogr
+import pytest
+import warnings
 
-from pygeogrids.grids import lonlat2cell
+from pygeogrids.grids import lonlat2cell, BasicGrid
 import pygeogrids as grids
 
 
@@ -135,6 +137,19 @@ class TestFindNearestNeighbor(unittest.TestCase):
         assert gpi[1, 0] == 38430
         assert gpi[1, 1] == 38429
 
+    def test_nearest_neighbor_max_dist(self):
+        # test with maxdist higher than nearest point
+        gpi, dist = self.grid.find_nearest_gpi(14.3, 18.5, max_dist=100e3)
+        assert gpi == 25754
+        assert len([dist]) == 1
+        lon, lat = self.grid.gpi2lonlat(gpi)
+        assert lon == 14.5
+        assert lat == 18.5
+
+        # test with maxdist lower than nearest point
+        gpi, dist = self.grid.find_nearest_gpi(14.3, 18.5, max_dist=10e3)
+        assert len(gpi) == 0
+        assert len(dist) == 0
 
 class TestCellGridNotGpiDirect(unittest.TestCase):
 
@@ -657,6 +672,31 @@ class Test_ShpGrid(unittest.TestCase):
         subgrid = self.grid.get_shp_grid_points(self.shp)
         assert subgrid.activearrlon == 15
         assert subgrid.activearrlat == 46
+
+
+@pytest.mark.filterwarnings("error")
+def test_BasicGrid_transform_lon():
+    """
+    Tests whether transforming longitudes works as expected.
+    """
+
+    lat = np.asarray([10, -10, 5, 42])
+    lon_pos = np.asarray([0, 90, 180, 270])
+    lon_centered = np.asarray([0, 90, 180, -90])
+
+    # case 1: warning and transformation
+    with pytest.warns(UserWarning):
+        grid = BasicGrid(lon_pos, lat)
+        assert np.all(grid.arrlon == lon_centered)
+
+    # case 2: no warning and transform
+    grid = BasicGrid(lon_pos, lat, transform_lon=True)
+    assert np.all(grid.arrlon == lon_centered)
+
+    # case 3: no warning and no transform
+    grid = BasicGrid(lon_pos, lat, transform_lon=False)
+    assert np.all(grid.arrlon == lon_pos)
+
 
 
 if __name__ == "__main__":
