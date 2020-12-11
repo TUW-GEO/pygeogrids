@@ -2,7 +2,8 @@
 [run]
 branch = True
 source = pygeogrids
-# omit = bad_file.py
+omit =
+    src/pygeogrids/_version.py
 
 [paths]
 source =
