@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version x.x.x
+=============
+
+- FIX: Nearest neighbour search for grids with non-default GPIs
+- Replace Travis CI with Github Actions workflows.
+
 Version 0.2.7
 =============
 
