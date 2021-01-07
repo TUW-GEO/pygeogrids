@@ -391,11 +391,13 @@ class BasicGrid(object):
         Returns
         -------
         gpi : long
-            Grid point index.
+            Grid point index. If no point was found within the maximum
+            distance to consider, an empty array is returned.
         distance : float
             Distance of gpi to given lon, lat.
             At the moment not on a great circle but in spherical
-            cartesian coordinates.
+            cartesian coordinates. If no point was found within the maximum
+            distance to consider, an empty array is returned.
         """
         gpi, distance = self.find_k_nearest_gpi(lon, lat, max_dist=max_dist, k=1)
 
@@ -435,7 +437,7 @@ class BasicGrid(object):
         distance, ind = self.kdTree.find_nearest_index(
             lon, lat, max_dist=max_dist, k=k)
 
-        if self.gpidirect and self.allpoints:
+        if self.gpidirect and self.allpoints or len(ind) == 0:
             gpi = ind
         else:
             gpi = self.activegpis[ind]

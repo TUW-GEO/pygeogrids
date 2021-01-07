@@ -151,6 +151,13 @@ class TestFindNearestNeighbor(unittest.TestCase):
         assert len(gpi) == 0
         assert len(dist) == 0
 
+        # test with custom gpi, see issue #68
+        grid = grids.BasicGrid(lon=[16,17], lat=[45,46], gpis=[100,200])
+        gpi, dist = grid.find_nearest_gpi(0,0, max_dist=1000)
+        assert len(gpi) == 0
+        assert len(dist) == 0
+                                                
+
 class TestCellGridNotGpiDirect(unittest.TestCase):
 
     """
