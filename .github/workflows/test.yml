@@ -22,7 +22,7 @@ jobs:
           - os: ubuntu-latest
             python-version: '3.6'
             ymlfile: environment_pinned.yml
-    name: Py${{ matrix.python-version }}@${{ matrix.os }} (${{ matrix.ymlfile }}) 🐍
+    name: Py${{ matrix.python-version }}@${{ matrix.os }}|${{ matrix.ymlfile }}🐍
     runs-on: ${{ matrix.os }}
 
     steps:
