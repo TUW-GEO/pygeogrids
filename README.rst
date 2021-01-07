@@ -2,8 +2,8 @@
 pygeogrids
 ==========
 
-.. image:: https://travis-ci.org/TUW-GEO/pygeogrids.svg?branch=master
-   :target: https://travis-ci.org/TUW-GEO/pygeogrids
+.. image:: https://github.com/TUW-GEO/pygeogrids/workflows/test/badge.svg
+   :target: https://github.com/TUW-GEO/pygeogrids/actions?query=test
 
 .. image:: https://coveralls.io/repos/TUW-GEO/pygeogrids/badge.svg?branch=master
    :target: https://coveralls.io/r/TUW-GEO/pygeogrids?branch=master
