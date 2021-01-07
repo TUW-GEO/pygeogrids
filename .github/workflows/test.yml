@@ -76,8 +76,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   artifacts:
-    - name: Upload environment yml 📄
-      uses: actions/upload-artifact@v2
-      with:
-        name: os_py_environments
-        path: .artifacts/*
+    name: Upload environment yml 📄
+    uses: actions/upload-artifact@v2
+    with:
+      name: os_py_environments
+      path: .artifacts/*
