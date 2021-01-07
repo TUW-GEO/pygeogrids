@@ -66,6 +66,7 @@ jobs:
           COVERALLS_PARALLEL: true
   artifacts:
     name: Upload Artifacts 📄
+    needs: build
     runs-on: ubuntu-latest
     container: python:3-slim
     steps:
