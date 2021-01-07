@@ -64,6 +64,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
           COVERALLS_PARALLEL: true
+  artifacts:
+    name: Upload Artifacts 📄
+    runs-on: ubuntu-latest
+    container: python:3-slim
+    steps:
+      - uses: actions/upload-artifact@v2
+        with:
+          name: os_py_environments
+          path: .artifacts/*
   coveralls:
     name: Submit Coveralls 👚
     needs: build
@@ -75,9 +84,3 @@ jobs:
           pip3 install --upgrade coveralls && coveralls --finish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  artifacts:
-    name: Upload environment yml 📄
-    uses: actions/upload-artifact@v2
-    with:
-      name: os_py_environments
-      path: .artifacts/*
