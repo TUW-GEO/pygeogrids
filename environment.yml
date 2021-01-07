@@ -1,4 +1,4 @@
-name: pygeogrids_dev
+name: pygeogrids
 channels:
   - conda-forge
 dependencies:
