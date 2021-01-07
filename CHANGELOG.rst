@@ -5,13 +5,24 @@ Changelog
 Version x.x.x
 =============
 
+-
+
+Version 0.3.2
+=============
+
 - FIX: Nearest neighbour search for grids with non-default GPIs
 - Replace Travis CI with Github Actions workflows.
 
-Version 0.2.7
+Version 0.3.1
 =============
 
 - Add k parameter to nearest neighbor search (number of nearest neighbors to return)
+
+
+Version 0.3.0
+=============
+
+- Refracture package to pyscaffold 3 standard
 
 Version 0.2.6
 =============
