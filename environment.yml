@@ -9,6 +9,7 @@ dependencies:
   - gdal
   - pyproj
   - pykdtree
+  - pip
   - pip:
     - pytest
     - pytest-cov
