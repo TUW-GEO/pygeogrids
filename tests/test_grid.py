@@ -465,6 +465,7 @@ class TestCellGrid(unittest.TestCase):
                                                   latmax=-5,
                                                   lonmin=-10,
                                                   lonmax=-5)
+
         nptest.assert_allclose(gpis,
                                np.array([5684, 5685, 5828, 5829,
                                          5540, 5541, 5686, 5830, 5542]))

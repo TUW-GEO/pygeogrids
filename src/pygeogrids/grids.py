@@ -621,25 +621,40 @@ class BasicGrid(object):
             raise Exception("No supported implementation installed.\
                             Please install gdal and osgeo.")
 
+    @staticmethod
+    def issorted(a):
+        return np.all(a[:-1] <= a[1:])
+
+    def _index_bbox_grid_points(self, gp_info: np.array,
+                                latmin:float, latmax:float, lonmin:float,
+                                lonmax:float) -> (np.array, np.array):
+
+        index = np.where((gp_info[2] <= latmax) &
+                         (gp_info[2] >= latmin) &
+                         (gp_info[1] <= lonmax) &
+                         (gp_info[1] >= lonmin))
+
+        return index
+
     def get_bbox_grid_points(self, latmin=-90, latmax=90, lonmin=-180,
                              lonmax=180, coords=False, both=False):
         """
         Returns all grid points located in a submitted geographic box,
-        optinal as coordinates
+        optional as coordinates.
 
         Parameters
         ----------
-        latmin : float, optional
+        latmin : float, optional (default: -90)
             minimum latitude
-        latmax : float, optional
+        latmax : float, optional (default: 90)
             maximum latitude
-        lonmin : float, optional
+        lonmin : float, optional (default: -180)
             minimum latitude
-        lonmax : float, optional
+        lonmax : float, optional (default: 180)
             maximum latitude
-        coords : boolean, optional
+        coords : boolean, optional (default: False)
             set to True if coordinates should be returned
-        both: boolean, optional
+        both: boolean, optional (default: False)
             set to True if gpis and coordinates should be returned
 
         Returns
@@ -652,14 +667,14 @@ class BasicGrid(object):
             longitudes of gpis, if coords=True
         """
 
-        gp_info = np.array(list(self.grid_points()))
-        gpis = gp_info[:, 0].astype(int)
-        lons = gp_info[:, 1]
-        lats = gp_info[:, 2]
-        index = np.where((lats <= latmax) &
-                         (lats >= latmin) &
-                         (lons <= lonmax) &
-                         (lons >= lonmin))
+        if self.issplit:
+            raise NotImplementedError
+
+        gp_info = self.get_grid_points()
+
+        index = self._index_bbox_grid_points(gp_info, latmin, latmax,
+                                             lonmin, lonmax)
+        gpis, lons, lats = gp_info
 
         if coords is True:
             return lats[index], lons[index]
@@ -1059,6 +1074,60 @@ class CellGrid(BasicGrid):
                           == other.arrcell[idx_gpi_other])
         return np.all([basicsame, cellsame])
 
+    def get_bbox_grid_points(self, latmin=-90, latmax=90, lonmin=-180,
+                             lonmax=180, coords=False, both=False,
+                             sort_by_cells=True):
+        """
+        Returns all grid points located in a submitted geographic box,
+        optional as coordinates. The points are grouped by cells!
+
+        Parameters
+        ----------
+        latmin : float, optional (default: -90)
+            minimum latitude
+        latmax : float, optional (default: 90)
+            maximum latitude
+        lonmin : float, optional (default: -180)
+            minimum latitude
+        lonmax : float, optional (default: 180)
+            maximum latitude
+        coords : boolean, optional (default: False)
+            set to True if coordinates should be returned
+        both: boolean, optional (default: False)
+            set to True if gpis and coordinates should be returned
+        sort_by_cells: bool, optional (default: True)
+            Points in the bbox are grouped by cells (so that e.g. when iterating
+            over them you can read data from a cell that is already in memory).
+
+        Returns
+        -------
+        gpi : numpy.ndarray
+            grid point indices, if coords=False
+        lat : numpy.ndarray
+            longitudes of gpis, if coords=True
+        lon : numpy.ndarray
+            longitudes of gpis, if coords=True
+        """
+
+        gp_info = self.get_grid_points()
+
+        index = self._index_bbox_grid_points(
+            gp_info, latmin, latmax, lonmin, lonmax)
+
+        gpis, lons, lats, cells = gp_info
+
+        gpis, lons, lats, cells = gpis[index], lons[index], lats[index], cells[index]
+
+        if sort_by_cells:
+            indx = np.lexsort((gpis, cells))
+            gpis, lons, lats, cells = gpis[indx], lons[indx], lats[indx], cells[indx]
+
+        if coords is True:
+            return lats, lons
+        elif both:
+            return gpis, lats, lons
+        else:
+            return gpis
 
 def lonlat2cell(lon, lat, cellsize=5., cellsize_lon=None, cellsize_lat=None):
     """
@@ -1213,3 +1282,15 @@ def reorder_to_cellsize(grid, cellsize_lat, cellsize_lon):
     return CellGrid(new_arrlon, new_arrlat, new_arrcell,
                     gpis=new_gpis,
                     subset=new_subset)
+
+if __name__ == '__main__':
+    latdim = np.arange(90, -90, -1)
+    londim = np.arange(-180, 180, 1)
+    lons, lats = np.meshgrid(londim, latdim)
+    grid = BasicGrid(lons.flatten(), lats.flatten()).to_cell_grid()
+    gpis, lons, lats = grid.get_bbox_grid_points(-10,10,-10,10,both=True)
+    gpis2,lons2, lats2 = grid.new_get_bbox_grid_points(both=True)
+    assert np.all(gpis == gpis2)
+    assert np.all(lons == lons2)
+    assert np.all(lats == lats2)
+
