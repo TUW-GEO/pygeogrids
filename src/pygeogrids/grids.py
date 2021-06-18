@@ -1167,7 +1167,7 @@ def lonlat2cell(lon, lat, cellsize=5., cellsize_lon=None, cellsize_lat=None):
     return np.int32(cells)
 
 
-def gridfromdims(londim, latdim, **kwargs):
+def gridfromdims(londim, latdim, origin='bottom', **kwargs):
     """
     Defines new grid object from latitude and longitude dimensions. Latitude
     and longitude dimensions are 1D arrays that give the latitude and
@@ -1179,6 +1179,11 @@ def gridfromdims(londim, latdim, **kwargs):
         longitude dimension
     latdim : numpy.ndarray
         latitude dimension
+    origin : Literal['bottom', 'top'], optional (default: 'bottom')
+        If bottom is selected, the GPI origin is at (min_lon, min_lat),
+        i.e. in the bottom left corner.
+        If 'top' is selected, the origin is at (min_lon, max_lat),
+        i.e. in the top left corner
 
     Returns
     -------
@@ -1186,6 +1191,14 @@ def gridfromdims(londim, latdim, **kwargs):
         New grid object.
     """
     lons, lats = np.meshgrid(londim, latdim)
+    if origin.lower() == 'bottom':
+        lats = np.flipud(lats)
+    elif origin.lower() == 'top':
+        pass
+    else:
+        raise ValueError(f"Unexpected origin passed, expected 'top' or 'bottom' "
+                         f"got {origin.lower()}")
+
     return BasicGrid(lons.flatten(), lats.flatten(),
                      shape=(len(latdim), len(londim)), **kwargs)
 

@@ -349,9 +349,9 @@ def load_grid(filename, subset_flag='subset_flag', subset_value=1,
         # determine if it is a cell grid or a basic grid
         arrcell = None
         if 'cell' in nc_data.variables.keys():
-            arrcell = nc_data.variables['cell'][:].flatten()
+            arrcell = np.array(nc_data.variables['cell'][:].flatten())
 
-        gpis = nc_data.variables[location_var_name][:].flatten()
+        gpis = np.array(nc_data.variables[location_var_name][:].flatten())
 
         shape = None
         if hasattr(nc_data, 'shape'):
@@ -375,8 +375,8 @@ def load_grid(filename, subset_flag='subset_flag', subset_value=1,
 
         # check if grid has regular shape
         if len(shape) == 2:
-            lons, lats = np.meshgrid(nc_data.variables['lon'][:],
-                                     nc_data.variables['lat'][:])
+            lons, lats = np.meshgrid(np.array(nc_data.variables['lon'][:]),
+                                     np.array(nc_data.variables['lat'][:]))
             lons = lons.flatten()
             lats = lats.flatten()
 
@@ -385,13 +385,14 @@ def load_grid(filename, subset_flag='subset_flag', subset_value=1,
                     np.isin(nc_data.variables[subset_flag][:].flatten(), subset_value))[0]
 
         elif len(shape) == 1:
-            lons = nc_data.variables['lon'][:]
-            lats = nc_data.variables['lat'][:]
+            lons = np.array(nc_data.variables['lon'][:])
+            lats = np.array(nc_data.variables['lat'][:])
 
             # determine if it has a subset
             if subset_flag in nc_data.variables.keys():
                 subset = np.where(
-                    np.isin(nc_data.variables[subset_flag][:].flatten(), subset_value))[0]
+                    np.isin(np.array(nc_data.variables[subset_flag][:].flatten()),
+                            subset_value))[0]
 
         if 'crs' in nc_data.variables:
             geodatumName = nc_data.variables['crs'].getncattr('ellipsoid_name')
