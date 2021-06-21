@@ -323,7 +323,7 @@ def save_grid(filename, grid, subset_name='subset_flag', subset_value=1.,
 
 
 def load_grid(filename, subset_flag='subset_flag', subset_value=1,
-              location_var_name='gpi'):
+              location_var_name='gpi', **grid_kwargs):
     """
     load a grid from netCDF file
 
@@ -338,6 +338,7 @@ def load_grid(filename, subset_flag='subset_flag', subset_value=1,
     location_var_name: string, optional (default: 'gpi')
         variable name under which the grid point locations
         are stored
+    **grid_kwargs: additional kwargs that are passed to BasicGrid or CellGrid
 
     Returns
     -------
@@ -407,7 +408,8 @@ def load_grid(filename, subset_flag='subset_flag', subset_value=1,
                              gpis=gpis,
                              geodatum=geodatumName,
                              subset=subset,
-                             shape=shape)
+                             shape=shape,
+                             **grid_kwargs)
         else:
             # CellGrid
             return CellGrid(lons,
@@ -416,4 +418,5 @@ def load_grid(filename, subset_flag='subset_flag', subset_value=1,
                             gpis=gpis,
                             geodatum=geodatumName,
                             subset=subset,
-                            shape=shape)
+                            shape=shape,
+                            **grid_kwargs)

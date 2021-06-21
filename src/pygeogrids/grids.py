@@ -99,6 +99,8 @@ class BasicGrid(object):
         By default values are transformed, but a warning is issued.
         To turn off the warning, set this to ``True``, to turn of
         transformation set this to ``False``.
+    kd_tree_name: str, optional (default: 'pykdtree')
+        KDTree engine, 'pykdtree' or 'scipy'
 
     Attributes
     ----------
@@ -154,7 +156,8 @@ class BasicGrid(object):
     """
 
     def __init__(self, lon, lat, gpis=None, geodatum='WGS84', subset=None,
-                 setup_kdTree=True, shape=None, transform_lon=None):
+                 setup_kdTree=True, shape=None, transform_lon=None,
+                 kd_tree_name='pykdtree'):
         """
         init method, prepares lon and lat arrays for _transform_lonlats if
         necessary
@@ -237,7 +240,9 @@ class BasicGrid(object):
 
         self.issplit = False
 
+        self.kd_tree_name = kd_tree_name
         self.kdTree = None
+
         if setup_kdTree:
             self._setup_kdtree()
 
@@ -247,7 +252,7 @@ class BasicGrid(object):
         """
         if self.kdTree is None:
             self.kdTree = NN.findGeoNN(self.activearrlon, self.activearrlat,
-                                       self.geodatum)
+                                       self.geodatum, kd_tree_name=self.kd_tree_name)
             self.kdTree._build_kdtree()
 
     def split(self, n):
