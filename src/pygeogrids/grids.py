@@ -1301,14 +1301,4 @@ def reorder_to_cellsize(grid, cellsize_lat, cellsize_lon):
                     gpis=new_gpis,
                     subset=new_subset)
 
-if __name__ == '__main__':
-    latdim = np.arange(90, -90, -1)
-    londim = np.arange(-180, 180, 1)
-    lons, lats = np.meshgrid(londim, latdim)
-    grid = BasicGrid(lons.flatten(), lats.flatten()).to_cell_grid()
-    gpis, lons, lats = grid.get_bbox_grid_points(-10,10,-10,10,both=True)
-    gpis2,lons2, lats2 = grid.new_get_bbox_grid_points(both=True)
-    assert np.all(gpis == gpis2)
-    assert np.all(lons == lons2)
-    assert np.all(lats == lats2)
 
