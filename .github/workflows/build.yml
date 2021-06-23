@@ -47,11 +47,6 @@ jobs:
           mkdir -p .artifacts
           filename=env_py${{ matrix.python-version }}_${{ matrix.os }}.yml
           conda env export --no-builds | grep -v "prefix" > .artifacts/$filename
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: Artifacts
-          path: .artifacts/*
       - name: Install package and test
         shell: bash -l {0}
         run: |
@@ -72,7 +67,7 @@ jobs:
           if [ ${{ matrix.os }} == "windows-latest" ]
           then
             # build whls on windows
-            pip install wheel
+            pip install .
             python setup.py bdist_wheel --dist-dir .artifacts/dist
           else
             # build dist on linux

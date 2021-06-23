@@ -32,9 +32,13 @@ Testing grid functionality.
 import unittest
 import numpy.testing as nptest
 import numpy as np
-from osgeo import ogr
+try:
+    from osgeo import ogr
+    ogr_installed = True
+except ImportError:
+    ogr_installed = False
+
 import pytest
-import warnings
 
 from pygeogrids.grids import lonlat2cell, BasicGrid
 import pygeogrids as grids
@@ -650,6 +654,8 @@ def test_reorder_to_cellsize():
                                np.array([14, 14, 14, 14]))
 
 
+@pytest.mark.skipif(not ogr_installed,
+                    reason="OGR not installed")
 class Test_ShpGrid(unittest.TestCase):
 
     def setUp(self):
