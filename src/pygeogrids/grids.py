@@ -32,12 +32,7 @@ The grids module defines the grid classes.
 import numpy as np
 import numpy.testing as nptest
 import warnings
-try:
-    from osgeo import ogr
-    ogr_installed = True
-except ImportError:
-    ogr_installed = False
-
+from osgeo import ogr
 try:
     from itertools import izip as zip
 except ImportError:

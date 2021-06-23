@@ -654,8 +654,6 @@ def test_reorder_to_cellsize():
                                np.array([14, 14, 14, 14]))
 
 
-@pytest.mark.skipif(not ogr_installed,
-                    reason="OGR not installed")
 class Test_ShpGrid(unittest.TestCase):
 
     def setUp(self):
