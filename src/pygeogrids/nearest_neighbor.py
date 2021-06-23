@@ -207,7 +207,8 @@ class findGeoNN(object):
             k = self.kdtree.query_ball_point(query_coords,
                                              r=max_dist, return_length=True)
 
-        d, ind = self.kdtree.query(query_coords, k=k)
+        d, ind = self.kdtree.query(
+            query_coords, distance_upper_bound=max_dist, k=k)
 
         # if no point was found, d == inf
         if not np.all(np.isfinite(d)):

@@ -147,7 +147,7 @@ class TestFindNearestNeighbor(unittest.TestCase):
         assert lat == 18.5
 
         # test with maxdist lower than nearest point
-        gpi, dist = self.grid.find_nearest_gpi(14.3, 18.5, max_dist=10e3)
+        gpi, dist = self.grid.find_nearest_gpi(14.3, 18.5, max_dist=10000)
         assert len(gpi) == 0
         assert len(dist) == 0
 
