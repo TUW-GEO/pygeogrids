@@ -32,9 +32,13 @@ Testing grid functionality.
 import unittest
 import numpy.testing as nptest
 import numpy as np
-from osgeo import ogr
+try:
+    from osgeo import ogr
+    ogr_installed = True
+except ImportError:
+    ogr_installed = False
+
 import pytest
-import warnings
 
 from pygeogrids.grids import lonlat2cell, BasicGrid
 import pygeogrids as grids
@@ -147,7 +151,7 @@ class TestFindNearestNeighbor(unittest.TestCase):
         assert lat == 18.5
 
         # test with maxdist lower than nearest point
-        gpi, dist = self.grid.find_nearest_gpi(14.3, 18.5, max_dist=10e3)
+        gpi, dist = self.grid.find_nearest_gpi(14.3, 18.5, max_dist=10000)
         assert len(gpi) == 0
         assert len(dist) == 0
 
@@ -465,6 +469,7 @@ class TestCellGrid(unittest.TestCase):
                                                   latmax=-5,
                                                   lonmin=-10,
                                                   lonmax=-5)
+
         nptest.assert_allclose(gpis,
                                np.array([5684, 5685, 5828, 5829,
                                          5540, 5541, 5686, 5830, 5542]))

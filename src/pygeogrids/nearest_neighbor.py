@@ -153,7 +153,7 @@ class findGeoNN(object):
             self.kdtree = sc_spat.cKDTree(self.coords)
         else:
             raise Exception("No supported kdtree implementation installed.\
-                             Please install pykdtree or scipy.")
+                             Please install pykdtree and/or scipy.")
 
     def find_nearest_index(self, lon, lat, max_dist=np.Inf, k=1):
         """
@@ -199,6 +199,13 @@ class findGeoNN(object):
             self._build_kdtree()
 
         query_coords = self._transform_lonlats(lon, lat)
+
+        if k is None:
+            if self.kd_tree_name != 'scipy':
+                raise NotImplementedError("Only available for the scipy kdTree")
+            query_coords = query_coords[0]
+            k = self.kdtree.query_ball_point(query_coords,
+                                             r=max_dist, return_length=True)
 
         d, ind = self.kdtree.query(
             query_coords, distance_upper_bound=max_dist, k=k)
