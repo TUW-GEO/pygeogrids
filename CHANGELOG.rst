@@ -2,10 +2,11 @@
 Changelog
 =========
 
-Version x.x.x
+Version 0.4.0
 =============
 
--
+- Faster implementation of bbox search
+- Uses pyscaffold v4 standard
 
 Version 0.3.2
 =============
@@ -17,7 +18,6 @@ Version 0.3.1
 =============
 
 - Add k parameter to nearest neighbor search (number of nearest neighbors to return)
-
 
 Version 0.3.0
 =============

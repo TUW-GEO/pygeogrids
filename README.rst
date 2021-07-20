@@ -43,12 +43,6 @@ This package should be installable through pip:
 
     pip install pygeogrids
 
-To install the package use pip 6.0 or later. On linux systems `pykdtree
-<https://github.com/storpipfugl/pykdtree>`__ will be installed whereas on
-windows systems `scipy <http://www.scipy.org/>`__ ``cKDTree`` will be used.
-pykdtree is faster than the scipy implementation but it is at the moment
-not available for Windows systems.
-
 Features
 ========
 
