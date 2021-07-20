@@ -29,8 +29,10 @@
 Module for extracting grid points from global administrative areas
 """
 import os
+
 try:
     from osgeo import ogr
+
     ogr_installed = True
 except ImportError:
     ogr_installed = False
@@ -70,8 +72,8 @@ def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None):
     ImportError: If gdal or osgeo are not installed
     """
     if ogr_installed:
-        drv = ogr.GetDriverByName('ESRI Shapefile')
-        ds_in = drv.Open(os.path.join(gadm_shp_path , f'gadm28_adm{level}.shp'))
+        drv = ogr.GetDriverByName("ESRI Shapefile")
+        ds_in = drv.Open(os.path.join(gadm_shp_path, f"gadm28_adm{level}.shp"))
         lyr_in = ds_in.GetLayer(0)
         if name:
             if level == 0:
@@ -89,5 +91,6 @@ def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None):
             raise ValueError("Requested Object not found in shapefile.")
 
     else:
-        raise ImportError("No supported implementation installed."
-                          "Please install gdal and osgeo.")
+        raise ImportError(
+            "No supported implementation installed." "Please install gdal and osgeo."
+        )

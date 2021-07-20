@@ -30,7 +30,7 @@ import numpy as np
 import pyproj
 
 
-class GeodeticDatum():
+class GeodeticDatum:
     """
     Class representing a geodetic datum providing transformation and
     calculation functionality
@@ -43,7 +43,7 @@ class GeodeticDatum():
     """
 
     def __init__(self, ellps, **kwargs):
-        kwargs['ellps'] = ellps
+        kwargs["ellps"] = ellps
         self.geod = pyproj.Geod(**kwargs)
         self.geod.e = np.sqrt(self.geod.es)
         self.name = ellps
@@ -112,7 +112,7 @@ class GeodeticDatum():
         radius : np.array, float
             Radius of parallel
         """
-        x, y, _ = self.toECEF(0., lat)
+        x, y, _ = self.toECEF(0.0, lat)
         return np.sqrt(x ** 2 + y ** 2)
 
     def GeocentricLat(self, lat):
@@ -132,8 +132,7 @@ class GeodeticDatum():
         if _element_iterable(lat):
             lat = np.array(lat, dtype=np.float64)
 
-        return np.rad2deg(np.arctan((1 - self.geod.e ** 2) *
-                                    np.tan(np.deg2rad(lat))))
+        return np.rad2deg(np.arctan((1 - self.geod.e ** 2) * np.tan(np.deg2rad(lat))))
 
     def GeodeticLat(self, lat):
         """
@@ -151,8 +150,7 @@ class GeodeticDatum():
         """
         if _element_iterable(lat):
             lat = np.array(lat, dtype=np.float64)
-        return np.rad2deg(np.arctan(np.tan(np.deg2rad(lat)) /
-                                    (1 - self.geod.e ** 2)))
+        return np.rad2deg(np.arctan(np.tan(np.deg2rad(lat)) / (1 - self.geod.e ** 2)))
 
     def ReducedLat(self, lat):
         """
@@ -170,8 +168,9 @@ class GeodeticDatum():
         """
         if _element_iterable(lat):
             lat = np.array(lat, dtype=np.float64)
-        return np.rad2deg(np.arctan(np.sqrt(1 - self.geod.e ** 2) *
-                                    np.tan(np.deg2rad(lat))))
+        return np.rad2deg(
+            np.arctan(np.sqrt(1 - self.geod.e ** 2) * np.tan(np.deg2rad(lat)))
+        )
 
     def GeocentricDistance(self, lon, lat):
         """
@@ -190,7 +189,7 @@ class GeodeticDatum():
             Geocentric radius
         """
         x, y, z = self.toECEF(lon, lat)
-        return np.sqrt(x**2 + y**2 + z**2)
+        return np.sqrt(x ** 2 + y ** 2 + z ** 2)
 
     def EllN(self, lat):
         """
@@ -209,8 +208,9 @@ class GeodeticDatum():
 
         if _element_iterable(lat):
             lat = np.array(lat, dtype=np.float64)
-        return self.geod.a / np.sqrt(1 - (self.geod.es) *
-                                     (np.sin(np.deg2rad(lat))) ** 2)
+        return self.geod.a / np.sqrt(
+            1 - (self.geod.es) * (np.sin(np.deg2rad(lat))) ** 2
+        )
 
     def EllM(self, lat):
         """
@@ -228,9 +228,9 @@ class GeodeticDatum():
         """
         if _element_iterable(lat):
             lat = np.array(lat, dtype=np.float64)
-        return (self.geod.a * (1 - self.geod.es)) / \
-               ((1 - self.geod.es) *
-                (np.sin(np.deg2rad(lat)) ** 2) ** (3. / 2.))
+        return (self.geod.a * (1 - self.geod.es)) / (
+            (1 - self.geod.es) * (np.sin(np.deg2rad(lat)) ** 2) ** (3.0 / 2.0)
+        )
 
     def GaussianRadi(self, lat):
         """
@@ -294,7 +294,7 @@ class GeodeticDatum():
         if _element_iterable(lat1) and lat1.shape == lat2.shape:
             lat1 = np.array(lat1, dtype=np.float64)
             lat2 = np.array(lat2, dtype=np.float64)
-        fazi, bazi, dist = self.geod.inv(0., lat1, 0., lat2)
+        fazi, bazi, dist = self.geod.inv(0.0, lat1, 0.0, lat2)
         return dist
 
 

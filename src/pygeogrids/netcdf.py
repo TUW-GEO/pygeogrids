@@ -36,12 +36,20 @@ from datetime import datetime
 from pygeogrids import CellGrid, BasicGrid
 
 
-def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
-                gpis=None, subsets={}, global_attrs=None,
-                format='NETCDF4',
-                zlib=False,
-                complevel=4,
-                shuffle=True):
+def save_lonlat(
+    filename,
+    arrlon,
+    arrlat,
+    geodatum,
+    arrcell=None,
+    gpis=None,
+    subsets={},
+    global_attrs=None,
+    format="NETCDF4",
+    zlib=False,
+    complevel=4,
+    shuffle=True,
+):
     """
     saves grid information to netCDF file
 
@@ -81,21 +89,22 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
         see netCDF documentation
     """
 
-    with Dataset(filename, 'w', format=format) as ncfile:
+    with Dataset(filename, "w", format=format) as ncfile:
 
-        if (global_attrs is not None and 'shape' in global_attrs and
-                type(global_attrs['shape']) is not int and
-                len(global_attrs['shape']) == 2):
+        if (
+            global_attrs is not None
+            and "shape" in global_attrs
+            and type(global_attrs["shape"]) is not int
+            and len(global_attrs["shape"]) == 2
+        ):
 
-            latsize = global_attrs['shape'][0]
-            lonsize = global_attrs['shape'][1]
+            latsize = global_attrs["shape"][0]
+            lonsize = global_attrs["shape"][1]
             ncfile.createDimension("lat", latsize)
             ncfile.createDimension("lon", lonsize)
-            gpisize = global_attrs['shape'][0] * global_attrs['shape'][1]
+            gpisize = global_attrs["shape"][0] * global_attrs["shape"][1]
             if gpis is None:
-                gpivalues = np.arange(gpisize,
-                                      dtype=np.int32).reshape(latsize,
-                                                              lonsize)
+                gpivalues = np.arange(gpisize, dtype=np.int32).reshape(latsize, lonsize)
             else:
                 gpivalues = gpis.reshape(latsize, lonsize)
 
@@ -103,7 +112,8 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
             lats = arrlat.reshape(latsize, lonsize)
             # sort arrlon, arrlat and gpis
             arrlon_sorted, arrlat_sorted, gpivalues = sort_for_netcdf(
-                lons, lats, gpivalues)
+                lons, lats, gpivalues
+            )
 
             # sorts arrlat descending
             arrlat_store = np.unique(arrlat_sorted)[::-1]
@@ -121,108 +131,133 @@ def save_lonlat(filename, arrlon, arrlat, geodatum, arrcell=None,
 
         dim = list(ncfile.dimensions.keys())
 
-        crs = ncfile.createVariable('crs', np.dtype('int32').char,
-                                    shuffle=shuffle,
-                                    zlib=zlib, complevel=complevel)
-        setattr(crs, 'grid_mapping_name', 'latitude_longitude')
-        setattr(crs, 'longitude_of_prime_meridian', 0.)
-        setattr(crs, 'semi_major_axis', geodatum.geod.a)
-        setattr(crs, 'inverse_flattening', 1. / geodatum.geod.f)
-        setattr(crs, 'ellipsoid_name', geodatum.name)
+        crs = ncfile.createVariable(
+            "crs",
+            np.dtype("int32").char,
+            shuffle=shuffle,
+            zlib=zlib,
+            complevel=complevel,
+        )
+        setattr(crs, "grid_mapping_name", "latitude_longitude")
+        setattr(crs, "longitude_of_prime_meridian", 0.0)
+        setattr(crs, "semi_major_axis", geodatum.geod.a)
+        setattr(crs, "inverse_flattening", 1.0 / geodatum.geod.f)
+        setattr(crs, "ellipsoid_name", geodatum.name)
 
-        gpi = ncfile.createVariable('gpi', np.dtype('int32').char, dim,
-                                    shuffle=shuffle,
-                                    zlib=zlib, complevel=complevel)
+        gpi = ncfile.createVariable(
+            "gpi",
+            np.dtype("int32").char,
+            dim,
+            shuffle=shuffle,
+            zlib=zlib,
+            complevel=complevel,
+        )
 
         if gpis is None:
             gpi[:] = gpivalues
-            setattr(gpi, 'long_name', 'Grid point index')
-            setattr(gpi, 'units', '')
-            setattr(gpi, 'valid_range', [0, gpisize])
-            gpidirect = 0x1b
+            setattr(gpi, "long_name", "Grid point index")
+            setattr(gpi, "units", "")
+            setattr(gpi, "valid_range", [0, gpisize])
+            gpidirect = 0x1B
         else:
             gpi[:] = gpivalues
-            setattr(gpi, 'long_name', 'Grid point index')
-            setattr(gpi, 'units', '')
-            setattr(gpi, 'valid_range', [np.min(gpivalues), np.max(gpivalues)])
-            gpidirect = 0x0b
+            setattr(gpi, "long_name", "Grid point index")
+            setattr(gpi, "units", "")
+            setattr(gpi, "valid_range", [np.min(gpivalues), np.max(gpivalues)])
+            gpidirect = 0x0B
 
-        latitude = ncfile.createVariable('lat', np.dtype('float64').char,
-                                         dim[0],
-                                         shuffle=shuffle,
-                                         zlib=zlib, complevel=complevel)
+        latitude = ncfile.createVariable(
+            "lat",
+            np.dtype("float64").char,
+            dim[0],
+            shuffle=shuffle,
+            zlib=zlib,
+            complevel=complevel,
+        )
         latitude[:] = arrlat_store
-        setattr(latitude, 'long_name', 'Latitude')
-        setattr(latitude, 'units', 'degree_north')
-        setattr(latitude, 'standard_name', 'latitude')
-        setattr(latitude, 'valid_range', [-90.0, 90.0])
+        setattr(latitude, "long_name", "Latitude")
+        setattr(latitude, "units", "degree_north")
+        setattr(latitude, "standard_name", "latitude")
+        setattr(latitude, "valid_range", [-90.0, 90.0])
 
         if len(dim) == 2:
             londim = dim[1]
         else:
             londim = dim[0]
-        longitude = ncfile.createVariable('lon', np.dtype('float64').char,
-                                          londim,
-                                          shuffle=shuffle,
-                                          zlib=zlib, complevel=complevel)
+        longitude = ncfile.createVariable(
+            "lon",
+            np.dtype("float64").char,
+            londim,
+            shuffle=shuffle,
+            zlib=zlib,
+            complevel=complevel,
+        )
         longitude[:] = arrlon_store
-        setattr(longitude, 'long_name', 'Longitude')
-        setattr(longitude, 'units', 'degree_east')
-        setattr(longitude, 'standard_name', 'longitude')
-        setattr(longitude, 'valid_range', [-180.0, 180.0])
+        setattr(longitude, "long_name", "Longitude")
+        setattr(longitude, "units", "degree_east")
+        setattr(longitude, "standard_name", "longitude")
+        setattr(longitude, "valid_range", [-180.0, 180.0])
 
         if arrcell is not None:
-            cell = ncfile.createVariable('cell', np.dtype('int32').char,
-                                         dim,
-                                         shuffle=shuffle,
-                                         zlib=zlib, complevel=complevel)
+            cell = ncfile.createVariable(
+                "cell",
+                np.dtype("int32").char,
+                dim,
+                shuffle=shuffle,
+                zlib=zlib,
+                complevel=complevel,
+            )
 
             if len(dim) == 2:
-                arrcell = arrcell.reshape(latsize,
-                                          lonsize)
+                arrcell = arrcell.reshape(latsize, lonsize)
                 _, _, arrcell = sort_for_netcdf(lons, lats, arrcell)
             cell[:] = arrcell
-            setattr(cell, 'long_name', 'Cell')
-            setattr(cell, 'units', '')
-            setattr(cell, 'valid_range', [np.min(arrcell), np.max(arrcell)])
+            setattr(cell, "long_name", "Cell")
+            setattr(cell, "units", "")
+            setattr(cell, "valid_range", [np.min(arrcell), np.max(arrcell)])
 
         if subsets:
             for subset_name in subsets.keys():
-                flag = ncfile.createVariable(subset_name, np.dtype('int8').char,
-                                             dim,
-                                             shuffle=shuffle,
-                                             zlib=zlib, complevel=complevel)
+                flag = ncfile.createVariable(
+                    subset_name,
+                    np.dtype("int8").char,
+                    dim,
+                    shuffle=shuffle,
+                    zlib=zlib,
+                    complevel=complevel,
+                )
 
                 # create flag array based on shape of data
                 lf = np.zeros_like(gpivalues)
                 if len(dim) == 2:
                     lf = lf.flatten()
-                value = subsets[subset_name]['value']
-                lf[subsets[subset_name]['points']] = value
+                value = subsets[subset_name]["value"]
+                lf[subsets[subset_name]["points"]] = value
                 if len(dim) == 2:
                     lf = lf.reshape(latsize, lonsize)
                     _, _, lf = sort_for_netcdf(lons, lats, lf)
 
                 flag[:] = lf
-                setattr(flag, 'long_name', subset_name)
-                setattr(flag, 'units', '')
-                setattr(flag, 'coordinates', 'lat lon')
-                setattr(flag, 'flag_values', np.arange(2, dtype=np.int8))
-                setattr(flag, 'flag_meanings', subsets[subset_name]['meaning'])
-                setattr(flag, 'valid_range', [0, value])
+                setattr(flag, "long_name", subset_name)
+                setattr(flag, "units", "")
+                setattr(flag, "coordinates", "lat lon")
+                setattr(flag, "flag_values", np.arange(2, dtype=np.int8))
+                setattr(flag, "flag_meanings", subsets[subset_name]["meaning"])
+                setattr(flag, "valid_range", [0, value])
 
         s = "%Y-%m-%d %H:%M:%S"
         date_created = datetime.now().strftime(s)
 
-        attr = {'Conventions': 'CF-1.6',
-                'id': os.path.split(filename)[1],  # file name
-                'date_created': date_created,
-                'geospatial_lat_min': np.round(np.min(arrlat), 4),
-                'geospatial_lat_max': np.round(np.max(arrlat), 4),
-                'geospatial_lon_min': np.round(np.min(arrlon), 4),
-                'geospatial_lon_max': np.round(np.max(arrlon), 4),
-                'gpidirect': gpidirect
-                }
+        attr = {
+            "Conventions": "CF-1.6",
+            "id": os.path.split(filename)[1],  # file name
+            "date_created": date_created,
+            "geospatial_lat_min": np.round(np.min(arrlat), 4),
+            "geospatial_lat_max": np.round(np.max(arrlat), 4),
+            "geospatial_lon_min": np.round(np.min(arrlon), 4),
+            "geospatial_lon_max": np.round(np.max(arrlon), 4),
+            "gpidirect": gpidirect,
+        }
 
         ncfile.setncatts(attr)
 
@@ -261,24 +296,31 @@ def sort_for_netcdf(lons, lats, values):
     arrlon = lons.flatten()
     arrval = values.flatten()
     idxlatsrt = np.argsort(arrlat)[::-1]
-    idxlat = np.argsort(arrlat[idxlatsrt].
-                        reshape(lats.shape),
-                        axis=0)[::-1]
-    idxlon = np.argsort(arrlon[idxlatsrt].
-                        reshape(lons.shape)
-                        [idxlat, np.arange(lons.shape[1])], axis=1)
+    idxlat = np.argsort(arrlat[idxlatsrt].reshape(lats.shape), axis=0)[::-1]
+    idxlon = np.argsort(
+        arrlon[idxlatsrt].reshape(lons.shape)[idxlat, np.arange(lons.shape[1])], axis=1
+    )
 
-    values = arrval[idxlatsrt].reshape(
-        *lons.shape)[idxlat, np.arange(lons.shape[1])][np.arange(lons.shape[0])[:, None], idxlon]
-    lons = arrlon[idxlatsrt].reshape(
-        *lons.shape)[idxlat, np.arange(lons.shape[1])][np.arange(lons.shape[0])[:, None], idxlon]
-    lats = arrlat[idxlatsrt].reshape(
-        *lons.shape)[idxlat, np.arange(lons.shape[1])][np.arange(lons.shape[0])[:, None], idxlon]
+    values = arrval[idxlatsrt].reshape(*lons.shape)[idxlat, np.arange(lons.shape[1])][
+        np.arange(lons.shape[0])[:, None], idxlon
+    ]
+    lons = arrlon[idxlatsrt].reshape(*lons.shape)[idxlat, np.arange(lons.shape[1])][
+        np.arange(lons.shape[0])[:, None], idxlon
+    ]
+    lats = arrlat[idxlatsrt].reshape(*lons.shape)[idxlat, np.arange(lons.shape[1])][
+        np.arange(lons.shape[0])[:, None], idxlon
+    ]
     return lons, lats, values
 
 
-def save_grid(filename, grid, subset_name='subset_flag', subset_value=1.,
-              subset_meaning='water land', global_attrs=None):
+def save_grid(
+    filename,
+    grid,
+    subset_name="subset_flag",
+    subset_value=1.0,
+    subset_meaning="water land",
+    global_attrs=None,
+):
     """
     save a BasicGrid or CellGrid to netCDF
     it is assumed that a subset should be used as land_points
@@ -309,21 +351,39 @@ def save_grid(filename, grid, subset_name='subset_flag', subset_value=1.,
     if grid.shape is not None:
         if global_attrs is None:
             global_attrs = {}
-        global_attrs['shape'] = grid.shape
+        global_attrs["shape"] = grid.shape
 
     if grid.subset is not None:
-        subsets = {subset_name: {
-            'points': grid.subset, 'meaning': subset_meaning, 'value': subset_value}}
+        subsets = {
+            subset_name: {
+                "points": grid.subset,
+                "meaning": subset_meaning,
+                "value": subset_value,
+            }
+        }
     else:
         subsets = None
 
-    save_lonlat(filename, grid.arrlon, grid.arrlat, grid.geodatum,
-                arrcell=arrcell, gpis=gpis, subsets=subsets, zlib=True,
-                global_attrs=global_attrs)
+    save_lonlat(
+        filename,
+        grid.arrlon,
+        grid.arrlat,
+        grid.geodatum,
+        arrcell=arrcell,
+        gpis=gpis,
+        subsets=subsets,
+        zlib=True,
+        global_attrs=global_attrs,
+    )
 
 
-def load_grid(filename, subset_flag='subset_flag', subset_value=1,
-              location_var_name='gpi', **grid_kwargs):
+def load_grid(
+    filename,
+    subset_flag="subset_flag",
+    subset_value=1,
+    location_var_name="gpi",
+    **grid_kwargs
+):
     """
     load a grid from netCDF file
 
@@ -346,16 +406,16 @@ def load_grid(filename, subset_flag='subset_flag', subset_value=1,
         grid instance initialized with the loaded data
     """
 
-    with Dataset(filename, 'r') as nc_data:
+    with Dataset(filename, "r") as nc_data:
         # determine if it is a cell grid or a basic grid
         arrcell = None
-        if 'cell' in nc_data.variables.keys():
-            arrcell = np.array(nc_data.variables['cell'][:].flatten())
+        if "cell" in nc_data.variables.keys():
+            arrcell = np.array(nc_data.variables["cell"][:].flatten())
 
         gpis = np.array(nc_data.variables[location_var_name][:].flatten())
 
         shape = None
-        if hasattr(nc_data, 'shape'):
+        if hasattr(nc_data, "shape"):
             try:
                 shape = tuple(nc_data.shape)
             except TypeError as e:
@@ -372,51 +432,61 @@ def load_grid(filename, subset_flag='subset_flag', subset_value=1,
         # some old grid do not have a shape attribute
         # this meant that they had shape of len 1
         if shape is None:
-            shape = tuple([len(nc_data.variables['lon'][:])])
+            shape = tuple([len(nc_data.variables["lon"][:])])
 
         # check if grid has regular shape
         if len(shape) == 2:
-            lons, lats = np.meshgrid(np.array(nc_data.variables['lon'][:]),
-                                     np.array(nc_data.variables['lat'][:]))
+            lons, lats = np.meshgrid(
+                np.array(nc_data.variables["lon"][:]),
+                np.array(nc_data.variables["lat"][:]),
+            )
             lons = lons.flatten()
             lats = lats.flatten()
 
             if subset_flag in nc_data.variables.keys():
                 subset = np.where(
-                    np.isin(nc_data.variables[subset_flag][:].flatten(), subset_value))[0]
+                    np.isin(nc_data.variables[subset_flag][:].flatten(), subset_value)
+                )[0]
 
         elif len(shape) == 1:
-            lons = np.array(nc_data.variables['lon'][:])
-            lats = np.array(nc_data.variables['lat'][:])
+            lons = np.array(nc_data.variables["lon"][:])
+            lats = np.array(nc_data.variables["lat"][:])
 
             # determine if it has a subset
             if subset_flag in nc_data.variables.keys():
                 subset = np.where(
-                    np.isin(np.array(nc_data.variables[subset_flag][:].flatten()),
-                            subset_value))[0]
+                    np.isin(
+                        np.array(nc_data.variables[subset_flag][:].flatten()),
+                        subset_value,
+                    )
+                )[0]
 
-        if 'crs' in nc_data.variables:
-            geodatumName = nc_data.variables['crs'].getncattr('ellipsoid_name')
+        if "crs" in nc_data.variables:
+            geodatumName = nc_data.variables["crs"].getncattr("ellipsoid_name")
         else:
             # ellipsoid information is missing, use WGS84 by default
-            geodatumName = 'WGS84'
+            geodatumName = "WGS84"
 
         if arrcell is None:
             # BasicGrid
-            return BasicGrid(lons,
-                             lats,
-                             gpis=gpis,
-                             geodatum=geodatumName,
-                             subset=subset,
-                             shape=shape,
-                             **grid_kwargs)
+            return BasicGrid(
+                lons,
+                lats,
+                gpis=gpis,
+                geodatum=geodatumName,
+                subset=subset,
+                shape=shape,
+                **grid_kwargs
+            )
         else:
             # CellGrid
-            return CellGrid(lons,
-                            lats,
-                            arrcell,
-                            gpis=gpis,
-                            geodatum=geodatumName,
-                            subset=subset,
-                            shape=shape,
-                            **grid_kwargs)
+            return CellGrid(
+                lons,
+                lats,
+                arrcell,
+                gpis=gpis,
+                geodatum=geodatumName,
+                subset=subset,
+                shape=shape,
+                **grid_kwargs
+            )

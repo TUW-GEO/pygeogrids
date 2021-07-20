@@ -29,12 +29,14 @@ import numpy as np
 
 try:
     import pykdtree.kdtree as pykd
+
     pykdtree_installed = True
 except ImportError:
     pykdtree_installed = False
 
 try:
     import scipy.spatial as sc_spat
+
     scipy_installed = True
 except ImportError:
     scipy_installed = False
@@ -92,8 +94,7 @@ class findGeoNN(object):
 
     """
 
-    def __init__(self, lon, lat, geodatum, grid=False,
-                 kd_tree_name='pykdtree'):
+    def __init__(self, lon, lat, geodatum, grid=False, kd_tree_name="pykdtree"):
         """
         init method, prepares lon and lat arrays for _transform_lonlats if
         necessary
@@ -107,8 +108,7 @@ class findGeoNN(object):
             self.lon_size = len(lon)
         else:
             if lat.shape != lon.shape:
-                raise Exception(
-                    "lat and lon np.arrays have to have equal shapes")
+                raise Exception("lat and lon np.arrays have to have equal shapes")
             lat_init = lat
             lon_init = lon
         # Earth radius
@@ -137,9 +137,7 @@ class findGeoNN(object):
         lon = np.array(lon)
         lat = np.array(lat)
         coords = np.zeros((lon.size, 3), dtype=np.float64)
-        (coords[:, 0],
-         coords[:, 1],
-         coords[:, 2]) = self.geodatum.toECEF(lon, lat)
+        (coords[:, 0], coords[:, 1], coords[:, 2]) = self.geodatum.toECEF(lon, lat)
 
         return coords
 
@@ -147,13 +145,15 @@ class findGeoNN(object):
         """
         Build the kdtree and saves it in the self.kdtree attribute
         """
-        if self.kd_tree_name == 'pykdtree' and pykdtree_installed:
+        if self.kd_tree_name == "pykdtree" and pykdtree_installed:
             self.kdtree = pykd.KDTree(self.coords)
         elif scipy_installed:
             self.kdtree = sc_spat.cKDTree(self.coords)
         else:
-            raise Exception("No supported kdtree implementation installed.\
-                             Please install pykdtree and/or scipy.")
+            raise Exception(
+                "No supported kdtree implementation installed.\
+                             Please install pykdtree and/or scipy."
+            )
 
     def find_nearest_index(self, lon, lat, max_dist=np.Inf, k=1):
         """
@@ -201,14 +201,14 @@ class findGeoNN(object):
         query_coords = self._transform_lonlats(lon, lat)
 
         if k is None:
-            if self.kd_tree_name != 'scipy':
+            if self.kd_tree_name != "scipy":
                 raise NotImplementedError("Only available for the scipy kdTree")
             query_coords = query_coords[0]
-            k = self.kdtree.query_ball_point(query_coords,
-                                             r=max_dist, return_length=True)
+            k = self.kdtree.query_ball_point(
+                query_coords, r=max_dist, return_length=True
+            )
 
-        d, ind = self.kdtree.query(
-            query_coords, distance_upper_bound=max_dist, k=k)
+        d, ind = self.kdtree.query(query_coords, distance_upper_bound=max_dist, k=k)
 
         # if no point was found, d == inf
         if not np.all(np.isfinite(d)):

@@ -17,20 +17,21 @@ import re
 import subprocess
 import sys
 
-__location__ = os.path.join(os.getcwd(), os.path.dirname(
-    inspect.getfile(inspect.currentframe())))
+__location__ = os.path.join(
+    os.getcwd(), os.path.dirname(inspect.getfile(inspect.currentframe()))
+)
 
 # these strings will be replaced by git during git-archive
 git_refnames = "$Format:%d$"
 git_full = "$Format:%H$"
 
 # general settings
-tag_prefix = 'v'  # tags are like v1.2.0
+tag_prefix = "v"  # tags are like v1.2.0
 package = "pygeogrids"
 namespace = []
 root_pkg = namespace[0] if namespace else package
 if namespace:
-    pkg_path = os.path.join(*namespace[-1].split('.') + [package])
+    pkg_path = os.path.join(*namespace[-1].split(".") + [package])
 else:
     pkg_path = package
 
@@ -42,13 +43,16 @@ class ShellCommand(object):
         self._cwd = cwd
 
     def __call__(self, *args):
-        command = "{cmd} {args}".format(cmd=self._command,
-                                        args=subprocess.list2cmdline(args))
-        output = subprocess.check_output(command,
-                                         shell=self._shell,
-                                         cwd=self._cwd,
-                                         stderr=subprocess.STDOUT,
-                                         universal_newlines=True)
+        command = "{cmd} {args}".format(
+            cmd=self._command, args=subprocess.list2cmdline(args)
+        )
+        output = subprocess.check_output(
+            command,
+            shell=self._shell,
+            cwd=self._cwd,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+        )
         return self._yield_output(output)
 
     def _yield_output(self, msg):
@@ -90,10 +94,9 @@ def version_from_git(tag_prefix, root, verbose=False):
         return None
     if not tag.startswith(tag_prefix):
         if verbose:
-            print("tag '{}' doesn't start with prefix '{}'".format(tag,
-                                                                   tag_prefix))
+            print("tag '{}' doesn't start with prefix '{}'".format(tag, tag_prefix))
         return None
-    tag = tag[len(tag_prefix):]
+    tag = tag[len(tag_prefix) :]
     sha1 = next(git("rev-parse", "HEAD"))
     full = sha1.strip()
     if tag.endswith("-dirty"):
@@ -135,7 +138,7 @@ def version_from_keywords(keywords, tag_prefix, verbose=False):
     # starting in git-1.8.3, tags are listed as "tag: foo-1.0" instead of
     # just "foo-1.0". If we see a "tag: " prefix, prefer those.
     TAG = "tag: "
-    tags = set([r[len(TAG):] for r in refs if r.startswith(TAG)])
+    tags = set([r[len(TAG) :] for r in refs if r.startswith(TAG)])
     if not tags:
         # Either we're using git < 1.8.3, or there really are no tags. We use
         # a heuristic: assume all version tags have a digit. The old git %d
@@ -144,24 +147,22 @@ def version_from_keywords(keywords, tag_prefix, verbose=False):
         # between branches and tags. By ignoring refnames without digits, we
         # filter out many common branch names like "release" and
         # "stabilization", as well as "HEAD" and "master".
-        tags = set([r for r in refs if re.search(r'\d', r)])
+        tags = set([r for r in refs if re.search(r"\d", r)])
         if verbose:
-            print("discarding '{}', no digits".format(",".join(refs-tags)))
+            print("discarding '{}', no digits".format(",".join(refs - tags)))
     if verbose:
         print("likely tags: {}".format(",".join(sorted(tags))))
     for ref in sorted(tags):
         # sorting will prefer e.g. "2.0" over "2.0rc1"
         if ref.startswith(tag_prefix):
-            r = ref[len(tag_prefix):]
+            r = ref[len(tag_prefix) :]
             if verbose:
                 print("picking {}".format(r))
-            return {"version": r,
-                    "full": keywords["full"].strip()}
+            return {"version": r, "full": keywords["full"].strip()}
     else:
         if verbose:
             print("no suitable tags, using full revision id")
-        return {"version": keywords["full"].strip(),
-                "full": keywords["full"].strip()}
+        return {"version": keywords["full"].strip(), "full": keywords["full"].strip()}
 
 
 def version_from_parentdir(parentdir_prefix, root, verbose=False):
@@ -170,24 +171,26 @@ def version_from_parentdir(parentdir_prefix, root, verbose=False):
     dirname = os.path.basename(root)
     if not dirname.startswith(parentdir_prefix):
         if verbose:
-            print("guessing rootdir is '{}', but '{}' doesn't start with "
-                  "prefix '{}'".format(root, dirname, parentdir_prefix))
+            print(
+                "guessing rootdir is '{}', but '{}' doesn't start with "
+                "prefix '{}'".format(root, dirname, parentdir_prefix)
+            )
         return None
-    version = dirname[len(parentdir_prefix):].split('-')[0]
+    version = dirname[len(parentdir_prefix) :].split("-")[0]
     return {"version": version, "full": ""}
 
 
 def git2pep440(ver_str):
-    dash_count = ver_str.count('-')
+    dash_count = ver_str.count("-")
     if dash_count == 0:
         return ver_str
     elif dash_count == 1:
-        return ver_str.split('-')[0] + "+dirty"
+        return ver_str.split("-")[0] + "+dirty"
     elif dash_count == 2:
-        tag, commits, sha1 = ver_str.split('-')
+        tag, commits, sha1 = ver_str.split("-")
         return "{}.post0.dev{}+{}".format(tag, commits, sha1)
     elif dash_count == 3:
-        tag, commits, sha1, _ = ver_str.split('-')
+        tag, commits, sha1, _ = ver_str.split("-")
         return "{}.post0.dev{}+{}.dirty".format(tag, commits, sha1)
     else:
         raise RuntimeError("Invalid version string")
@@ -195,7 +198,7 @@ def git2pep440(ver_str):
 
 def get_versions(verbose=False):
     vcs_kwds = {"refnames": git_refnames, "full": git_full}
-    parentdir = package + '-'
+    parentdir = package + "-"
     root = __location__
     # pkg_path is the relative path from the top of the source
     # tree (where the .git directory might live) to this file.
@@ -205,10 +208,9 @@ def get_versions(verbose=False):
 
     # different version retrieval methods as (method, args, comment)
     ver_retrieval = [
-        (version_from_keywords, (vcs_kwds, tag_prefix, verbose),
-         'expanded keywords'),
-        (version_from_parentdir, (parentdir, root, verbose), 'parentdir'),
-        (version_from_git, (tag_prefix, root, verbose), 'git')
+        (version_from_keywords, (vcs_kwds, tag_prefix, verbose), "expanded keywords"),
+        (version_from_parentdir, (parentdir, root, verbose), "parentdir"),
+        (version_from_git, (tag_prefix, root, verbose), "git"),
     ]
     for method, args, comment in ver_retrieval:
         ver = method(*args)
@@ -218,5 +220,5 @@ def get_versions(verbose=False):
             break
     else:
         ver = {"version": "unknown", "full": ""}
-    ver['version'] = git2pep440(ver['version'])
+    ver["version"] = git2pep440(ver["version"])
     return ver

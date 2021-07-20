@@ -32,8 +32,10 @@ The grids module defines the grid classes.
 import numpy as np
 import numpy.testing as nptest
 import warnings
+
 try:
     from osgeo import ogr
+
     ogr_installed = True
 except ImportError:
     ogr_installed = False
@@ -154,9 +156,18 @@ class BasicGrid(object):
         the provided 2d-shape that make up the grid
     """
 
-    def __init__(self, lon, lat, gpis=None, geodatum='WGS84', subset=None,
-                 setup_kdTree=True, shape=None, transform_lon=None,
-                 kd_tree_name='pykdtree'):
+    def __init__(
+        self,
+        lon,
+        lat,
+        gpis=None,
+        geodatum="WGS84",
+        subset=None,
+        setup_kdTree=True,
+        shape=None,
+        transform_lon=None,
+        kd_tree_name="pykdtree",
+    ):
         """
         init method, prepares lon and lat arrays for _transform_lonlats if
         necessary
@@ -170,8 +181,7 @@ class BasicGrid(object):
             subset = np.asanyarray(subset)
 
         if lat.shape != lon.shape:
-            raise GridDefinitionError(
-                "lat and lon np.arrays have to have equal shapes")
+            raise GridDefinitionError("lat and lon np.arrays have to have equal shapes")
 
         self.n_gpi = len(lon)
 
@@ -194,15 +204,19 @@ class BasicGrid(object):
 
         if shape is not None and len(shape) == 2:
             if len(self.arrlat) % shape[0] != 0:
-                msg = ("Given shape does not have the correct first dimension."
-                       " Length of lat array is not divisible by shape[0] "
-                       " without rest")
+                msg = (
+                    "Given shape does not have the correct first dimension."
+                    " Length of lat array is not divisible by shape[0] "
+                    " without rest"
+                )
                 raise GridDefinitionError(msg)
 
             if len(self.arrlon) % shape[1] != 0:
-                msg = ("Given shape does not have the correct second "
-                       "dimension. Length of lon array is not divisible by "
-                       "shape[1] without rest")
+                msg = (
+                    "Given shape does not have the correct second "
+                    "dimension. Length of lon array is not divisible by "
+                    "shape[1] without rest"
+                )
                 raise GridDefinitionError(msg)
 
             self.shape = shape
@@ -219,8 +233,9 @@ class BasicGrid(object):
             self.gpidirect = True
         else:
             if lat.shape != gpis.shape:
-                raise GridDefinitionError("lat, lon gpi np.arrays have to "
-                                          "have equal shapes")
+                raise GridDefinitionError(
+                    "lat, lon gpi np.arrays have to " "have equal shapes"
+                )
             self.gpis = gpis
             self.gpidirect = False
 
@@ -250,8 +265,12 @@ class BasicGrid(object):
         Setup kdTree
         """
         if self.kdTree is None:
-            self.kdTree = NN.findGeoNN(self.activearrlon, self.activearrlat,
-                                       self.geodatum, kd_tree_name=self.kd_tree_name)
+            self.kdTree = NN.findGeoNN(
+                self.activearrlon,
+                self.activearrlat,
+                self.geodatum,
+                kd_tree_name=self.kd_tree_name,
+            )
             self.kdTree._build_kdtree()
 
     def split(self, n):
@@ -303,9 +322,11 @@ class BasicGrid(object):
         elif self.issplit and len(args) == 1:
             return self._split_grid_points(args[0])
 
-        raise GridIterationError("this function only takes an argument if "
-                                 "the grid is split, and takes no argument "
-                                 "if the grid is not split")
+        raise GridIterationError(
+            "this function only takes an argument if "
+            "the grid is split, and takes no argument "
+            "if the grid is not split"
+        )
 
     def get_grid_points(self, *args):
         """
@@ -329,15 +350,11 @@ class BasicGrid(object):
         """
 
         if not self.issplit and len(args) == 0:
-            return (self.activegpis,
-                    self.activearrlon,
-                    self.activearrlat)
+            return (self.activegpis, self.activearrlon, self.activearrlat)
 
         elif self.issplit and len(args) == 1:
             n = args[0]
-            return (self.subgpis[n],
-                    self.subarrlons[n],
-                    self.subarrlats[n])
+            return (self.subgpis[n], self.subarrlons[n], self.subarrlats[n])
 
     def _normal_grid_points(self):
         """
@@ -352,8 +369,7 @@ class BasicGrid(object):
         lat : float
             longitude of gpi
         """
-        for i, (lon, lat) in enumerate(zip(self.activearrlon,
-                                           self.activearrlat)):
+        for i, (lon, lat) in enumerate(zip(self.activearrlon, self.activearrlat)):
             yield self.activegpis[i], lon, lat
 
     def _split_grid_points(self, n):
@@ -375,8 +391,7 @@ class BasicGrid(object):
             Longitude of gpi.
         """
 
-        for i, (lon, lat) in enumerate(zip(self.subarrlons[n],
-                                           self.subarrlats[n])):
+        for i, (lon, lat) in enumerate(zip(self.subarrlons[n], self.subarrlats[n])):
             yield self.subgpis[n][i], lon, lat
 
     def find_nearest_gpi(self, lon, lat, max_dist=np.Inf):
@@ -438,8 +453,7 @@ class BasicGrid(object):
         if self.kdTree is None:
             self._setup_kdtree()
 
-        distance, ind = self.kdTree.find_nearest_index(
-            lon, lat, max_dist=max_dist, k=k)
+        distance, ind = self.kdTree.find_nearest_index(lon, lat, max_dist=max_dist, k=k)
 
         if self.gpidirect and self.allpoints or len(ind) == 0:
             gpi = ind
@@ -524,7 +538,7 @@ class BasicGrid(object):
             return index_lat, index_lon
 
         else:
-            raise(GridDefinitionError("Grid has no 2D shape"))
+            raise (GridDefinitionError("Grid has no 2D shape"))
 
     def calc_lut(self, other, max_dist=np.Inf, into_subset=False):
         """
@@ -556,7 +570,8 @@ class BasicGrid(object):
 
         if self.kdTree.kdtree is not None and other.kdTree.kdtree is not None:
             dist, index = other.kdTree.find_nearest_index(
-                self.activearrlon, self.activearrlat, max_dist=max_dist)
+                self.activearrlon, self.activearrlat, max_dist=max_dist
+            )
 
             valid_index = np.where(dist != np.inf)[0]
             dist = dist[valid_index]
@@ -600,9 +615,9 @@ class BasicGrid(object):
 
         if ogr_installed:
             lonmin, lonmax, latmin, latmax = ply.GetEnvelope()
-            gpis, lats, lons = self.get_bbox_grid_points(latmin, latmax,
-                                                         lonmin, lonmax,
-                                                         both=True)
+            gpis, lats, lons = self.get_bbox_grid_points(
+                latmin, latmax, lonmin, lonmax, both=True
+            )
 
             lon_ip = []
             lat_ip = []
@@ -622,26 +637,36 @@ class BasicGrid(object):
                 return None
 
         else:
-            raise Exception("No supported implementation installed.\
-                            Please install gdal and osgeo.")
+            raise Exception(
+                "No supported implementation installed.\
+                            Please install gdal and osgeo."
+            )
 
     @staticmethod
     def issorted(a):
         return np.all(a[:-1] <= a[1:])
 
-    def _index_bbox_grid_points(self, gp_info: np.array,
-                                latmin:float, latmax:float, lonmin:float,
-                                lonmax:float) -> (np.array, np.array):
+    def _index_bbox_grid_points(
+        self,
+        gp_info: np.array,
+        latmin: float,
+        latmax: float,
+        lonmin: float,
+        lonmax: float,
+    ) -> (np.array, np.array):
 
-        index = np.where((gp_info[2] <= latmax) &
-                         (gp_info[2] >= latmin) &
-                         (gp_info[1] <= lonmax) &
-                         (gp_info[1] >= lonmin))
+        index = np.where(
+            (gp_info[2] <= latmax)
+            & (gp_info[2] >= latmin)
+            & (gp_info[1] <= lonmax)
+            & (gp_info[1] >= lonmin)
+        )
 
         return index
 
-    def get_bbox_grid_points(self, latmin=-90, latmax=90, lonmin=-180,
-                             lonmax=180, coords=False, both=False):
+    def get_bbox_grid_points(
+        self, latmin=-90, latmax=90, lonmin=-180, lonmax=180, coords=False, both=False
+    ):
         """
         Returns all grid points located in a submitted geographic box,
         optional as coordinates.
@@ -676,8 +701,7 @@ class BasicGrid(object):
 
         gp_info = self.get_grid_points()
 
-        index = self._index_bbox_grid_points(gp_info, latmin, latmax,
-                                             lonmin, lonmax)
+        index = self._index_bbox_grid_points(gp_info, latmin, latmax, lonmin, lonmax)
         gpis, lons, lats = gp_info
 
         if coords is True:
@@ -705,17 +729,27 @@ class BasicGrid(object):
         cell_grid : CellGrid object
             Cell grid object.
         """
-        cells = lonlat2cell(self.arrlon, self.arrlat, cellsize=cellsize,
-                            cellsize_lat=cellsize_lat,
-                            cellsize_lon=cellsize_lon)
+        cells = lonlat2cell(
+            self.arrlon,
+            self.arrlat,
+            cellsize=cellsize,
+            cellsize_lat=cellsize_lat,
+            cellsize_lon=cellsize_lon,
+        )
 
         if self.gpidirect:
             gpis = None
         else:
             gpis = self.gpis
 
-        return CellGrid(self.arrlon, self.arrlat, cells, gpis=gpis,
-                        subset=self.subset, shape=self.shape)
+        return CellGrid(
+            self.arrlon,
+            self.arrlat,
+            cells,
+            gpis=gpis,
+            subset=self.subset,
+            shape=self.shape,
+        )
 
     def subgrid_from_gpis(self, gpis):
         """
@@ -751,20 +785,19 @@ class BasicGrid(object):
         idx_gpi_other = np.argsort(other.gpis)
         gpisame = np.all(self.gpis[idx_gpi] == other.gpis[idx_gpi_other])
         try:
-            nptest.assert_allclose(self.arrlon[idx_gpi],
-                                   other.arrlon[idx_gpi_other])
+            nptest.assert_allclose(self.arrlon[idx_gpi], other.arrlon[idx_gpi_other])
             lonsame = True
         except AssertionError:
             lonsame = False
         try:
-            nptest.assert_allclose(self.arrlat[idx_gpi],
-                                   other.arrlat[idx_gpi_other])
+            nptest.assert_allclose(self.arrlat[idx_gpi], other.arrlat[idx_gpi_other])
             latsame = True
         except AssertionError:
             latsame = False
         if self.subset is not None and other.subset is not None:
             subsetsame = np.all(
-                sorted(self.gpis[self.subset]) == sorted(other.gpis[other.subset]))
+                sorted(self.gpis[self.subset]) == sorted(other.gpis[other.subset])
+            )
         elif self.subset is None and other.subset is None:
             subsetsame = True
         else:
@@ -782,8 +815,7 @@ class BasicGrid(object):
         else:
             geosame = False
 
-        return np.all([lonsame, latsame, gpisame, subsetsame, shapesame,
-                       geosame])
+        return np.all([lonsame, latsame, gpisame, subsetsame, shapesame, geosame])
 
 
 class CellGrid(BasicGrid):
@@ -820,19 +852,35 @@ class CellGrid(BasicGrid):
         if a subset is given otherwise equal to arrlon.
     """
 
-    def __init__(self, lon, lat, cells, gpis=None, geodatum='WGS84',
-                 subset=None, setup_kdTree=False, **kwargs):
+    def __init__(
+        self,
+        lon,
+        lat,
+        cells,
+        gpis=None,
+        geodatum="WGS84",
+        subset=None,
+        setup_kdTree=False,
+        **kwargs,
+    ):
 
-        super(CellGrid, self).__init__(lon, lat, gpis=gpis,
-                                       geodatum=geodatum, subset=subset,
-                                       setup_kdTree=setup_kdTree, **kwargs)
+        super(CellGrid, self).__init__(
+            lon,
+            lat,
+            gpis=gpis,
+            geodatum=geodatum,
+            subset=subset,
+            setup_kdTree=setup_kdTree,
+            **kwargs,
+        )
 
         self.gpi_lut = None
         cells = np.asanyarray(cells)
 
         if self.arrlon.shape != cells.shape:
             raise GridDefinitionError(
-                "lat, lon and cells np.arrays have to have equal shapes")
+                "lat, lon and cells np.arrays have to have equal shapes"
+            )
         self.arrcell = cells
 
         if subset is not None:
@@ -905,17 +953,21 @@ class CellGrid(BasicGrid):
             Cell numbers.
         """
         if not self.issplit and len(args) == 0:
-            return (self.activegpis,
-                    self.activearrlon,
-                    self.activearrlat,
-                    self.activearrcell)
+            return (
+                self.activegpis,
+                self.activearrlon,
+                self.activearrlat,
+                self.activearrcell,
+            )
 
         elif self.issplit and len(args) == 1:
             n = args[0]
-            return (self.subgpis[n],
-                    self.subarrlons[n],
-                    self.subarrlats[n],
-                    self.subcells[n])
+            return (
+                self.subgpis[n],
+                self.subarrlons[n],
+                self.subarrlats[n],
+                self.subcells[n],
+            )
 
     def grid_points_for_cell(self, cells):
         """
@@ -991,8 +1043,9 @@ class CellGrid(BasicGrid):
         for cell in uniq_cells:
             cell_gpis = np.where(cell == self.activearrcell)[0]
             for gpi in cell_gpis:
-                yield self.activegpis[gpi], self.activearrlon[gpi], \
-                    self.activearrlat[gpi], cell
+                yield self.activegpis[gpi], self.activearrlon[gpi], self.activearrlat[
+                    gpi
+                ], cell
 
     def _split_grid_points(self, n):
         """
@@ -1019,8 +1072,9 @@ class CellGrid(BasicGrid):
         for cell in uniq_cells:
             cell_gpis = np.where(cell == self.subcells[n])[0]
             for gpi in cell_gpis:
-                yield self.subgpis[n][gpi], self.subarrlons[n][gpi], \
-                    self.subarrlats[n][gpi], cell
+                yield self.subgpis[n][gpi], self.subarrlons[n][gpi], self.subarrlats[n][
+                    gpi
+                ], cell
 
     def subgrid_from_gpis(self, gpis):
         """
@@ -1039,8 +1093,7 @@ class CellGrid(BasicGrid):
         sublons, sublats = self.gpi2lonlat(gpis)
         subcells = self.gpi2cell(gpis)
 
-        return CellGrid(sublons, sublats, subcells, gpis,
-                        geodatum=self.geodatum.name)
+        return CellGrid(sublons, sublats, subcells, gpis, geodatum=self.geodatum.name)
 
     def subgrid_from_cells(self, cells):
         """
@@ -1059,8 +1112,9 @@ class CellGrid(BasicGrid):
         subgpis, sublons, sublats = self.grid_points_for_cell(cells)
         subcells = self.gpi2cell(subgpis)
 
-        return CellGrid(sublons, sublats, subcells, subgpis,
-                        geodatum=self.geodatum.name)
+        return CellGrid(
+            sublons, sublats, subcells, subgpis, geodatum=self.geodatum.name
+        )
 
     def __eq__(self, other):
         """
@@ -1074,13 +1128,19 @@ class CellGrid(BasicGrid):
         basicsame = super(CellGrid, self).__eq__(other)
         idx_gpi = np.argsort(self.gpis)
         idx_gpi_other = np.argsort(other.gpis)
-        cellsame = np.all(self.arrcell[idx_gpi]
-                          == other.arrcell[idx_gpi_other])
+        cellsame = np.all(self.arrcell[idx_gpi] == other.arrcell[idx_gpi_other])
         return np.all([basicsame, cellsame])
 
-    def get_bbox_grid_points(self, latmin=-90, latmax=90, lonmin=-180,
-                             lonmax=180, coords=False, both=False,
-                             sort_by_cells=True):
+    def get_bbox_grid_points(
+        self,
+        latmin=-90,
+        latmax=90,
+        lonmin=-180,
+        lonmax=180,
+        coords=False,
+        both=False,
+        sort_by_cells=True,
+    ):
         """
         Returns all grid points located in a submitted geographic box,
         optional as coordinates. The points are grouped by cells!
@@ -1115,8 +1175,7 @@ class CellGrid(BasicGrid):
 
         gp_info = self.get_grid_points()
 
-        index = self._index_bbox_grid_points(
-            gp_info, latmin, latmax, lonmin, lonmax)
+        index = self._index_bbox_grid_points(gp_info, latmin, latmax, lonmin, lonmax)
 
         gpis, lons, lats, cells = gp_info
 
@@ -1133,7 +1192,8 @@ class CellGrid(BasicGrid):
         else:
             return gpis
 
-def lonlat2cell(lon, lat, cellsize=5., cellsize_lon=None, cellsize_lat=None):
+
+def lonlat2cell(lon, lat, cellsize=5.0, cellsize_lon=None, cellsize_lat=None):
     """
     Partition lon, lat points into cells.
 
@@ -1159,19 +1219,20 @@ def lonlat2cell(lon, lat, cellsize=5., cellsize_lon=None, cellsize_lat=None):
         cellsize_lon = cellsize
     if cellsize_lat is None:
         cellsize_lat = cellsize
-    y = np.clip(np.floor((np.double(lat) +
-                          (np.double(90.0) + 1e-9)) / cellsize_lat), 0, 180)
-    x = np.clip(np.floor((np.double(lon) + (np.double(180.0) + 1e-9))
-                         / cellsize_lon), 0, 360)
+    y = np.clip(
+        np.floor((np.double(lat) + (np.double(90.0) + 1e-9)) / cellsize_lat), 0, 180
+    )
+    x = np.clip(
+        np.floor((np.double(lon) + (np.double(180.0) + 1e-9)) / cellsize_lon), 0, 360
+    )
     cells = np.int32(x * (np.double(180.0) / cellsize_lat) + y)
 
-    max_cells = ((np.double(180.0) / cellsize_lat) *
-                 (np.double(360.0)) / cellsize_lon)
+    max_cells = (np.double(180.0) / cellsize_lat) * (np.double(360.0)) / cellsize_lon
     cells = np.where(cells > max_cells - 1, cells - max_cells, cells)
     return np.int32(cells)
 
 
-def gridfromdims(londim, latdim, origin='top', **kwargs):
+def gridfromdims(londim, latdim, origin="top", **kwargs):
     """
     Defines new grid object from latitude and longitude dimensions. Latitude
     and longitude dimensions are 1D arrays that give the latitude and
@@ -1195,20 +1256,30 @@ def gridfromdims(londim, latdim, origin='top', **kwargs):
         New grid object.
     """
     lons, lats = np.meshgrid(londim, latdim)
-    if origin.lower() == 'bottom':
+    if origin.lower() == "bottom":
         lats = np.flipud(lats)
-    elif origin.lower() == 'top':
+    elif origin.lower() == "top":
         pass
     else:
-        raise ValueError(f"Unexpected origin passed, expected 'top' or 'bottom' "
-                         f"got {origin.lower()}")
+        raise ValueError(
+            f"Unexpected origin passed, expected 'top' or 'bottom' "
+            f"got {origin.lower()}"
+        )
 
-    return BasicGrid(lons.flatten(), lats.flatten(),
-                     shape=(len(latdim), len(londim)), **kwargs)
+    return BasicGrid(
+        lons.flatten(), lats.flatten(), shape=(len(latdim), len(londim)), **kwargs
+    )
 
 
-def genreg_grid(grd_spc_lat=1, grd_spc_lon=1, minlat=-90.0, maxlat=90.0,
-                minlon=-180.0, maxlon=180.0, **kwargs):
+def genreg_grid(
+    grd_spc_lat=1,
+    grd_spc_lon=1,
+    minlat=-90.0,
+    maxlat=90.0,
+    minlon=-180.0,
+    maxlon=180.0,
+    **kwargs,
+):
     """
     Define a global regular lon lat grid which starts in the North Western
     Corner of minlon, maxlat. The grid points are defined to be in the middle
@@ -1283,8 +1354,7 @@ def reorder_to_cellsize(grid, cellsize_lat, cellsize_lon):
         different ordering.
     """
 
-    cell_grid = grid.to_cell_grid(cellsize_lat=cellsize_lat,
-                                  cellsize_lon=cellsize_lon)
+    cell_grid = grid.to_cell_grid(cellsize_lat=cellsize_lat, cellsize_lon=cellsize_lon)
     cell_sort = np.argsort(cell_grid.arrcell)
     new_arrlon = grid.arrlon[cell_sort]
     new_arrlat = grid.arrlat[cell_sort]
@@ -1296,6 +1366,6 @@ def reorder_to_cellsize(grid, cellsize_lat, cellsize_lon):
         full_subset[grid.subset] = 1
         new_full_subset = full_subset[cell_sort]
         new_subset = np.where(new_full_subset == 1)[0]
-    return CellGrid(new_arrlon, new_arrlat, new_arrcell,
-                    gpis=new_gpis,
-                    subset=new_subset)
+    return CellGrid(
+        new_arrlon, new_arrlat, new_arrcell, gpis=new_gpis, subset=new_subset
+    )
