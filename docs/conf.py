@@ -35,7 +35,7 @@ subprocess.run(
         "install",
         "--user",
         "--name",
-        "conda-env-ismn-py",
+        "conda-env-pygeogrids-py",
         "--display-name",
         "Python [conda env:pygeogrids]"
     ],
