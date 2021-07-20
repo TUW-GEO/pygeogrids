@@ -28,7 +28,7 @@
 """
 Module for extracting grid points from global administrative areas
 """
-
+import os
 try:
     from osgeo import ogr
     ogr_installed = True
@@ -71,7 +71,7 @@ def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None):
     """
     if ogr_installed:
         drv = ogr.GetDriverByName('ESRI Shapefile')
-        ds_in = drv.Open(gadm_shp_path + 'gadm28_adm{:}.shp'.format(level))
+        ds_in = drv.Open(os.path.join(gadm_shp_path , f'gadm28_adm{level}.shp'))
         lyr_in = ds_in.GetLayer(0)
         if name:
             if level == 0:

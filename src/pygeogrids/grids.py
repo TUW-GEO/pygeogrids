@@ -1299,5 +1299,3 @@ def reorder_to_cellsize(grid, cellsize_lat, cellsize_lon):
     return CellGrid(new_arrlon, new_arrlat, new_arrcell,
                     gpis=new_gpis,
                     subset=new_subset)
-
-

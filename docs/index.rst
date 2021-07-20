@@ -32,6 +32,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   Examples <examples/index.rst>
    License <license>
    Authors <authors>
    Changelog <changelog>

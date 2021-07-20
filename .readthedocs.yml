@@ -1,0 +1,16 @@
+version: 2
+
+sphinx:
+  configuration: docs/conf.py
+
+submodules:
+  include: all
+
+conda:
+  environment: docs/docs_environment.yml
+
+python:
+  version: 3.9
+  install:
+    - method: pip
+      path: .

@@ -9,6 +9,7 @@ dependencies:
   - gdal
   - pyproj
   - pykdtree
+  - scipy
   - pip
   - pip:
     - sphinx_rtd_theme
