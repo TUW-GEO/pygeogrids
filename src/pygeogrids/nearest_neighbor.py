@@ -26,6 +26,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as np
+import warnings
 
 try:
     import pykdtree.kdtree as pykd
@@ -214,9 +215,10 @@ class findGeoNN(object):
         d, ind = self.kdtree.query(
             query_coords, distance_upper_bound=max_dist, k=k)
 
-        # if no point was found, d == inf
-        if np.all(np.isfinite(d) == False):
-            d, ind = np.array([]), np.array([])
+        if np.any(np.isinf(d)):
+            warnings.warn(f"Less than k={k} points found within "
+                          f"max_dist={max_dist}. Distance set to 'Inf'."
+                          )
 
         if not self.grid:
             return d, ind
