@@ -108,7 +108,8 @@ class findGeoNN(object):
             self.lon_size = len(lon)
         else:
             if lat.shape != lon.shape:
-                raise Exception("lat and lon np.arrays have to have equal shapes")
+                raise Exception(
+                    "lat and lon np.arrays have to have equal shapes")
             lat_init = lat
             lon_init = lon
         # Earth radius
@@ -137,7 +138,8 @@ class findGeoNN(object):
         lon = np.array(lon)
         lat = np.array(lat)
         coords = np.zeros((lon.size, 3), dtype=np.float64)
-        (coords[:, 0], coords[:, 1], coords[:, 2]) = self.geodatum.toECEF(lon, lat)
+        (coords[:, 0], coords[:, 1], coords[:, 2]
+         ) = self.geodatum.toECEF(lon, lat)
 
         return coords
 
@@ -202,16 +204,18 @@ class findGeoNN(object):
 
         if k is None:
             if self.kd_tree_name != "scipy":
-                raise NotImplementedError("Only available for the scipy kdTree")
+                raise NotImplementedError(
+                    "Only available for the scipy kdTree")
             query_coords = query_coords[0]
             k = self.kdtree.query_ball_point(
                 query_coords, r=max_dist, return_length=True
             )
 
-        d, ind = self.kdtree.query(query_coords, distance_upper_bound=max_dist, k=k)
+        d, ind = self.kdtree.query(
+            query_coords, distance_upper_bound=max_dist, k=k)
 
         # if no point was found, d == inf
-        if not np.all(np.isfinite(d)):
+        if np.all(np.isfinite(d) == False):
             d, ind = np.array([]), np.array([])
 
         if not self.grid:
