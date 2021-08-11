@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Version 0.4.1
+=============
+
+- Fixes a bug in the nearest neighbour lookup, where no points were returned
+  when less than k gpis are found in the selected max distance
+  (`Issue #73 <https://github.com/TUW-GEO/pygeogrids/issues/73>`_ ).
+
 Version 0.4.0
 =============
 
