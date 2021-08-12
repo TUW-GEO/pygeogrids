@@ -119,6 +119,7 @@ class TestFindNearestNeighbor(unittest.TestCase):
         assert lon == 145.5
         assert lat == 45.5
 
+
     def test_k_nearest_neighbor(self):
         gpi, dist = self.grid.find_k_nearest_gpi(14.3, 18.5, k=2)
         assert gpi[0, 0] == 25754
@@ -130,6 +131,14 @@ class TestFindNearestNeighbor(unittest.TestCase):
         lon, lat = self.grid.gpi2lonlat(gpi[0, 1])
         assert lon == 13.5
         assert lat == 18.5
+
+        with pytest.warns(UserWarning):
+            gpi, dist = self.grid.find_k_nearest_gpi(14.3, 18.5, k=2, 
+                                                     max_dist=25000)
+        assert len(gpi) == len(dist) == 1
+        assert np.all(np.isfinite(dist))
+        assert gpi == 25754
+
 
     def test_k_nearest_neighbor_list(self):
         gpi, dist = self.grid.find_k_nearest_gpi(
@@ -708,8 +717,3 @@ def test_BasicGrid_transform_lon():
     # case 3: no warning and no transform
     grid = BasicGrid(lon_pos, lat, transform_lon=False)
     assert np.all(grid.arrlon == lon_pos)
-
-
-
-if __name__ == "__main__":
-    unittest.main()
