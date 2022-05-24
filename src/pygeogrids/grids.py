@@ -456,9 +456,8 @@ class BasicGrid(object):
         distance, ind = self.kdTree.find_nearest_index(lon, lat,
                                                        max_dist=max_dist, k=k)
         mask = np.isinf(distance)
-        if np.any(mask):
-            ind = ind[~mask]
-            distance = distance[~mask]
+        ind = ind[~mask]
+        distance = distance[~mask]
 
         if self.gpidirect and self.allpoints or len(ind) == 0:
             gpi = ind
