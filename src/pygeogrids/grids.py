@@ -445,7 +445,7 @@ class BasicGrid(object):
         -------
         gpi : np.ndarray
             Grid point indices.
-        distance : np.ndarray
+        dist : np.ndarray
             Distance of gpi(s) to given lon, lat.
             At the moment not on a great circle but in spherical
             cartesian coordinates.
@@ -453,18 +453,17 @@ class BasicGrid(object):
         if self.kdTree is None:
             self._setup_kdtree()
 
-        distance, ind = self.kdTree.find_nearest_index(lon, lat,
-                                                       max_dist=max_dist, k=k)
-        mask = np.isinf(distance)
-        ind = ind[~mask]
-        distance = distance[~mask]
+        dist, ind = self.kdTree.find_nearest_index(lon, lat,
+                                                   max_dist=max_dist, k=k)
+        mask = np.isinf(dist)
+        gpi = np.zeros(dist.shape, dtype=np.int32) + np.iinfo(np.int32).max
 
         if self.gpidirect and self.allpoints or len(ind) == 0:
-            gpi = ind
+            gpi[~mask] = ind[~mask]
         else:
-            gpi = self.activegpis[ind]
+            gpi[~mask] = self.activegpis[ind[~mask]]
 
-        return gpi, distance
+        return gpi, dist
 
     def gpi2lonlat(self, gpi):
         """
