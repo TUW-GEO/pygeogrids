@@ -1224,12 +1224,8 @@ def lonlat2cell(lon, lat, cellsize=5.0, cellsize_lon=None, cellsize_lat=None):
         cellsize_lon = cellsize
     if cellsize_lat is None:
         cellsize_lat = cellsize
-    y = np.clip(
-        np.floor((np.double(lat) + (np.double(90.0) + 1e-9)) / cellsize_lat), 0, 180
-    )
-    x = np.clip(
-        np.floor((np.double(lon) + (np.double(180.0) + 1e-9)) / cellsize_lon), 0, 360
-    )
+    y = np.floor((np.double(lat) + (np.double(90.0) + 1e-9)) / cellsize_lat)
+    x = np.floor((np.double(lon) + (np.double(180.0) + 1e-9)) / cellsize_lon)
     cells = np.int32(x * (np.double(180.0) / cellsize_lat) + y)
 
     max_cells = (np.double(180.0) / cellsize_lat) * (np.double(360.0)) / cellsize_lon
