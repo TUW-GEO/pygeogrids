@@ -133,11 +133,9 @@ class TestFindNearestNeighbor(unittest.TestCase):
         assert lat == 18.5
 
         with pytest.warns(UserWarning):
-            gpi, dist = self.grid.find_k_nearest_gpi(14.3, 18.5, k=2, 
+            gpi, dist = self.grid.find_k_nearest_gpi(14.3, 18.5, k=2,
                                                      max_dist=25000)
-        assert len(gpi) == len(dist) == 1
-        assert np.all(np.isfinite(dist))
-        assert gpi == 25754
+        assert gpi.shape == dist.shape == (1, 2)
 
 
     def test_k_nearest_neighbor_list(self):
@@ -161,15 +159,14 @@ class TestFindNearestNeighbor(unittest.TestCase):
 
         # test with maxdist lower than nearest point
         gpi, dist = self.grid.find_nearest_gpi(14.3, 18.5, max_dist=10000)
-        assert len(gpi) == 0
-        assert len(dist) == 0
+        assert gpi == np.iinfo(np.int32).max
+        assert dist == np.inf
 
         # test with custom gpi, see issue #68
         grid = grids.BasicGrid(lon=[16,17], lat=[45,46], gpis=[100,200])
         gpi, dist = grid.find_nearest_gpi(0,0, max_dist=1000)
-        assert len(gpi) == 0
-        assert len(dist) == 0
-                                                
+        assert gpi == np.iinfo(np.int32).max
+        assert dist == np.inf
 
 class TestCellGridNotGpiDirect(unittest.TestCase):
 
