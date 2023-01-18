@@ -2,6 +2,15 @@
 Changelog
 =========
 
+Version 0.4.2
+=============
+- Fixes a bug in the cell grid creation if the cell size is chosen smaller than 1
+  (`PR #77 <https://github.com/TUW-GEO/pygeogrids/pull/77>`_ ).
+- Better handling of ``np.inf`` in ``k_nearest_neighbor`` search
+  (`PR #76 <https://github.com/TUW-GEO/pygeogrids/pull/76>`_ ).
+
+
+
 Version 0.4.1
 =============
 
