@@ -533,7 +533,7 @@ class BasicGrid(object):
                 pos = np.searchsorted(self.gpis[gpisorted], gpi)
                 index = gpisorted[pos]
 
-            index_lat = (index / self.shape[1]).astype(np.int)
+            index_lat = (index / self.shape[1]).astype(np.int64)
             index_lon = index % self.shape[1]
             if not iterable:
                 index_lat = index_lat[0]
