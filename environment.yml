@@ -13,7 +13,7 @@ dependencies:
   - ipykernel
   - pip
   - pip:
-    - sphinx==4.0.3  # https://github.com/spatialaudio/nbsphinx/issues/584, when this is resolved this line can be deleted to use the latest version.
+    - sphinx
     - nbsphinx
     - sphinx_rtd_theme
     - pytest

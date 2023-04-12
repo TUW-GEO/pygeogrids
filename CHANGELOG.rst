@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Unreleased changes in master branch
+===================================
+- Add a more flexible reader to search points in shapes from shapefiles
+- Default 100m country shapefiles are now provided in the package
+
 Version 0.4.2
 =============
 - Fixes a bug in the cell grid creation if the cell size is chosen smaller than 1
@@ -9,40 +14,32 @@ Version 0.4.2
 - Better handling of ``np.inf`` in ``k_nearest_neighbor`` search
   (`PR #76 <https://github.com/TUW-GEO/pygeogrids/pull/76>`_ ).
 
-
-
 Version 0.4.1
 =============
-
 - Fixes a bug in the nearest neighbour lookup, where no points were returned
   when less than k gpis are found in the selected max distance
   (`Issue #73 <https://github.com/TUW-GEO/pygeogrids/issues/73>`_ ).
 
 Version 0.4.0
 =============
-
 - Faster implementation of bbox search
 - Uses pyscaffold v4 standard
 
 Version 0.3.2
 =============
-
 - FIX: Nearest neighbour search for grids with non-default GPIs
 - Replace Travis CI with Github Actions workflows.
 
 Version 0.3.1
 =============
-
 - Add k parameter to nearest neighbor search (number of nearest neighbors to return)
 
 Version 0.3.0
 =============
-
 - Refracture package to pyscaffold 3 standard
 
 Version 0.2.6
 =============
-
 - Allow subsetting from non-binary masks
 - Fix ParallelArcDist function (two calls of deg2rad(lat))
 - Update readme
@@ -50,13 +47,11 @@ Version 0.2.6
 
 Version 0.2.5
 =============
-
 - Fix speed bug of gpi2cell
 - Update copyright header
 
 Version 0.2.4
 =============
-
 - Add option to subset a grid with a shape file (OGRGeometry) in
   get_shp_grid_points.
 - Add shapefile module for reading shapefiles from
@@ -67,24 +62,20 @@ Version 0.2.4
 
 Version 0.2.3
 =============
-
 - Fix bug in calc_lut in case of differently ordered subset of a grid.
 - Add function to reorder grid based on different cell size. (See grids.reorder_to_cellsize)
 
 Version 0.2.2
 =============
-
 - Add option to load grids with non standard variable name for gpis.
 
 Version 0.2.1
 =============
-
 - Fix bug in gpi2lonlat with subset, see #42
 - Add simple script for plotting a global cell partitioning.
 
 Version 0.2.0
 =============
-
 - fix bug in storing/loading grids with shape attribute set.
 - change equality check of grids to be more flexible. Now only a match of the
   tuples gpi, lon, lat, cell is checked. The order does no longer matter.
@@ -96,34 +87,28 @@ Version 0.2.0
 
 Version 0.1.9
 =============
-
 -  bugfix in lonlat2cell. Improvements in dependency installation and
    documentation.
 
 Version 0.1.7
 =============
-
 -  bugfix in gpi2lonlat. Now supports array as input.
 
 Version 0.1.6
 =============
-
 -  add geodatic datum functionality to grid objects
 
 Version 0.1.5
 =============
-
 -  bugfix of subgrid creation which returned wrongly shaped subarrays
 
 Version 0.1.4
 =============
-
 -  fix bug in lookuptable generation when gpis have custom ordering
 -  add functions for getting subgrids from cells and gpis
 
 Version 0.1.3
 =============
-
 -  change meaning and rename grid dimensions to lon2d, lat2d. They do
    now represent 2d arrays of latitudes and longitudes which means that
    they no longer have to be regular in order to be able to have a
@@ -131,13 +116,11 @@ Version 0.1.3
 
 Version 0.1.2
 =============
-
 -  fix issue #19 by refactoring the iterable checking into own function
 -  made pykdtree an optional requirement see issue #18
 
 Version 0.1.1
 =============
-
 -  added support for saving more subsets and loading a certain one
    in/from a netcdf grid file
 -  fix #15 by setting correct shape for derived cell grids
@@ -145,7 +128,6 @@ Version 0.1.1
 
 Version 0.1
 ===========
-
 -  Initial version pulled out of pytesmo
 -  added support for iterables like lists and numpy arrays to functions
    like find\_nearest\_gpi. numpy arrays should work everywhere if you
