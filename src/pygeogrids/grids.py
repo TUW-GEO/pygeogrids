@@ -786,7 +786,7 @@ class BasicGrid(object):
         # same
         idx_gpi = np.argsort(self.gpis)
         idx_gpi_other = np.argsort(other.gpis)
-        gpisame = np.all(self.gpis[idx_gpi] == other.gpis[idx_gpi_other])
+        gpisame = np.array_equal(self.gpis[idx_gpi], other.gpis[idx_gpi_other])
         try:
             nptest.assert_allclose(self.arrlon[idx_gpi], other.arrlon[idx_gpi_other])
             lonsame = True
