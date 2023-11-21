@@ -1131,7 +1131,7 @@ class CellGrid(BasicGrid):
         basicsame = super(CellGrid, self).__eq__(other)
         idx_gpi = np.argsort(self.gpis)
         idx_gpi_other = np.argsort(other.gpis)
-        cellsame = np.all(self.arrcell[idx_gpi] == other.arrcell[idx_gpi_other])
+        cellsame = np.array_equal(self.arrcell[idx_gpi], other.arrcell[idx_gpi_other])
         return np.all([basicsame, cellsame])
 
     def get_bbox_grid_points(
