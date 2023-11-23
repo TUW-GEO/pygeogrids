@@ -2,8 +2,8 @@
 pygeogrids
 ==========
 
-.. image:: https://github.com/TUW-GEO/pygeogrids/workflows/test/badge.svg
-   :target: https://github.com/TUW-GEO/pygeogrids/actions?query=test
+.. image:: https://github.com/TUW-GEO/pygeogrids/workflows/Automated%20Tests/badge.svg?branch=master
+   :target: https://github.com/TUW-GEO/pygeogrids/actions
 
 .. image:: https://coveralls.io/repos/TUW-GEO/pygeogrids/badge.svg?branch=master
    :target: https://coveralls.io/r/TUW-GEO/pygeogrids?branch=master
@@ -18,6 +18,8 @@ pygeogrids
 This is a package for creation and handling of Discrete Global Grids or Point
 collections. We hope extend the interface also to projected grids(images) in the
 future.
+
+The full documentation is available at http://pygeogrids.readthedocs.org/.
 
 Citation
 ========
