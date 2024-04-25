@@ -4,6 +4,8 @@ channels:
 dependencies:
   - geos
   - gdal
+  - matplotlib
+  - cartopy
   - ipykernel
   - pip
   - pip:
