@@ -31,70 +31,74 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib as mp
 except ImportError:
-    warnings.warn("Matplotlib is necessary for plotting grids.")
+    warnings.warn("Matplotlib is necessary for plotting grids. "
+                  "Call `conda install matplotlib`")
 try:
-    from mpl_toolkits.basemap import Basemap
+    import cartopy
+    import cartopy.crs as ccrs
 except ImportError:
-    warnings.warn("Basemap is necessary for plotting grids.")
+    warnings.warn("Cartopy is necessary for plotting grids."
+                  "Call `conda install cartopy`")
+
 import numpy as np
 import pygeogrids.grids as grids
 
 
 def plot_cell_grid_partitioning(
-    output, cellsize_lon=5.0, cellsize_lat=5.0, figsize=(12, 6)
+    output, cellsize_lon=5.0, cellsize_lat=5.0, figsize=(12, 6), fontsize=2,
 ):
     """
     Plot an overview of a global cell partitioning.
 
     Parameters
     ----------
-    output: string
-        output file name
+    output: str
+        output file path, must end with .png
+    cellsize_lon: float, optional (default: 5.0)
+        Cell sampling in longitude dimension
+    cellsize_lat: float, optional (default: 5.0)
+        Cell sampling in latitude dimension
+    figsize: tuple, optional (default: (12, 6))
+        Figure size (inch)
+    fontsize: float, optional (default: 2)
+        Font size for labels on the map
     """
-    mp.rcParams["font.size"] = 10
-    mp.rcParams["text.usetex"] = True
-    plt.figure(figsize=figsize, dpi=300)
-    ax = plt.axes([0, 0, 1, 1])
 
-    map = Basemap(
-        projection="cyl",
-        llcrnrlat=-90,
-        urcrnrlat=90,
-        llcrnrlon=-180,
-        urcrnrlon=180,
-        ax=ax,
-    )
-    map.drawparallels(
-        np.arange(-90, 90, cellsize_lat), labels=[1, 0, 0, 0], linewidth=0.5
-    )
-    map.drawmeridians(
-        np.arange(-180, 180, cellsize_lon),
-        labels=[0, 0, 0, 1],
-        rotation="vertical",
-        linewidth=0.5,
-    )
-    # fill continents 'coral' (with zorder=0), color wet areas 'aqua'
-    map.drawmapboundary(fill_color="aqua")
-    map.fillcontinents(color="0.6", lake_color="aqua")
+    fig, ax = plt.subplots(figsize=figsize,
+                           subplot_kw={"projection": ccrs.PlateCarree()})
+
+    ax.add_feature(cartopy.feature.LAND, color='coral')
+    ax.add_feature(cartopy.feature.LAKES, color='aqua')
+    ax.add_feature(cartopy.feature.OCEAN, color='aqua')
+
+    for y in np.arange(-90, 90, cellsize_lat):
+        ax.plot([-180, 180], [y, y], '--', transform=ccrs.PlateCarree(), lw=0.5,
+                color='black')
+
+    for x in np.arange(-180, 180, cellsize_lat):
+        ax.plot([x, x], [-90, 90], '--', transform=ccrs.PlateCarree(), lw=0.5,
+                color='black')
+
     label_lats = np.arange(-90 + cellsize_lat / 2.0, 90, cellsize_lat)
     label_lons = np.arange(-180 + cellsize_lon / 2.0, 180, cellsize_lon)
     lons, lats = np.meshgrid(label_lons, label_lats)
-    x, y = map(lons.flatten(), lats.flatten())
+
     cells = grids.lonlat2cell(
         lons.flatten(),
         lats.flatten(),
         cellsize_lon=cellsize_lon,
         cellsize_lat=cellsize_lat,
     )
-    for xt, yt, cell in zip(x, y, cells):
-        plt.text(
-            xt,
-            yt,
+    for lon, lat, cell in zip(lons.flatten(), lats.flatten(), cells):
+        ax.text(
+            lon,
+            lat,
             "{:}".format(cell),
-            fontsize=4,
+            fontsize=fontsize,
             va="center",
             ha="center",
             weight="bold",
         )
-    plt.savefig(output, format="png", dpi=300)
-    plt.close()
+
+    fig.savefig(output, format="png", dpi=300)
+    plt.close(fig)
