@@ -35,7 +35,6 @@ import warnings
 
 try:
     from osgeo import ogr
-
     ogr_installed = True
 except ImportError:
     ogr_installed = False

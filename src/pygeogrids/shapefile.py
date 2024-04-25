@@ -36,7 +36,6 @@ from pygeogrids.grids import CellGrid
 
 try:
     from osgeo import ogr
-
     ogr_installed = True
 except ImportError:
     ogr_installed = False
@@ -97,9 +96,8 @@ def get_gad_grid_points(grid, gadm_shp_path, level, name=None, oid=None):
             raise ValueError("Requested Object not found in shapefile.")
 
     else:
-        raise ImportError(
-            "No supported implementation installed." "Please install gdal and osgeo."
-        )
+        raise ImportError("Could not import ogr from osgeo. "
+                          "Please install them via `conda install geos gdal` first.")
 
 
 class ShpReader:
@@ -138,8 +136,8 @@ class ShpReader:
             to filter out the relevant polygons.
         """
         if not ogr_installed:
-            raise ImportError("Could not import ogr/osr. "
-                              "Please install `gdal` with conda first.")
+            raise ImportError("Could not import ogr from osgeo. "
+                              "Please install them via `conda install geos gdal` first.")
         self.shp_path = shp_path
         self.driver = driver
         self._init_open_shp()
@@ -213,7 +211,7 @@ class ShpReader:
         rows = np.unique(np.where(np.isin(self.features.values, names))[0])
         return self.features.index.values[rows]
 
-    def geom(self, id) -> ogr.Geometry:
+    def geom(self, id) -> 'ogr.Geometry':
         """
         Get geometry of feature with passed id
         """

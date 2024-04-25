@@ -32,16 +32,11 @@ Testing grid functionality.
 import unittest
 import numpy.testing as nptest
 import numpy as np
-try:
-    from osgeo import ogr
-    ogr_installed = True
-except ImportError:
-    ogr_installed = False
-
 import pytest
 
 from pygeogrids.grids import lonlat2cell, BasicGrid
 import pygeogrids as grids
+from pygeogrids.grids import ogr_installed
 
 
 class Test_lonlat2cell(unittest.TestCase):
@@ -660,12 +655,15 @@ def test_reorder_to_cellsize():
                                np.array([14, 14, 14, 14]))
 
 
+@pytest.mark.skipif(not ogr_installed, reason="OGR not installed.")
 class Test_ShpGrid(unittest.TestCase):
 
     def setUp(self):
         """
         Setup grid and shp_file to check if grid points fall in shp.
         """
+        from osgeo import ogr
+
         lat = np.arange(-90, 90, 1)
         lon = np.arange(-180, 180, 1)
         self.lons, self.lats = np.meshgrid(lon, lat)
@@ -682,7 +680,6 @@ class Test_ShpGrid(unittest.TestCase):
         poly.AddGeometry(ring)
 
         self.shp = poly
-
     def test_shpgrid(self):
         '''
         Check if gridpoints fall in polygon.
