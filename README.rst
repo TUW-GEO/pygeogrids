@@ -2,16 +2,18 @@
 pygeogrids
 ==========
 
-.. image:: https://github.com/TUW-GEO/pygeogrids/workflows/Automated%20Tests/badge.svg?branch=master
+|ci| |cov| |pip| |doc|
+
+.. |ci| image:: https://github.com/TUW-GEO/pygeogrids/workflows/Automated%20Tests/badge.svg?branch=master
    :target: https://github.com/TUW-GEO/pygeogrids/actions
 
-.. image:: https://coveralls.io/repos/TUW-GEO/pygeogrids/badge.svg?branch=master
+.. |cov| image:: https://coveralls.io/repos/TUW-GEO/pygeogrids/badge.svg?branch=master
    :target: https://coveralls.io/r/TUW-GEO/pygeogrids?branch=master
 
-.. image:: https://badge.fury.io/py/pygeogrids.svg
+.. |pip| image:: https://badge.fury.io/py/pygeogrids.svg
     :target: https://badge.fury.io/py/pygeogrids
 
-.. image:: https://readthedocs.org/projects/pygeogrids/badge/?version=latest
+.. |doc| image:: https://readthedocs.org/projects/pygeogrids/badge/?version=latest
    :target: http://pygeogrids.readthedocs.org/
 
 
