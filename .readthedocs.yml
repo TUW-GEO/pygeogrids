@@ -1,16 +1,17 @@
 version: 2
 
-sphinx:
-  configuration: docs/conf.py
-
-submodules:
-  include: all
-
-conda:
-  environment: environment.yml
+build:
+  os: ubuntu-20.04
+  tools:
+    python: mambaforge-4.10
 
 python:
-  version: 3.8
   install:
     - method: pip
       path: .
+
+sphinx:
+  configuration: docs/conf.py
+
+conda:
+  environment: docs/env.yml
