@@ -15,4 +15,4 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
-from .grids import BasicGrid, CellGrid, genreg_grid, lonlat2cell, reorder_to_cellsize
+from pygeogrids.grids import BasicGrid, CellGrid, genreg_grid, lonlat2cell, reorder_to_cellsize

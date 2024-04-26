@@ -1,6 +1,8 @@
-from pygeogrids.shapefile import subgrid_for_shp
+import pytest
+from pygeogrids.shapefile import subgrid_for_shp, ogr_installed
 from pygeogrids.grids import genreg_grid
 
+@pytest.mark.skipif(not ogr_installed, reason="OGR not installed.")
 def test_subgrid_from_shapefile():
     grid = genreg_grid(1)
 
