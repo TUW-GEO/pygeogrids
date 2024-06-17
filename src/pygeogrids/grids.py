@@ -393,7 +393,7 @@ class BasicGrid(object):
         for i, (lon, lat) in enumerate(zip(self.subarrlons[n], self.subarrlats[n])):
             yield self.subgpis[n][i], lon, lat
 
-    def find_nearest_gpi(self, lon, lat, max_dist=np.Inf):
+    def find_nearest_gpi(self, lon, lat, max_dist=np.inf):
         """
         Finds nearest gpi, builds kdTree if it does not yet exist.
 
@@ -404,7 +404,7 @@ class BasicGrid(object):
         lat : float or iterable
             Latitude of point.
         max_dist : float, optional
-            Maximum distance [m] to consider for search (default: np.Inf).
+            Maximum distance [m] to consider for search (default: np.inf).
 
         Returns
         -------
@@ -425,7 +425,7 @@ class BasicGrid(object):
 
         return gpi, distance
 
-    def find_k_nearest_gpi(self, lon, lat, max_dist=np.Inf, k=1):
+    def find_k_nearest_gpi(self, lon, lat, max_dist=np.inf, k=1):
         """
         Find k nearest gpi, builds kdTree if it does not yet exist.
 
@@ -436,7 +436,7 @@ class BasicGrid(object):
         lat : float or iterable
             Latitude of point.
         max_dist : float, optional
-            Maximum distance to consider for search (default: np.Inf).
+            Maximum distance to consider for search (default: np.inf).
         k : int, optional
             The number of nearest neighbors to return (default: 1).
 
@@ -542,7 +542,7 @@ class BasicGrid(object):
         else:
             raise (GridDefinitionError("Grid has no 2D shape"))
 
-    def calc_lut(self, other, max_dist=np.Inf, into_subset=False):
+    def calc_lut(self, other, max_dist=np.inf, into_subset=False):
         """
         Takes other BasicGrid or CellGrid objects and computes a lookup table
         between them. The lut will have the size of self.n_gpis and will
