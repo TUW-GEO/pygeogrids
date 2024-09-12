@@ -80,17 +80,17 @@ jobs:
           then
             # build whls on windows
             pip install .
-            python setup.py bdist_wheel --dist-dir .artifacts/dist
+            python setup.py bdist_wheel --dist-dir artifacts/dist
           else
             # build dist on linux
-            python setup.py sdist --dist-dir .artifacts/dist
+            python setup.py sdist --dist-dir artifacts/dist
           fi
-          ls .artifacts/dist
+          ls artifacts/dist
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: Artifacts
-          path: .artifacts/*
+          name: Artifacts-py${{ matrix.python-version }}-${{ matrix.os }}
+          path: artifacts/*
   coveralls:
     name: Submit Coveralls 👚
     needs: build
@@ -113,7 +113,11 @@ jobs:
           echo "GITHUB_REF = $GITHUB_REF"
           echo "GITHUB_REPOSITORY = $GITHUB_REPOSITORY"
       - name: Download Artifacts
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4
+        with:
+          path: Artifacts
+          pattern: Artifacts-*
+          merge-multiple: true
       - name: Display downloaded files
         run: ls -aR
       - name: Upload to PyPI
