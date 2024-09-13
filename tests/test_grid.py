@@ -153,13 +153,15 @@ class TestFindNearestNeighbor(unittest.TestCase):
         assert lat == 18.5
 
         # test with maxdist lower than nearest point
-        gpi, dist = self.grid.find_nearest_gpi(14.3, 18.5, max_dist=10000)
+        with pytest.warns(UserWarning):
+            gpi, dist = self.grid.find_nearest_gpi(14.3, 18.5, max_dist=10000)
         assert gpi == np.iinfo(np.int32).max
         assert dist == np.inf
 
         # test with custom gpi, see issue #68
         grid = grids.BasicGrid(lon=[16,17], lat=[45,46], gpis=[100,200])
-        gpi, dist = grid.find_nearest_gpi(0,0, max_dist=1000)
+        with pytest.warns(UserWarning):
+            gpi, dist = grid.find_nearest_gpi(0,0, max_dist=1000)
         assert gpi == np.iinfo(np.int32).max
         assert dist == np.inf
 

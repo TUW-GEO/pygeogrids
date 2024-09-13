@@ -21,7 +21,11 @@ jobs:
       matrix:
         include:
           - os: "ubuntu-latest"
-            python-version: '3.8'  # first supported
+            python-version: '3.9'  # first supported
+          - os: "windows-latest"
+            python-version: '3.9'  # first supported
+          - os: "macos-latest"
+            python-version: '3.9'  # first supported
           - os: "ubuntu-latest"
             python-version: '3.12'  # latest supported
           - os: "windows-latest"
@@ -29,16 +33,15 @@ jobs:
           - os: "macos-latest"
             python-version: '3.12'  # latest supported
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
-          fetch-depth: 0
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
-          environment-file: environment.yml
+          #environment-file: environment.yml   # we use setup.cfg dependencies only
           activate-environment: pygeogrids
           auto-activate-base: false
       - name: Print environment infos
@@ -52,13 +55,13 @@ jobs:
       - name: Export Environment
         shell: bash -l {0}
         run: |
-          mkdir -p .artifacts
+          mkdir -p artifacts
           filename=env_py${{ matrix.python-version }}_${{ matrix.os }}.yml
-          conda env export --no-builds | grep -v "prefix" > .artifacts/$filename
+          conda env export --no-builds | grep -v "prefix" > artifacts/$filename
       - name: Install package and test
         shell: bash -l {0}
         run: |
-          python setup.py develop
+          pip install -e .[testing]
           pytest
       - name: Upload Coverage
         shell: bash -l {0}
@@ -72,21 +75,19 @@ jobs:
         shell: bash -l {0}
         run: |
           pip install setuptools_scm
-          if [ ${{ matrix.os }} == "windows-latest" ]
+          if [ ${{ matrix.os }} == "ubuntu-latest" ]
           then
-            # build whls on windows
-            pip install .
-            python setup.py bdist_wheel --dist-dir .artifacts/dist
-          else
             # build dist on linux
-            python setup.py sdist --dist-dir .artifacts/dist
+            python setup.py sdist --dist-dir artifacts/dist
           fi
-          ls .artifacts/dist
+          pip install wheel
+          python setup.py bdist_wheel --dist-dir artifacts/dist
+          ls artifacts/dist
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: Artifacts
-          path: .artifacts/*
+          name: Artifacts-py${{ matrix.python-version }}-${{ matrix.os }}
+          path: artifacts/*
   coveralls:
     name: Submit Coveralls 👚
     needs: build
@@ -109,7 +110,11 @@ jobs:
           echo "GITHUB_REF = $GITHUB_REF"
           echo "GITHUB_REPOSITORY = $GITHUB_REPOSITORY"
       - name: Download Artifacts
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4
+        with:
+          path: Artifacts
+          pattern: Artifacts-*
+          merge-multiple: true
       - name: Display downloaded files
         run: ls -aR
       - name: Upload to PyPI
