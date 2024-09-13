@@ -33,11 +33,10 @@ jobs:
           - os: "macos-latest"
             python-version: '3.12'  # latest supported
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
-          fetch-depth: 0
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
           auto-update-conda: true
@@ -76,15 +75,13 @@ jobs:
         shell: bash -l {0}
         run: |
           pip install setuptools_scm
-          if [ ${{ matrix.os }} == "windows-latest" ]
+          if [ ${{ matrix.os }} == "ubuntu-latest" ]
           then
-            # build whls on windows
-            pip install .
-            python setup.py bdist_wheel --dist-dir artifacts/dist
-          else
             # build dist on linux
             python setup.py sdist --dist-dir artifacts/dist
           fi
+          pip install wheel
+          python setup.py bdist_wheel --dist-dir artifacts/dist
           ls artifacts/dist
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
