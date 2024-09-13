@@ -4,7 +4,7 @@ pygeogrids
 
 |ci| |cov| |pip| |doc|
 
-.. |ci| image:: https://github.com/TUW-GEO/pygeogrids/workflows/Automated%20Tests/badge.svg?branch=master
+.. |ci| image:: https://github.com/TUW-GEO/pygeogrids/actions/workflows/build.yml/badge.svg?branch=master
    :target: https://github.com/TUW-GEO/pygeogrids/actions
 
 .. |cov| image:: https://coveralls.io/repos/TUW-GEO/pygeogrids/badge.svg?branch=master
