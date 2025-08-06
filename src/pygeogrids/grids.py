@@ -879,6 +879,10 @@ class CellGrid(BasicGrid):
         self.gpi_lut = None
         cells = np.asanyarray(cells)
 
+        # Handle scalar case: reshape 0-dimensional array to 1D
+        if cells.ndim == 0:
+            cells = cells.reshape(1)
+
         if self.arrlon.shape != cells.shape:
             raise GridDefinitionError(
                 "lat, lon and cells np.arrays have to have equal shapes"
