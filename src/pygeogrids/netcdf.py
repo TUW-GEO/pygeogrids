@@ -490,3 +490,20 @@ def load_grid(
                 shape=shape,
                 **grid_kwargs
             )
+
+
+if __name__ == '__main__':
+    from pygeogrids.netcdf import load_grid, save_grid
+    from pygeogrids.shapefile import subgrid_for_shp
+    import os
+    from smecv_grid.gr
+
+    path = "/home/wpreimes/shares/climers/Datapool/ECMWF_reanalysis/02_processed/ERA5-Land/datasets/sm_precip_lai"
+
+    grid = load_grid(os.path.join(path, "grid.nc"))
+
+    subgrid = subgrid_for_shp(grid,
+                              shp_path="/home/wpreimes/shares/climers/Projects/CCIplus_AWU_Precursor/07_data/ancillary/shapefiles_study_areas/ir_area_EBRO.shp",
+                              values=None)
+
+    save_grid('/tmp/era5land_ir_area_EBRO_grid.nc', subgrid)
