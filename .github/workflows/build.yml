@@ -32,6 +32,7 @@ jobs:
             python-version: '3.12'  # latest supported
           - os: "macos-latest"
             python-version: '3.12'  # latest supported
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,12 +62,12 @@ jobs:
       - name: Install package and test
         shell: bash -l {0}
         run: |
-          pip install -e .[testing]
+          pip install -e ".[testing]"
           pytest
       - name: Upload Coverage
         shell: bash -l {0}
         run: |
-          pip install coveralls && coveralls --service=github
+          pip install coveralls && coveralls --service=github-actions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
@@ -88,20 +89,26 @@ jobs:
         with:
           name: Artifacts-py${{ matrix.python-version }}-${{ matrix.os }}
           path: artifacts/*
+
   coveralls:
     name: Submit Coveralls 👚
     needs: build
     runs-on: ubuntu-latest
     container: python:3-slim
     steps:
-      - name: Finished
+      - name: Finalize Coveralls Parallel Build
+        continue-on-error: true
         run: |
-          pip3 install --upgrade coveralls && coveralls --service=github --finish
+          pip3 install --upgrade coveralls
+          coveralls --finish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_SERVICE_NAME: github-actions
+
   publish:
     name: Upload to PyPI 🚀
-    if: startsWith(github.ref, 'refs/tags/v') && startsWith(github.repository, 'TUW-GEO')
+    if: startsWith(github.ref, 'refs/tags/v') && 
+        startsWith(github.repository, 'TUW-GEO')
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -118,11 +125,11 @@ jobs:
       - name: Display downloaded files
         run: ls -aR
       - name: Upload to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.4.1
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          skip_existing: true
+          skip-existing: true
           verbose: true
-          verify_metadata: true
-          packages_dir: Artifacts/dist/
+          verify-metadata: true
+          packages-dir: Artifacts/dist/
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }} # this needs to be uploaded to github actions secrets

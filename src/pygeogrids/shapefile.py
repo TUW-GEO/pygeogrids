@@ -219,7 +219,7 @@ class ShpReader:
         geom = feature.geometry().Clone()
         return geom
 
-def subgrid_for_shp(grid, values, shp_path=path_shp_countries,
+def subgrid_for_shp(grid, values=None, shp_path=path_shp_countries,
                     field=None, shp_driver='ESRI Shapefile',
                     verbose=False):
     """
@@ -229,12 +229,13 @@ def subgrid_for_shp(grid, values, shp_path=path_shp_countries,
     ----------
     grid: CellGrid
         Grid that should be cut to shape(s) in passed shapefile
-    values: np.ndarray or list
+    values: np.ndarray or list or None, default: None
         Values in field that are used to select the shape(s) to cut the grid
         to. Usually e.g. a list of country names or continent names.
         The passed values are looked up in all loaded fields, i.e. in all
         columns of the feature table. A polygon is selected if the value
         appears in ANY of the columns (fields) of the feature table.
+        If None is passed, all features are used.
     shp_path: str, optional (default: ./shapefiles/ne_10m_admin_0_countries.shp)
         Path to shapefile. By default we use the 110m resolution country
         shape file provided in this package. In theory any shapefile should
@@ -313,7 +314,10 @@ def subgrid_for_shp(grid, values, shp_path=path_shp_countries,
         print("Feature table:")
         print(shp_reader.features)
 
-    ids = np.unique(shp_reader.lookup_id(values))
+    if values is None:
+        ids = shp_reader.features.index.values
+    else:
+        ids = np.unique(shp_reader.lookup_id(values))
 
     if len(ids) == 0:
         raise ValueError(f"No features found for {values} in "
