@@ -4,7 +4,8 @@ Changelog
 
 Unreleased changes in master branch
 ===================================
--
+- Subgrid from shapefile now allows to use all features from a .shp file
+
 Version v0.5.2
 ==============
 - scipy was added to pip dependencies
@@ -14,7 +15,6 @@ Version v0.5.1
 - Fixed a compatibility issue with numpy 2.0.0 (np.Inf was removed)
 - Updated errors due to missing dependencies
 - Basemap replaced with cartopy
-- Subgrid from shapefile now allows to use all features from a .shp file
 
 Version v0.5.0
 ==============
