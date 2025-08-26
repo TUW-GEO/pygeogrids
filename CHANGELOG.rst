@@ -7,6 +7,7 @@ Unreleased changes in master branch
 
 - Updated errors due to missing dependencies
 - Basemap replaced with cartopy
+- Subgrid from shapefile now allows to use all features from a .shp file
 
 Version v0.5.0
 ==============
