@@ -278,7 +278,7 @@ class BasicGrid(object):
 
         Parameters
         ----------
-        gpis: np.ndarray[int]
+        gpis: np.ndarray
             Array of grid points
 
         Returns
@@ -500,7 +500,7 @@ class BasicGrid(object):
 
         Parameters
         ----------
-        gpi : int or np.ndarray[int]
+        gpi : int or np.ndarray
             Grid point index/indices.
 
         Returns
