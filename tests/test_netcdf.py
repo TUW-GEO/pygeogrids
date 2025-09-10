@@ -186,7 +186,7 @@ def test_store_load_regular_2D_grid_custom_gpis():
                            gpis.flatten(), shape=lons.shape)
     testfile = tempfile.NamedTemporaryFile().name
     grid_nc.save_grid(testfile, grid)
-    grid_loaded = grid_nc.load_grid(testfile, subset_flag=None)
+    grid_loaded = grid_nc.load_grid(testfile)
     assert grid == grid_loaded
 
 
@@ -203,7 +203,7 @@ def test_store_load_regular_2D_grid():
                            gpis.flatten(), shape=lons.shape)
     testfile = tempfile.NamedTemporaryFile().name
     grid_nc.save_grid(testfile, grid)
-    grid_loaded = grid_nc.load_grid(testfile, subset_flag=None)
+    grid_loaded = grid_nc.load_grid(testfile)
     assert grid == grid_loaded
 
 
