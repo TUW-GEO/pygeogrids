@@ -1103,7 +1103,7 @@ class CellGrid(BasicGrid):
 
         Parameters
         ----------
-        gpis : int, np.ndarray
+        gpis : int or np.ndarray[int]
             Grid point indices.
 
         Returns
@@ -1115,12 +1115,8 @@ class CellGrid(BasicGrid):
         indices = self._gp2idx(gpis)
         subgpis = self.gpis[indices]
 
-        if len(subgpis) == 0:
-            warnings.warn("None of the passed GPIs was found in the grid.")
-            sublons = sublats = subcells = np.array([])
-        else:
-            sublons, sublats = self.gpi2lonlat(gpis)
-            subcells = self.gpi2cell(gpis)
+        sublons, sublats = self.gpi2lonlat(gpis)
+        subcells = self.gpi2cell(gpis)
 
         return CellGrid(sublons, sublats, subcells, subgpis,
                         geodatum=self.geodatum.name)
