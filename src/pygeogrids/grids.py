@@ -272,6 +272,36 @@ class BasicGrid(object):
             )
             self.kdTree._build_kdtree()
 
+    def _gp2idx(self, gps):
+        """
+        Find location of gpis in the current grid array.
+
+        Parameters
+        ----------
+        gpis: np.ndarray[int]
+            Array of grid points
+
+        Returns
+        -------
+        indices: np.ndarray
+            Array of indices
+        """
+        not_avail = ~np.isin(gps, self.gpis)
+        if np.any(not_avail):
+            with np.printoptions(threshold=20, edgeitems=5):
+                raise ValueError("Some of the searched grid points are not "
+                                 f"defined in the grid: {gps[not_avail]}")
+        else:
+            if self.gpidirect:
+                indices = gps
+            else:
+                gpisorted = np.argsort(self.gpis)
+                # find the position where the gpis fit in the sorted array
+                pos = np.searchsorted(self.gpis[gpisorted], gps)
+                indices = gpisorted[pos]
+
+            return indices
+
     def split(self, n):
         """
         Function splits the grid into n parts this changes not function but
@@ -466,39 +496,32 @@ class BasicGrid(object):
 
     def gpi2lonlat(self, gpi):
         """
-        Longitude and latitude for given gpi.
+        Get the longitude and latitude for given GPI(s).
 
         Parameters
         ----------
-        gpi : int32 or iterable
-            Grid point index.
+        gpi : int or np.ndarray[int]
+            Grid point index/indices.
 
         Returns
         -------
-        lon : float
-            Longitude of gpi.
-        lat : float
-            Latitude of gpi
+        lon : float or np.ndarray[float]
+            Longitude of gpi(s)
+        lat : float or np.ndarray[float]
+            Latitude of gpi(s)
         """
+        is_iterable = _element_iterable(gpi)
+
         # check if iterable
-        iterable = _element_iterable(gpi)
+        gpi = np.ravel(gpi)
 
-        gpi = np.atleast_1d(gpi)
-        if self.gpidirect:
-            lons, lats = self.arrlon[gpi], self.arrlat[gpi]
-        else:
-            # get the indices that would sort the gpis
-            gpisorted = np.argsort(self.gpis)
-            # find the position where the gpis fit in the sorted array
-            pos = np.searchsorted(self.gpis[gpisorted], gpi)
-            index = gpisorted[pos]
-            lons, lats = self.arrlon[index], self.arrlat[index]
+        indices = self._gp2idx(gpi)
+        lons, lats = self.arrlon[indices], self.arrlat[indices]
 
-        if not iterable:
-            lons = lons[0]
-            lats = lats[0]
-
-        return lons, lats
+        if not is_iterable:  # in this case we return 2 floats
+            return lons[0], lats[0]
+        else:  # if list was passed, we return arrays
+            return lons, lats
 
     def gpi2rowcol(self, gpi):
         """
@@ -667,7 +690,8 @@ class BasicGrid(object):
         return index
 
     def get_bbox_grid_points(
-        self, latmin=-90, latmax=90, lonmin=-180, lonmax=180, coords=False, both=False
+        self, latmin=-90, latmax=90, lonmin=-180, lonmax=180, coords=False,
+        both=False
     ):
         """
         Returns all grid points located in a submitted geographic box,
@@ -908,14 +932,9 @@ class CellGrid(BasicGrid):
         iterable = _element_iterable(gpi)
 
         gpi = np.atleast_1d(gpi)
-        if self.gpidirect:
-            cell = self.arrcell[gpi]
-        else:
-            if self.gpi_lut is None:
-                self.gpi_lut = np.zeros(self.gpis.max() + 1, dtype=np.int32)
-                self.gpi_lut[self.gpis] = np.arange(self.gpis.size)
 
-            cell = self.arrcell[self.gpi_lut[gpi]]
+        indices = self._gp2idx(gpi)
+        cell = self.arrcell[indices]
 
         if not iterable:
             cell = cell[0]
@@ -1084,7 +1103,7 @@ class CellGrid(BasicGrid):
 
         Parameters
         ----------
-        gpis : int, numpy.ndarray
+        gpis : int, np.ndarray
             Grid point indices.
 
         Returns
@@ -1092,10 +1111,19 @@ class CellGrid(BasicGrid):
         grid : BasicGrid
             Subgrid.
         """
-        sublons, sublats = self.gpi2lonlat(gpis)
-        subcells = self.gpi2cell(gpis)
+        gpis = np.ravel(gpis)
+        indices = self._gp2idx(gpis)
+        subgpis = self.gpis[indices]
 
-        return CellGrid(sublons, sublats, subcells, gpis, geodatum=self.geodatum.name)
+        if len(subgpis) == 0:
+            warnings.warn("None of the passed GPIs was found in the grid.")
+            sublons = sublats = subcells = np.array([])
+        else:
+            sublons, sublats = self.gpi2lonlat(gpis)
+            subcells = self.gpi2cell(gpis)
+
+        return CellGrid(sublons, sublats, subcells, subgpis,
+                        geodatum=self.geodatum.name)
 
     def subgrid_from_cells(self, cells):
         """
