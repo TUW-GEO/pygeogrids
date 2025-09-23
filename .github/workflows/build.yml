@@ -66,6 +66,7 @@ jobs:
           pytest
       - name: Upload Coverage
         shell: bash -l {0}
+        continue-on-error: true
         run: |
           pip install coveralls && coveralls --service=github-actions
         env:
