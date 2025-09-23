@@ -100,24 +100,6 @@ jobs:
         continue-on-error: true
         run: |
           pip3 install --upgrade coveralls
-          
-          # Retry
-          for attempt in 1 2 3; do
-            echo "Submitting to Coveralls (attempt $attempt)..."
-            
-            if coveralls --finish; then
-              echo "Coverage submitted successfully"
-              exit 0
-            fi
-            
-            if [ $attempt -lt 3 ]; then
-              echo "Retrying in $((attempt * 10))s..."
-              sleep $((attempt * 10))
-            fi
-          done
-          
-          echo "Failed to submit coverage after 3 attempts"
-          exit 1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_SERVICE_NAME: github-actions
