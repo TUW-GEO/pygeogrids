@@ -65,7 +65,7 @@ class Test(unittest.TestCase):
                                              subset=self.subset,
                                              shape=(180, 360))
 
-        self.testfile = tempfile.NamedTemporaryFile().name
+        self.testfile = tempfile.NamedTemporaryFile().name + '.nc'
 
     def tearDown(self):
         pass
@@ -141,35 +141,35 @@ class Test(unittest.TestCase):
         grid_nc.save_grid(self.testfile,
                           self.basic)
 
-        loaded_grid = grid_nc.load_grid(self.testfile)
+        loaded_grid = grid_nc.load_grid(self.testfile, subset_flag='subset_flag')
         assert self.basic == loaded_grid
 
     def test_save_load_basicgrid_shape_gpis(self):
         grid_nc.save_grid(self.testfile,
                           self.basic_shape_gpis)
 
-        loaded_grid = grid_nc.load_grid(self.testfile)
+        loaded_grid = grid_nc.load_grid(self.testfile, subset_flag='subset_flag')
         assert self.basic_shape_gpis == loaded_grid
 
     def test_save_load_basicgrid_irregular(self):
         grid_nc.save_grid(self.testfile,
                           self.basic_irregular)
 
-        loaded_grid = grid_nc.load_grid(self.testfile)
+        loaded_grid = grid_nc.load_grid(self.testfile, subset_flag='subset_flag')
         assert self.basic_irregular == loaded_grid
 
     def test_save_load_cellgrid(self):
         grid_nc.save_grid(self.testfile,
                           self.cellgrid)
 
-        loaded_grid = grid_nc.load_grid(self.testfile)
+        loaded_grid = grid_nc.load_grid(self.testfile, subset_flag='subset_flag')
         assert self.cellgrid == loaded_grid
 
     def test_save_load_cellgrid_shape(self):
         grid_nc.save_grid(self.testfile,
                           self.cellgrid_shape)
 
-        loaded_grid = grid_nc.load_grid(self.testfile)
+        loaded_grid = grid_nc.load_grid(self.testfile, subset_flag='subset_flag')
         assert self.cellgrid_shape == loaded_grid
 
 
@@ -243,8 +243,4 @@ def test_sort_lon_lat_for_netcdf():
     nptest.assert_almost_equal(lons_sorted, lons)
     nptest.assert_almost_equal(lats_sorted, lats)
     nptest.assert_almost_equal(gpis_sorted, gpis)
-
-
-if __name__ == "__main__":
-    unittest.main()
 

@@ -244,6 +244,10 @@ class TestCellGridNotGpiDirect(unittest.TestCase):
         cell = self.custom_gpi_cell_grid.gpi2cell(gpi)
         assert cell == 1549
 
+    def test_subgrid_wrong_gpi(self):
+        with pytest.raises(ValueError):
+            self.cellgrid.subgrid_from_gpis([99999999])
+
     def test_subgrid_from_cells(self):
         """
         Test subgrid selection.
@@ -595,6 +599,10 @@ class Test_2Dgrid(unittest.TestCase):
         row, column = self.custom_gpi_grid.gpi2rowcol(gpi)
         assert np.all(row == row_should)
         assert np.all(column == column_should)
+
+    def test_gpi2lonlat_not_in_grid(self):
+        with pytest.raises(ValueError):
+            self.grid.gpi2lonlat(np.array([999999]))
 
     def test_gpi2lonlat(self):
         """
