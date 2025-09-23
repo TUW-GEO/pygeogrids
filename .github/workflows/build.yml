@@ -107,7 +107,8 @@ jobs:
 
   publish:
     name: Upload to PyPI 🚀
-    if: startsWith(github.ref, 'refs/tags/v') && 
+    if: |
+        startsWith(github.ref, 'refs/tags/v') &&
         startsWith(github.repository, 'TUW-GEO')
     needs: build
     runs-on: ubuntu-latest
