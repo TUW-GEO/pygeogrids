@@ -172,12 +172,12 @@ class BasicGrid(object):
         necessary
 
         """
-        lon = np.atleast1d(lon)
-        lat = np.atleast1d(lat)
+        lon = np.atleast_1d(lon)
+        lat = np.atleast_1d(lat)
         if gpis is not None:
-            gpis = np.atleast1d(gpis)
+            gpis = np.atleast_1d(gpis)
         if subset is not None:
-            subset = np.atleast1d(subset)
+            subset = np.atleast_1d(subset)
 
         if lat.shape != lon.shape:
             raise GridDefinitionError("lat and lon np.arrays have to have equal shapes")
