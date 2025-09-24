@@ -172,12 +172,12 @@ class BasicGrid(object):
         necessary
 
         """
-        lon = np.asanyarray(lon)
-        lat = np.asanyarray(lat)
+        lon = np.atleast_1d(lon)
+        lat = np.atleast_1d(lat)
         if gpis is not None:
-            gpis = np.asanyarray(gpis)
+            gpis = np.atleast_1d(gpis)
         if subset is not None:
-            subset = np.asanyarray(subset)
+            subset = np.atleast_1d(subset)
 
         if lat.shape != lon.shape:
             raise GridDefinitionError("lat and lon np.arrays have to have equal shapes")
@@ -877,7 +877,7 @@ class CellGrid(BasicGrid):
         )
 
         self.gpi_lut = None
-        cells = np.asanyarray(cells)
+        cells = np.atleast_1d(cells)
 
         if self.arrlon.shape != cells.shape:
             raise GridDefinitionError(

@@ -4,7 +4,11 @@ Changelog
 
 Unreleased changes in master branch
 ===================================
+
+Version v0.5.3
+==============
 - Subgrid from shapefile now allows to use all features from a .shp file
+- Fix qa4sm single csv file user upload bug
 
 Version v0.5.2
 ==============
