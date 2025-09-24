@@ -877,11 +877,7 @@ class CellGrid(BasicGrid):
         )
 
         self.gpi_lut = None
-        cells = np.atleast1d(cells)
-
-        # Handle scalar case: reshape 0-dimensional array to 1D
-        if cells.ndim == 0:
-            cells = cells.reshape(1)
+        cells = np.atleast_1d(cells)
 
         if self.arrlon.shape != cells.shape:
             raise GridDefinitionError(
