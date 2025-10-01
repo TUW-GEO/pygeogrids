@@ -379,7 +379,7 @@ def save_grid(
 
 def load_grid(
     filename,
-    subset_flag="subset_flag",
+    subset_flag=None,
     subset_value=1,
     location_var_name="gpi",
     **grid_kwargs
@@ -389,13 +389,14 @@ def load_grid(
 
     Parameters
     ----------
-    filename : string
+    filename : str
         filename
-    subset_flag : string, optional (default: 'subset_flag')
-        name of the subset to load.
+    subset_flag : str, optional (default: None)
+        Name of the subset to load. Or None to load the grid without a subset.
+        To load a subset, it must exist as a variable in the netcdf file.
     subset_value : int or list, optional (default: 1)
         Value(s) of the subset variable that points are loaded for.
-    location_var_name: string, optional (default: 'gpi')
+    location_var_name: str, optional (default: 'gpi')
         variable name under which the grid point locations
         are stored
     **grid_kwargs: additional kwargs that are passed to BasicGrid or CellGrid
@@ -434,6 +435,9 @@ def load_grid(
         if shape is None:
             shape = tuple([len(nc_data.variables["lon"][:])])
 
+        avail_subsets = [s for s in list(nc_data.variables.keys()) if s not in
+                         ['crs', 'lat', 'lon', location_var_name]]
+
         # check if grid has regular shape
         if len(shape) == 2:
             lons, lats = np.meshgrid(
@@ -443,23 +447,39 @@ def load_grid(
             lons = lons.flatten()
             lats = lats.flatten()
 
-            if subset_flag in nc_data.variables.keys():
-                subset = np.where(
-                    np.isin(nc_data.variables[subset_flag][:].flatten(), subset_value)
-                )[0]
+            if subset_flag is None:
+                subset = None
+            else:
+                if subset_flag in nc_data.variables.keys():
+                    subset = np.where(
+                        np.isin(nc_data.variables[subset_flag][:].flatten(), subset_value)
+                    )[0]
+                else:
+                    raise ValueError(f"Passed subset `{subset_flag}` is "
+                                     f"not defined in the grid to load. "
+                                     f"Available subsets are: "
+                                     f"{avail_subsets}")
 
         elif len(shape) == 1:
             lons = np.array(nc_data.variables["lon"][:])
             lats = np.array(nc_data.variables["lat"][:])
 
             # determine if it has a subset
-            if subset_flag in nc_data.variables.keys():
-                subset = np.where(
-                    np.isin(
-                        np.array(nc_data.variables[subset_flag][:].flatten()),
-                        subset_value,
-                    )
-                )[0]
+            if subset_flag is None:
+                subset = None
+            else:
+                if subset_flag in nc_data.variables.keys():
+                    subset = np.where(
+                        np.isin(
+                            np.array(nc_data.variables[subset_flag][:].flatten()),
+                            subset_value,
+                        )
+                    )[0]
+                else:
+                    raise ValueError(f"Passed subset `{subset_flag}` is "
+                                     f"not defined in the grid to load. "
+                                     f"Available subsets are: "
+                                     f"{avail_subsets}")
 
         if "crs" in nc_data.variables:
             geodatumName = nc_data.variables["crs"].getncattr("ellipsoid_name")
